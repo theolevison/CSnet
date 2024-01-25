@@ -365,6 +365,7 @@ namespace CSnet
                             uint uiPacketID = GetPacketIdFromArbId((uint)stMessages[lCount - 1].ArbIDOrHeader);
                             uint uiDeviceSource = GetSourceFromArbId((uint)stMessages[lCount - 1].ArbIDOrHeader);
 
+                            MessageBox.Show($"{uiPacketType} {uiPacketID} {uiDeviceSource}");
                             Debug.WriteLine($"{uiPacketType} {uiPacketID} {uiDeviceSource}");
 
                             break;
