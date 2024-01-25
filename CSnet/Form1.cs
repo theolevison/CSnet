@@ -5,6 +5,7 @@ using System.Data;
 using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows.Forms;
 
@@ -365,8 +366,33 @@ namespace CSnet
                             uint uiPacketID = GetPacketIdFromArbId((uint)stMessages[lCount - 1].ArbIDOrHeader);
                             uint uiDeviceSource = GetSourceFromArbId((uint)stMessages[lCount - 1].ArbIDOrHeader);
 
-                            MessageBox.Show($"{uiPacketType} {uiPacketID} {uiDeviceSource}");
                             Debug.WriteLine($"{uiPacketType} {uiPacketID} {uiDeviceSource}");
+
+                            // Combine the wBMS message together
+                            int uiPayloadLength = (stMessages[lCount - 1].NumberBytesHeader << 8) | stMessages[lCount - 1].NumberBytesData;
+                            Debug.WriteLine($"Payload Length: {uiPayloadLength}");
+
+                            if (uiPayloadLength <= 514)
+                            {
+                                // Print out the payload
+                                Debug.Write("Payload: ");
+
+                                // wBMS Packet Payload is located in the ExtraDataPtr
+                                IntPtr ptr = stMessages[lCount - 1].iExtraDataPtr;
+
+                                // Print out the entire payload
+                                for (int uiDataIndex = 0; uiDataIndex < uiPayloadLength; uiDataIndex++)
+                                {
+                                    byte data = Marshal.ReadByte(ptr, uiDataIndex);
+                                    Debug.Write($"{data:X2}\t");
+                                }
+
+                                Debug.WriteLine();
+                            }
+                            else
+                            {
+                                Debug.WriteLine("Payload Length exceeds the Maximum size of 514!");
+                            }
 
                             break;
                         case (int)ePROTOCOL.SPY_PROTOCOL_CAN:
