@@ -296,6 +296,20 @@ namespace CSnet
         {
             return arbId & 0xFF;
         }
+        private const int API_PACKET_TYPE = 0;
+        private const int BMS_PACKET_TYPE = 1;
+        private const int PMS_PACKET_TYPE = 2;
+        private const int EMS_PACKET_TYPE = 3;
+        private const int NETWORK_STATUS_PACKET_TYPE = 4;
+        private const int HEALTH_REPORTS_PACKET_TYPE = 5;
+        private const int SPI_STATS_PACKET_TYPE = 6;
+        private const int WIL_STATS_PACKET_TYPE = 7;
+        private const int EVENT_PACKET_TYPE = 8;
+        private const int MAX_NODES = 64;
+        private const int SOURCE_WIL = 224;
+        private const int SOURCE_HOST = 225;
+        private const int MANAGER_0_ID = 240;
+        private const int MANAGER_1_ID = 241;
 
         private void cmdReceive_Click(object sender, EventArgs e)
         {
@@ -361,12 +375,77 @@ namespace CSnet
 
                             Debug.WriteLine(iNetId);
 
+                            if (iNetId == 532)
+                            {
+                                sListString += "wBMS 01 ";
+                            }
+                            else
+                            {
+                                //This is not a wBMS message
+                                sListString += "Unknown ";                                
+                            }
                             // Grab wBMS specific fields from the ArbIDOrHeader value
                             uint uiPacketType = GetPacketTypeFromArbId((uint)stMessages[lCount - 1].ArbIDOrHeader);
                             uint uiPacketID = GetPacketIdFromArbId((uint)stMessages[lCount - 1].ArbIDOrHeader);
                             uint uiDeviceSource = GetSourceFromArbId((uint)stMessages[lCount - 1].ArbIDOrHeader);
 
-                            Debug.WriteLine($"{uiPacketType} {uiPacketID} {uiDeviceSource}");
+                            Debug.WriteLine($"{uiPacketType} {uiPacketID} {uiDeviceSource} ");
+
+                            if (0 <= uiDeviceSource && uiDeviceSource < MAX_NODES)
+                            {
+                                sListString += $"Node {uiDeviceSource} ";
+                            }
+                            else if (uiDeviceSource == MANAGER_0_ID || uiDeviceSource == MANAGER_1_ID)
+                            {
+                                sListString += $"Manager {uiDeviceSource - MANAGER_0_ID} ";
+                            }
+                            else if (uiDeviceSource == SOURCE_WIL)
+                            {
+                                sListString += "WIL ";
+                            }
+                            else if (uiDeviceSource == SOURCE_HOST)
+                            {
+                                sListString += "HOST ";
+                            }
+                            else
+                            {
+                                sListString += "Unknown ";
+                            }
+
+                            switch (uiPacketType)
+                            {
+                                case API_PACKET_TYPE:
+                                    sListString += "API ";
+                                    break;
+                                case BMS_PACKET_TYPE:
+                                    sListString +="BMS ";
+                                    break;
+                                case PMS_PACKET_TYPE:
+                                    sListString +="PMS ";
+                                    break;
+                                case EMS_PACKET_TYPE:
+                                    sListString +="EMS ";
+                                    break;
+                                case NETWORK_STATUS_PACKET_TYPE:
+                                    sListString += "Network Metadata ";
+                                    break;
+                                case HEALTH_REPORTS_PACKET_TYPE:
+                                    sListString +="Health Report ";
+                                    break;
+                                case SPI_STATS_PACKET_TYPE:
+                                    sListString +="SPI Port Statistics ";
+                                    break;
+                                case WIL_STATS_PACKET_TYPE:
+                                    sListString +="WIL Statistics ";
+                                    break;
+                                case EVENT_PACKET_TYPE:
+                                    sListString +="Event Notification ";
+                                    break;
+                                default:
+                                    sListString += "Unknown ";
+                                    break;
+                            }
+
 
                             // Combine the wBMS message together
                             int uiPayloadLength = (stMessages[lCount - 1].NumberBytesHeader << 8) | stMessages[lCount - 1].NumberBytesData;
@@ -385,9 +464,10 @@ namespace CSnet
                                 {
                                     byte data = Marshal.ReadByte(ptr, uiDataIndex);
                                     Debug.Write($"{data:X2}\t");
+                                    sListString += data;
                                 }
 
-                                Debug.WriteLine();
+                                
                             }
                             else
                             {
