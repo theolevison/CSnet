@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Text;
@@ -352,19 +353,19 @@ namespace CSnet
                     {
                         case (int)ePROTOCOL.SPY_PROTOCOL_WBMS:
                             //this is the only protocol we care about
-                            Console.WriteLine("Protocol: wbms");
+                            Debug.WriteLine("Protocol: wbms");
 
                             //translate data from raw form, to data we can use
                             int iNetId = (stMessages[lCount - 1].NetworkID2 << 8) | stMessages[lCount - 1].NetworkID;
 
-                            Console.WriteLine(iNetId);
+                            Debug.WriteLine(iNetId);
 
                             // Grab wBMS specific fields from the ArbIDOrHeader value
                             uint uiPacketType = GetPacketTypeFromArbId((uint)stMessages[lCount - 1].ArbIDOrHeader);
                             uint uiPacketID = GetPacketIdFromArbId((uint)stMessages[lCount - 1].ArbIDOrHeader);
                             uint uiDeviceSource = GetSourceFromArbId((uint)stMessages[lCount - 1].ArbIDOrHeader);
 
-                            Console.WriteLine($"{uiPacketType} {uiPacketID} {uiDeviceSource}");
+                            Debug.WriteLine($"{uiPacketType} {uiPacketID} {uiDeviceSource}");
 
                             break;
                         case (int)ePROTOCOL.SPY_PROTOCOL_CAN:
