@@ -2452,7 +2452,7 @@ namespace CSnet
             uInstanceSelected = 0;
             uFunctionSelected = ADI_WIL_API_GET_ACL;
 
-            iResult = icsNeoDll.icsneoGenericAPISendCommand(m_hObject, uAPISelected, uInstanceSelected, uFunctionSelected, m_hObject, 0, out uFunctionError);
+            iResult = icsNeoDll.icsneoGenericAPISendCommand(m_hObject, uAPISelected, uInstanceSelected, uFunctionSelected, IntPtr.Zero, 0, out uFunctionError);
 
             if (iResult != 1 && uFunctionError != ADI_WIL_ERR_SUCCESS)
             {
@@ -2501,8 +2501,9 @@ namespace CSnet
                 {
                     Buffer.BlockCopy(pReturnedData, 0, pACL, 0, uNodeCount * ADI_WIL_MAC_SIZE);
                 }
-                System.Runtime.Remoting.Metadata.W3cXsd2001.SoapHexBinary shb = new System.Runtime.Remoting.Metadata.W3cXsd2001.SoapHexBinary(pACL);
-                MessageBox.Show(shb.ToString());
+                //System.Runtime.Remoting.Metadata.W3cXsd2001.SoapHexBinary shb = new System.Runtime.Remoting.Metadata.W3cXsd2001.SoapHexBinary(pACL);
+                //shb.ToString()
+                MessageBox.Show(pACL[0].ToString());
             }
         }
     }
