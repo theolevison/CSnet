@@ -2447,6 +2447,9 @@ namespace CSnet
             byte[] pACL = new byte[ADI_WIL_MAC_SIZE * ADI_WIL_MAX_NODES];
             uint uParametersLength, uReturnedDataLength;
 
+            //test value to see if the acl gets changed
+            pReturnedData[0] = 1;
+
             uCallbackError = 0;
             uAPISelected = 1;
             uInstanceSelected = 0;
@@ -2501,9 +2504,8 @@ namespace CSnet
                 {
                     Buffer.BlockCopy(pReturnedData, 0, pACL, 0, uNodeCount * ADI_WIL_MAC_SIZE);
                 }
-                //System.Runtime.Remoting.Metadata.W3cXsd2001.SoapHexBinary shb = new System.Runtime.Remoting.Metadata.W3cXsd2001.SoapHexBinary(pACL);
-                //shb.ToString()
-                MessageBox.Show(pACL[0].ToString());
+                System.Runtime.Remoting.Metadata.W3cXsd2001.SoapHexBinary shb = new System.Runtime.Remoting.Metadata.W3cXsd2001.SoapHexBinary(pACL);
+                MessageBox.Show(shb.ToString());
             }
         }
     }
