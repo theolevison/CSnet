@@ -2428,7 +2428,7 @@ namespace CSnet
                 return;  // do not read messages if we haven't opened neoVI yet
             }
 
-            /*
+            
             //set mode to active
             //adi_wil_SetMode(m_hObject, 3);
             byte functionError = 0;
@@ -2438,7 +2438,7 @@ namespace CSnet
             parameters[0] = 3; //3 = active mode
 
             icsNeoDll.icsneoGenericAPISendCommand(m_hObject, 1, 0, function, Marshal.UnsafeAddrOfPinnedArrayElement(parameters, 0), 1, out functionError);
-            */
+            
 
             int iResult;
             int iTimeOutCounter = 0;
