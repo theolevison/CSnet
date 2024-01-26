@@ -331,7 +331,14 @@ namespace CSnet
             }
 
             //set mode to active
-            icsNeoDll.adi_wil_SetMode(m_hObject, 3);
+            //adi_wil_SetMode(m_hObject, 3);
+            byte functionError = 0;
+            byte function = 4; // adi_wil_SetMode ADI_WIL_API_SET_MODE = 4;
+            byte[] parameters = new byte[512];
+
+            parameters[0] = 3; //3 = active mode
+
+            icsNeoDll.icsneoGenericAPISendCommand(m_hObject, 1, 0, function, Marshal.UnsafeAddrOfPinnedArrayElement(parameters, 0), 1, out functionError);
 
             // read the messages from the driver
             lResult = icsNeoDll.icsneoGetMessages(m_hObject, ref stMessages[0], ref lNumberOfMessages, ref lNumberOfErrors);
