@@ -330,6 +330,9 @@ namespace CSnet
                 return;  // do not read messages if we haven't opened neoVI yet
             }
 
+            //set mode to active
+            icsNeoDll.adi_wil_SetMode(m_hObject, 3);
+
             // read the messages from the driver
             lResult = icsNeoDll.icsneoGetMessages(m_hObject, ref stMessages[0], ref lNumberOfMessages, ref lNumberOfErrors);
             // was the read successful?
@@ -412,34 +415,57 @@ namespace CSnet
                                 sListString += "Unknown ";
                             }
 
+                            //TODO: need to go into active mode to get useful packets
+                            //WIL_RequestSetMode??//ADI_WIL_API_SET_MODE
+                            //adi_wil_SetMode()
+
+
                             switch (uiPacketType)
                             {
                                 case API_PACKET_TYPE:
                                     sListString += "API ";
+
+                                    //TODO: ignore
                                     break;
                                 case BMS_PACKET_TYPE:
                                     sListString +="BMS ";
+
+                                    //TODO: look in ICS WIL DLL Deliverables\wbmsapitester\wbmsapitester\containers for information on decoding bms payload
                                     break;
                                 case PMS_PACKET_TYPE:
                                     sListString +="PMS ";
+
+                                    //TODO: look in ICS WIL DLL Deliverables\wbmsapitester\wbmsapitester\containers for information on decoding pms payload
                                     break;
                                 case EMS_PACKET_TYPE:
                                     sListString +="EMS ";
+
+                                    //TODO: look in ICS WIL DLL Deliverables\wbmsapitester\wbmsapitester\containers for information on decoding ems payload
                                     break;
                                 case NETWORK_STATUS_PACKET_TYPE:
                                     sListString += "Network Metadata ";
+
+                                    //TODO: decode payload
                                     break;
                                 case HEALTH_REPORTS_PACKET_TYPE:
                                     sListString +="Health Report ";
+
+                                    //TODO: decode payload
                                     break;
                                 case SPI_STATS_PACKET_TYPE:
                                     sListString +="SPI Port Statistics ";
+
+                                    //TODO: decode payload
                                     break;
                                 case WIL_STATS_PACKET_TYPE:
                                     sListString +="WIL Statistics ";
+
+                                    //TODO: decode payload
                                     break;
                                 case EVENT_PACKET_TYPE:
                                     sListString +="Event Notification ";
+
+                                    //TODO: decode payload
                                     break;
                                 default:
                                     sListString += "Unknown ";

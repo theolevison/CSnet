@@ -2654,6 +2654,8 @@ namespace CSnet
         public static extern Int32 icsneoSetRTC(IntPtr hObject, ref icsSpyTime pTime);
         [DllImport("icsneo40.dll")]
         public static extern Int32 icsneoGetGPTPStatus(IntPtr hObject,ref GPTPStatus StatusGPTP);
+        [DllImport("icsneo40.dll")]
+        public static extern Int32 adi_wil_SetMode(IntPtr hObject,int Mode);
 
         public static double icsneoGetTimeStamp(long TimeHardware, long TimeHardware2)
         {
