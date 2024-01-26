@@ -2664,7 +2664,25 @@ namespace CSnet
         uint length,
         out byte functionError
         );
-        //public static extern Int32 adi_wil_SetMode(IntPtr hObject,int Mode);
+        [DllImport("icsneo40.dll")]
+        public static extern int icsneoGenericAPIReadData(
+        IntPtr hObject,
+        byte apiIndex,
+        byte instanceIndex,
+        out byte functionIndex,
+        IntPtr bData,
+        out uint length
+        );
+        [DllImport("icsneo40.dll")]
+        public static extern int icsneoGenericAPIGetStatus(
+            IntPtr hObject,
+            byte apiIndex,
+            byte instanceIndex,
+            out byte functionIndex,
+            out byte callbackError,
+            out byte finishedProcessing
+        );
+        
 
         public static double icsneoGetTimeStamp(long TimeHardware, long TimeHardware2)
         {

@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Security.Cryptography;
 using System.Text;
 using System.Windows.Forms;
 
@@ -2352,6 +2353,156 @@ namespace CSnet
             else
             {
                 cmdSetRTC.Text = "RTC Set";
+            }
+        }
+
+        private const byte ADI_WIL_MAC_SIZE = 8;
+        private const byte ADI_WIL_MAX_NODES = 62;
+                      
+        private const byte ADI_WIL_API_INITIALIZE = 0;
+        private const byte ADI_WIL_API_TERMINATE = 1;
+        private const byte ADI_WIL_API_CONNECT = 2;
+        private const byte ADI_WIL_API_DISCONNECT = 3;
+        private const byte ADI_WIL_API_SET_MODE = 4;
+        private const byte ADI_WIL_API_GET_MODE = 5;
+        private const byte ADI_WIL_API_SET_ACL = 6;
+        private const byte ADI_WIL_API_GET_ACL = 7;
+        private const byte ADI_WIL_API_QUERY_DEVICE = 8;
+        private const byte ADI_WIL_API_GET_NETWORK_STATUS = 9;
+        private const byte ADI_WIL_API_LOAD_FILE = 10;
+        private const byte ADI_WIL_API_ERASE_FILE = 11;
+        private const byte ADI_WIL_API_GET_DEVICE_VERSION = 12;
+        private const byte ADI_WIL_API_GET_FILE_CRC = 13;
+        private const byte ADI_WIL_API_SET_GPIO = 14;
+        private const byte ADI_WIL_API_GET_GPIO = 15;
+        private const byte ADI_WIL_API_SELECT_SCRIPT = 16;
+        private const byte ADI_WIL_API_MODIFY_SCRIPT = 17;
+        private const byte ADI_WIL_API_ENTER_INVENTORY_STATE = 18;
+        private const byte ADI_WIL_API_GET_FILE = 19;
+        private const byte ADI_WIL_API_GET_WIL_SOFTWARE_VERSION = 20;
+        private const byte ADI_WIL_API_PROCESS_TASK = 21;
+        private const byte ADI_WIL_API_SET_CONTEXTUAL_DATA = 22;
+        private const byte ADI_WIL_API_GET_CONTEXTUAL_DATA = 23;
+        private const byte ADI_WIL_API_RESET_DEVICE = 24;
+        private const byte ADI_WIL_API_SET_STATE_OF_HEALTH = 25;
+        private const byte ADI_WIL_API_GET_STATE_OF_HEALTH = 26;
+        private const byte ADI_WIL_API_ENABLE_FAULT_SERVICING = 27;
+        private const byte ADI_WIL_API_ROTATE_KEY = 28;
+        private const byte ADI_WIL_API_SET_CUSTOMER_IDENTIFIER_DATA = 29;
+        private const byte ADI_WIL_API_ENABLE_NETWORK_DATA_CAPTURE = 30;
+        private const byte ADI_WIL_API_UPDATE_MONITOR_PARAMETERS = 31;
+        private const byte ADI_WIL_API_GET_MONITOR_PARAMETERS_CRC = 32;
+        private const byte ADI_WIL_API_ASSESS_NETWORK_TOPOLOGY = 33;
+        private const byte ADI_WIL_API_APPLY_NETWORK_TOPOLOGY = 34;
+        private const byte ADI_WIL_API_CONFIGURE_CELL_BALANCING = 35;
+        private const byte ADI_WIL_API_GET_CELL_BALANCING_STATUS = 36;
+                      
+        private const byte ADI_WIL_ERR_SUCCESS = 0;
+        private const byte ADI_WIL_ERR_FAIL = 1;
+        private const byte ADI_WIL_ERR_API_IN_PROGRESS = 2;
+        private const byte ADI_WIL_ERR_TIMEOUT = 3;
+        private const byte ADI_WIL_ERR_NOT_CONNECTED = 4;
+        private const byte ADI_WIL_ERR_INVALID_PARAMETER = 5;
+        private const byte ADI_WIL_ERR_INVALID_STATE = 6;
+        private const byte ADI_WIL_ERR_NOT_SUPPORTED = 7;
+        private const byte ADI_WIL_ERR_EXTERNAL = 8;
+        private const byte ADI_WIL_ERR_INVALID_MODE = 9;
+        private const byte ADI_WIL_ERR_IN_PROGRESS = 10;
+        private const byte ADI_WIL_ERR_CONFIGURATION_MISMATCH = 11;
+        private const byte ADI_WIL_ERR_CRC = 12;
+        private const byte ADI_WIL_ERR_FILE_REJECTED = 13;
+        private const byte ADI_WIL_ERR_PARTIAL_SUCCESS = 14;
+                      
+        private const byte ADI_WIL_MODE_STANDBY = 1;
+        private const byte ADI_WIL_MODE_COMMISSIONING = 2;
+        private const byte ADI_WIL_MODE_ACTIVE = 3;
+        private const byte ADI_WIL_MODE_MONITORING = 4;
+        private const byte ADI_WIL_MODE_OTAP = 5;
+        private const byte ADI_WIL_MODE_SLEEP = 6;
+
+        private void getACL_Click(object sender, EventArgs e)
+        {
+            if (m_bPortOpen == false)
+            {
+                MessageBox.Show("neoVI not opened");
+                return;  // do not read messages if we haven't opened neoVI yet
+            }
+
+            /*
+            //set mode to active
+            //adi_wil_SetMode(m_hObject, 3);
+            byte functionError = 0;
+            byte function = 4; // adi_wil_SetMode ADI_WIL_API_SET_MODE = 4;
+            byte[] parameters = new byte[512];
+
+            parameters[0] = 3; //3 = active mode
+
+            icsNeoDll.icsneoGenericAPISendCommand(m_hObject, 1, 0, function, Marshal.UnsafeAddrOfPinnedArrayElement(parameters, 0), 1, out functionError);
+            */
+
+            int iResult;
+            int iTimeOutCounter = 0;
+            byte uAPISelected, uInstanceSelected, uFunctionSelected, uFunctionError, uCallbackError, uCurrentFunction, uFinishedProcessing, uNodeCount;
+            byte[] pReturnedData = new byte[513];
+            byte[] pACL = new byte[ADI_WIL_MAC_SIZE * ADI_WIL_MAX_NODES];
+            uint uParametersLength, uReturnedDataLength;
+
+            uCallbackError = 0;
+            uAPISelected = 1;
+            uInstanceSelected = 0;
+            uFunctionSelected = ADI_WIL_API_GET_ACL;
+
+            iResult = icsNeoDll.icsneoGenericAPISendCommand(m_hObject, uAPISelected, uInstanceSelected, uFunctionSelected, m_hObject, 0, out uFunctionError);
+
+            if (iResult != 1 && uFunctionError != ADI_WIL_ERR_SUCCESS)
+            {
+                // Handle Error Here
+                return;
+            }
+
+            while (iTimeOutCounter < 10)
+            {
+                iResult = icsNeoDll.icsneoGenericAPIGetStatus(m_hObject, uAPISelected, uInstanceSelected, out uCurrentFunction, out uCallbackError, out uFinishedProcessing);
+
+                if (uCurrentFunction != uFunctionSelected || iResult != 1)
+                {
+                    // Handle Error Here
+                    return;
+                }
+
+                if (uFinishedProcessing == 1)
+                {
+                    break;
+                }
+
+                System.Threading.Thread.Sleep(10);
+                iTimeOutCounter++;
+            }
+
+            if (uCallbackError != ADI_WIL_ERR_SUCCESS || iTimeOutCounter > 10)
+            {
+                // Handle Error Here
+                return;
+            }
+
+            iResult = icsNeoDll.icsneoGenericAPIReadData(m_hObject, uAPISelected, uInstanceSelected, out uCurrentFunction, Marshal.UnsafeAddrOfPinnedArrayElement(pReturnedData, 0), out uReturnedDataLength);
+
+            if (uCurrentFunction != uFunctionSelected || iResult != 1)
+            {
+                // Handle Error Here
+                return;
+            }
+
+            if (uReturnedDataLength > 0)
+            {
+                uNodeCount = pReturnedData[512];
+
+                if (ADI_WIL_MAX_NODES >= uNodeCount && uNodeCount >= 0)
+                {
+                    Buffer.BlockCopy(pReturnedData, 0, pACL, 0, uNodeCount * ADI_WIL_MAC_SIZE);
+                }
+                System.Runtime.Remoting.Metadata.W3cXsd2001.SoapHexBinary shb = new System.Runtime.Remoting.Metadata.W3cXsd2001.SoapHexBinary(pACL);
+                MessageBox.Show(shb.ToString());
             }
         }
     }
