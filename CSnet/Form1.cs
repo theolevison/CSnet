@@ -2464,6 +2464,7 @@ namespace CSnet
             if (iResult != 1 && uFunctionError != ADI_WIL_ERR_SUCCESS)
             {
                 // Handle Error Here
+                MessageBox.Show($"Send error {iResult}");
                 return;
             }
 
@@ -2471,9 +2472,10 @@ namespace CSnet
             {
                 iResult = icsNeoDll.icsneoGenericAPIGetStatus(m_hObject, uAPISelected, uInstanceSelected, out uCurrentFunction, out uCallbackError, out uFinishedProcessing);
 
-                if (uCurrentFunction != uFunctionSelected || iResult != 1)
+                if (uCurrentFunction != uFunctionSelected || iResult != 1) //1 is success
                 {
                     // Handle Error Here
+                    MessageBox.Show($"Error {iResult}");
                     return;
                 }
 
@@ -2489,18 +2491,18 @@ namespace CSnet
             if (uCallbackError != ADI_WIL_ERR_SUCCESS || iTimeOutCounter > 10)
             {
                 // Handle Error Here
+                MessageBox.Show($"Status error {iResult}");
                 return;
             }
 
             iResult = icsNeoDll.icsneoGenericAPIReadData(m_hObject, uAPISelected, uInstanceSelected, out uCurrentFunction, Marshal.UnsafeAddrOfPinnedArrayElement(pReturnedData, 0), out uReturnedDataLength);
 
-            if (uCurrentFunction != uFunctionSelected || iResult != 1)
+            if (uCurrentFunction != uFunctionSelected || iResult != 1) //1 is success
             {
                 // Handle Error Here
+                MessageBox.Show($"Read error {iResult}");
                 return;
-            }
-
-            MessageBox.Show(iResult.ToString());
+            }            
 
             if (uReturnedDataLength > 0)
             {
