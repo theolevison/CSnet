@@ -2501,9 +2501,9 @@ namespace CSnet
             uint uParametersLength, uReturnedDataLength;
 
             //test value to see if the acl gets changed
-            pReturnedData[0] = 1;
+            //pReturnedData[0] = 1;
 
-            MessageBox.Show(BitConverter.ToString(pReturnedData));
+            //MessageBox.Show(BitConverter.ToString(pReturnedData));
             MessageBox.Show(BitConverter.ToString(pACL));
 
             uAPISelected = 1;
@@ -2541,7 +2541,7 @@ namespace CSnet
                 {
                     Buffer.BlockCopy(pReturnedData, 0, pACL, 0, uNodeCount * ADI_WIL_MAC_SIZE);
                 }
-                MessageBox.Show(BitConverter.ToString(pReturnedData));
+                //MessageBox.Show(BitConverter.ToString(pReturnedData));
                 MessageBox.Show(BitConverter.ToString(pACL));
             }
         }
