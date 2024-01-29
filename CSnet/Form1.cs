@@ -2442,6 +2442,7 @@ namespace CSnet
             if (iResult != 1 && uFunctionError != ADI_WIL_ERR_SUCCESS)
             {
                 // Handle Error Here
+                MessageBox.Show($"Command error {uFunctionError}");
                 return;
             }
 
@@ -2452,6 +2453,7 @@ namespace CSnet
                 if (uCurrentFunction != uFunctionSelected || iResult != 1)
                 {
                     // Handle Error Here
+                    MessageBox.Show($"Status error {uFunctionError}");
                     return;
                 }
 
@@ -2467,6 +2469,7 @@ namespace CSnet
             if (uCallbackError != ADI_WIL_ERR_SUCCESS || iTimeOutCounter > 10)
             {
                 // Handle Error Here
+                MessageBox.Show($"Timeout/callback error {uCallbackError}");
                 return;
             }
         }
