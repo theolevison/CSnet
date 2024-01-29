@@ -2492,17 +2492,6 @@ namespace CSnet
             }
 
             //get ACL is available in all system modes
-            /*
-            //set mode to active
-            //adi_wil_SetMode(m_hObject, 3);
-            byte functionError = 0;
-            byte function = 4; // adi_wil_SetMode ADI_WIL_API_SET_MODE = 4;
-            byte[] parameters = new byte[512];
-
-            parameters[0] = 3; //3 = active mode
-
-            icsNeoDll.icsneoGenericAPISendCommand(m_hObject, 1, 0, function, Marshal.UnsafeAddrOfPinnedArrayElement(parameters, 0), 1, out functionError);
-            */
 
             int iResult;
 
@@ -2514,8 +2503,8 @@ namespace CSnet
             //test value to see if the acl gets changed
             pReturnedData[0] = 1;
 
-            System.Runtime.Remoting.Metadata.W3cXsd2001.SoapHexBinary shb = new System.Runtime.Remoting.Metadata.W3cXsd2001.SoapHexBinary(pReturnedData);
-            MessageBox.Show(shb.ToString());
+            MessageBox.Show(BitConverter.ToString(pReturnedData));
+            MessageBox.Show(BitConverter.ToString(pACL));
 
             uAPISelected = 1;
             uInstanceSelected = 0;
@@ -2526,7 +2515,7 @@ namespace CSnet
             if (iResult != 1 && uFunctionError != ADI_WIL_ERR_SUCCESS)
             {
                 // Handle Error Here
-                MessageBox.Show($"Send error {iResult}");
+                MessageBox.Show($"Send error {iResult} {uFunctionError}");
                 return;
             }
 
@@ -2552,8 +2541,8 @@ namespace CSnet
                 {
                     Buffer.BlockCopy(pReturnedData, 0, pACL, 0, uNodeCount * ADI_WIL_MAC_SIZE);
                 }
-                shb = new System.Runtime.Remoting.Metadata.W3cXsd2001.SoapHexBinary(pACL);
-                MessageBox.Show(shb.ToString());
+                MessageBox.Show(BitConverter.ToString(pReturnedData));
+                MessageBox.Show(BitConverter.ToString(pACL));
             }
         }
 
