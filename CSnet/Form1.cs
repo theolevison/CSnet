@@ -2425,7 +2425,7 @@ namespace CSnet
         {
             int iResult;
             int iTimeOutCounter = 0;
-            byte uAPISelected, uInstanceSelected, uFunctionSelected, uFunctionError, uCallbackError = 1, uCurrentFunction, uFinsihedProcessing;
+            byte uAPISelected, uInstanceSelected, uFunctionSelected, uFunctionError, uCallbackError = 1, uCurrentFunction, uFinishedProcessing;
             byte[] pParameters = new byte[512];
             uint uTotalLength;
             uAPISelected = 1;
@@ -2448,7 +2448,7 @@ namespace CSnet
 
             while (iTimeOutCounter < 10)
             {
-                iResult = icsNeoDll.icsneoGenericAPIGetStatus(m_hObject, uAPISelected, uInstanceSelected, out uCurrentFunction, out uCallbackError, out uFinsihedProcessing);
+                iResult = icsNeoDll.icsneoGenericAPIGetStatus(m_hObject, uAPISelected, uInstanceSelected, out uCurrentFunction, out uCallbackError, out uFinishedProcessing);
 
                 if (uCurrentFunction != uFunctionSelected || iResult != 1)
                 {
@@ -2457,7 +2457,7 @@ namespace CSnet
                     return;
                 }
 
-                if (uFinsihedProcessing == 1)
+                if (uFinishedProcessing == 1)
                 {
                     break;
                 }
@@ -2472,6 +2472,8 @@ namespace CSnet
                 MessageBox.Show($"Timeout/callback error {uCallbackError}");
                 return;
             }
+
+            MessageBox.Show("Apparently finished succesfully");
         }
 
         private void getACL_Click(object sender, EventArgs e)
