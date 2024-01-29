@@ -8,6 +8,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Text;
+using System.Threading;
 using System.Windows.Forms;
 
 namespace CSnet
@@ -2420,6 +2421,56 @@ namespace CSnet
         private const byte ADI_WIL_MODE_OTAP = 5;
         private const byte ADI_WIL_MODE_SLEEP = 6;
 
+        private void setACL_Click(object sender, EventArgs e)
+        {
+            int iResult;
+            int iTimeOutCounter = 0;
+            byte uAPISelected, uInstanceSelected, uFunctionSelected, uFunctionError, uCallbackError = 1, uCurrentFunction, uFinsihedProcessing;
+            byte[] pParameters = new byte[512];
+            uint uTotalLength;
+            uAPISelected = 1;
+            uInstanceSelected = 0;
+            uFunctionSelected = ADI_WIL_API_SET_ACL;
+            byte uNodeCount = 1;
+            byte[] pACLArray = { 0x64, 0xF9, 0xC0, 0x00, 0x00, 0x00, 0x00, 0x00};
+            pParameters[0] = uNodeCount;
+            Buffer.BlockCopy(pACLArray, 0, pParameters, 1, pACLArray.Length);
+            uTotalLength = (uint)(1 + pACLArray.Length);
+            
+            iResult = icsNeoDll.icsneoGenericAPISendCommand(m_hObject, uAPISelected, uInstanceSelected, uFunctionSelected, Marshal.UnsafeAddrOfPinnedArrayElement(pParameters, 0), uTotalLength, out uFunctionError);
+
+            if (iResult != 1 && uFunctionError != ADI_WIL_ERR_SUCCESS)
+            {
+                // Handle Error Here
+                return;
+            }
+
+            while (iTimeOutCounter < 10)
+            {
+                iResult = icsNeoDll.icsneoGenericAPIGetStatus(m_hObject, uAPISelected, uInstanceSelected, out uCurrentFunction, out uCallbackError, out uFinsihedProcessing);
+
+                if (uCurrentFunction != uFunctionSelected || iResult != 1)
+                {
+                    // Handle Error Here
+                    return;
+                }
+
+                if (uFinsihedProcessing == 1)
+                {
+                    break;
+                }
+
+                Thread.Sleep(100);
+                iTimeOutCounter++;
+            }
+
+            if (uCallbackError != ADI_WIL_ERR_SUCCESS || iTimeOutCounter > 10)
+            {
+                // Handle Error Here
+                return;
+            }
+        }
+
         private void getACL_Click(object sender, EventArgs e)
         {
             if (m_bPortOpen == false)
@@ -2442,8 +2493,8 @@ namespace CSnet
             */
 
             int iResult;
-            int iTimeOutCounter = 0;
-            byte uAPISelected, uInstanceSelected, uFunctionSelected, uFunctionError, uCallbackError, uCurrentFunction, uFinishedProcessing, uNodeCount;
+            
+            byte uAPISelected, uInstanceSelected, uFunctionSelected, uFunctionError, uCurrentFunction, uNodeCount;
             byte[] pReturnedData = new byte[513];
             byte[] pACL = new byte[ADI_WIL_MAC_SIZE * ADI_WIL_MAX_NODES];
             uint uParametersLength, uReturnedDataLength;
@@ -2454,7 +2505,6 @@ namespace CSnet
             System.Runtime.Remoting.Metadata.W3cXsd2001.SoapHexBinary shb = new System.Runtime.Remoting.Metadata.W3cXsd2001.SoapHexBinary(pReturnedData);
             MessageBox.Show(shb.ToString());
 
-            uCallbackError = 0;
             uAPISelected = 1;
             uInstanceSelected = 0;
             uFunctionSelected = ADI_WIL_API_GET_ACL;
@@ -2468,32 +2518,7 @@ namespace CSnet
                 return;
             }
 
-            while (iTimeOutCounter < 10)
-            {
-                iResult = icsNeoDll.icsneoGenericAPIGetStatus(m_hObject, uAPISelected, uInstanceSelected, out uCurrentFunction, out uCallbackError, out uFinishedProcessing);
-
-                if (uCurrentFunction != uFunctionSelected || iResult != 1) //1 is success
-                {
-                    // Handle Error Here
-                    MessageBox.Show($"Error {iResult}");
-                    return;
-                }
-
-                if (uFinishedProcessing == 1)
-                {
-                    break;
-                }
-
-                System.Threading.Thread.Sleep(10);
-                iTimeOutCounter++;
-            }
-
-            if (uCallbackError != ADI_WIL_ERR_SUCCESS || iTimeOutCounter > 10)
-            {
-                // Handle Error Here
-                MessageBox.Show($"Status error {iResult}");
-                return;
-            }
+            checkStatus(uAPISelected, uInstanceSelected, uFunctionSelected);
 
             iResult = icsNeoDll.icsneoGenericAPIReadData(m_hObject, uAPISelected, uInstanceSelected, out uCurrentFunction, Marshal.UnsafeAddrOfPinnedArrayElement(pReturnedData, 0), out uReturnedDataLength);
 
@@ -2514,6 +2539,42 @@ namespace CSnet
                 }
                 shb = new System.Runtime.Remoting.Metadata.W3cXsd2001.SoapHexBinary(pACL);
                 MessageBox.Show(shb.ToString());
+            }
+        }
+
+        private bool checkStatus(byte uAPISelected, byte uInstanceSelected, byte uFunctionSelected)
+        {
+            int iTimeOutCounter = 0;
+
+            byte uCallbackError = 1, uFinishedProcessing, uCurrentFunction;
+
+            while (iTimeOutCounter < 10)
+            {
+                int iResult = icsNeoDll.icsneoGenericAPIGetStatus(m_hObject, uAPISelected, uInstanceSelected, out uCurrentFunction, out uCallbackError, out uFinishedProcessing);
+
+                if (uCurrentFunction != uFunctionSelected || iResult != 1) //1 is success
+                {
+                    // Handle Error Here
+                    MessageBox.Show($"Error {iResult}");
+                    return false;
+                }
+
+                if (uFinishedProcessing == 1)
+                {
+                    break;
+                }
+
+                System.Threading.Thread.Sleep(10);
+                iTimeOutCounter++;
+            }
+
+            if (uCallbackError != ADI_WIL_ERR_SUCCESS || iTimeOutCounter > 10)
+            {
+                // Handle Error Here
+                return false;
+            } else
+            {
+                return true;
             }
         }
     }

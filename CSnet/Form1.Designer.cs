@@ -165,6 +165,8 @@
             this.cmdCloseDevice = new System.Windows.Forms.Button();
             this.tpTxRX = new System.Windows.Forms.TabPage();
             this.GroupBox4 = new System.Windows.Forms.GroupBox();
+            this.setACL = new System.Windows.Forms.Button();
+            this.getACL = new System.Windows.Forms.Button();
             this.lblWaitForRxMessageWithTimeOutResult = new System.Windows.Forms.Label();
             this.cmdWaitForMessageWithTimeOut = new System.Windows.Forms.Button();
             this.chkAutoRead = new System.Windows.Forms.CheckBox();
@@ -202,7 +204,6 @@
             this.chkDoIPState = new System.Windows.Forms.CheckBox();
             this.cmdSetDoIPState = new System.Windows.Forms.Button();
             this.tabPage5 = new System.Windows.Forms.TabPage();
-            this.getACL = new System.Windows.Forms.Button();
             this.TabControl2.SuspendLayout();
             this.TabPage1.SuspendLayout();
             this.GroupBox2.SuspendLayout();
@@ -246,7 +247,7 @@
             this.TabControl2.Controls.Add(this.tabPage6);
             this.TabControl2.Controls.Add(this.tabPage7);
             this.TabControl2.Location = new System.Drawing.Point(5, 6);
-            this.TabControl2.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.TabControl2.Margin = new System.Windows.Forms.Padding(4);
             this.TabControl2.Multiline = true;
             this.TabControl2.Name = "TabControl2";
             this.TabControl2.SelectedIndex = 0;
@@ -257,9 +258,9 @@
             // 
             this.TabPage1.Controls.Add(this.GroupBox2);
             this.TabPage1.Location = new System.Drawing.Point(46, 4);
-            this.TabPage1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.TabPage1.Margin = new System.Windows.Forms.Padding(4);
             this.TabPage1.Name = "TabPage1";
-            this.TabPage1.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.TabPage1.Padding = new System.Windows.Forms.Padding(4);
             this.TabPage1.Size = new System.Drawing.Size(1178, 260);
             this.TabPage1.TabIndex = 0;
             this.TabPage1.Text = "CAN";
@@ -285,9 +286,9 @@
             this.GroupBox2.Controls.Add(this.txtDataByte1);
             this.GroupBox2.Controls.Add(this.Label2);
             this.GroupBox2.Location = new System.Drawing.Point(8, 7);
-            this.GroupBox2.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.GroupBox2.Margin = new System.Windows.Forms.Padding(4);
             this.GroupBox2.Name = "GroupBox2";
-            this.GroupBox2.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.GroupBox2.Padding = new System.Windows.Forms.Padding(4);
             this.GroupBox2.Size = new System.Drawing.Size(1156, 244);
             this.GroupBox2.TabIndex = 46;
             this.GroupBox2.TabStop = false;
@@ -296,7 +297,7 @@
             // chkExtendedID
             // 
             this.chkExtendedID.Location = new System.Drawing.Point(81, 27);
-            this.chkExtendedID.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.chkExtendedID.Margin = new System.Windows.Forms.Padding(4);
             this.chkExtendedID.Name = "chkExtendedID";
             this.chkExtendedID.Size = new System.Drawing.Size(213, 20);
             this.chkExtendedID.TabIndex = 26;
@@ -316,7 +317,7 @@
             "7",
             "8"});
             this.lstNumberOfBytes.Location = new System.Drawing.Point(117, 90);
-            this.lstNumberOfBytes.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.lstNumberOfBytes.Margin = new System.Windows.Forms.Padding(4);
             this.lstNumberOfBytes.Name = "lstNumberOfBytes";
             this.lstNumberOfBytes.Size = new System.Drawing.Size(63, 24);
             this.lstNumberOfBytes.TabIndex = 17;
@@ -334,7 +335,7 @@
             // 
             this.lstNetwork.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.lstNetwork.Location = new System.Drawing.Point(273, 86);
-            this.lstNetwork.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.lstNetwork.Margin = new System.Windows.Forms.Padding(4);
             this.lstNetwork.Name = "lstNetwork";
             this.lstNetwork.Size = new System.Drawing.Size(137, 24);
             this.lstNetwork.TabIndex = 20;
@@ -351,7 +352,7 @@
             // txtDataByte2
             // 
             this.txtDataByte2.Location = new System.Drawing.Point(248, 54);
-            this.txtDataByte2.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.txtDataByte2.Margin = new System.Windows.Forms.Padding(4);
             this.txtDataByte2.Name = "txtDataByte2";
             this.txtDataByte2.Size = new System.Drawing.Size(41, 22);
             this.txtDataByte2.TabIndex = 7;
@@ -360,7 +361,7 @@
             // cmdTransmit
             // 
             this.cmdTransmit.Location = new System.Drawing.Point(24, 138);
-            this.cmdTransmit.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.cmdTransmit.Margin = new System.Windows.Forms.Padding(4);
             this.cmdTransmit.Name = "cmdTransmit";
             this.cmdTransmit.Size = new System.Drawing.Size(523, 57);
             this.cmdTransmit.TabIndex = 18;
@@ -370,7 +371,7 @@
             // txtDataByte3
             // 
             this.txtDataByte3.Location = new System.Drawing.Point(291, 54);
-            this.txtDataByte3.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.txtDataByte3.Margin = new System.Windows.Forms.Padding(4);
             this.txtDataByte3.Name = "txtDataByte3";
             this.txtDataByte3.Size = new System.Drawing.Size(41, 22);
             this.txtDataByte3.TabIndex = 8;
@@ -389,7 +390,7 @@
             // txtDataByte4
             // 
             this.txtDataByte4.Location = new System.Drawing.Point(333, 54);
-            this.txtDataByte4.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.txtDataByte4.Margin = new System.Windows.Forms.Padding(4);
             this.txtDataByte4.Name = "txtDataByte4";
             this.txtDataByte4.Size = new System.Drawing.Size(41, 22);
             this.txtDataByte4.TabIndex = 9;
@@ -398,7 +399,7 @@
             // txtDataByte5
             // 
             this.txtDataByte5.Location = new System.Drawing.Point(376, 54);
-            this.txtDataByte5.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.txtDataByte5.Margin = new System.Windows.Forms.Padding(4);
             this.txtDataByte5.Name = "txtDataByte5";
             this.txtDataByte5.Size = new System.Drawing.Size(41, 22);
             this.txtDataByte5.TabIndex = 10;
@@ -407,7 +408,7 @@
             // txtDataByte6
             // 
             this.txtDataByte6.Location = new System.Drawing.Point(419, 54);
-            this.txtDataByte6.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.txtDataByte6.Margin = new System.Windows.Forms.Padding(4);
             this.txtDataByte6.Name = "txtDataByte6";
             this.txtDataByte6.Size = new System.Drawing.Size(41, 22);
             this.txtDataByte6.TabIndex = 11;
@@ -416,7 +417,7 @@
             // txtDataByte7
             // 
             this.txtDataByte7.Location = new System.Drawing.Point(461, 54);
-            this.txtDataByte7.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.txtDataByte7.Margin = new System.Windows.Forms.Padding(4);
             this.txtDataByte7.Name = "txtDataByte7";
             this.txtDataByte7.Size = new System.Drawing.Size(41, 22);
             this.txtDataByte7.TabIndex = 12;
@@ -425,7 +426,7 @@
             // txtArbID
             // 
             this.txtArbID.Location = new System.Drawing.Point(81, 53);
-            this.txtArbID.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.txtArbID.Margin = new System.Windows.Forms.Padding(4);
             this.txtArbID.Name = "txtArbID";
             this.txtArbID.Size = new System.Drawing.Size(99, 22);
             this.txtArbID.TabIndex = 5;
@@ -434,7 +435,7 @@
             // txtDataByte8
             // 
             this.txtDataByte8.Location = new System.Drawing.Point(504, 54);
-            this.txtDataByte8.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.txtDataByte8.Margin = new System.Windows.Forms.Padding(4);
             this.txtDataByte8.Name = "txtDataByte8";
             this.txtDataByte8.Size = new System.Drawing.Size(41, 22);
             this.txtDataByte8.TabIndex = 13;
@@ -443,7 +444,7 @@
             // txtDataByte1
             // 
             this.txtDataByte1.Location = new System.Drawing.Point(205, 54);
-            this.txtDataByte1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.txtDataByte1.Margin = new System.Windows.Forms.Padding(4);
             this.txtDataByte1.Name = "txtDataByte1";
             this.txtDataByte1.Size = new System.Drawing.Size(41, 22);
             this.txtDataByte1.TabIndex = 6;
@@ -462,9 +463,9 @@
             // 
             this.TabPage2.Controls.Add(this.GroupBox3);
             this.TabPage2.Location = new System.Drawing.Point(46, 4);
-            this.TabPage2.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.TabPage2.Margin = new System.Windows.Forms.Padding(4);
             this.TabPage2.Name = "TabPage2";
-            this.TabPage2.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.TabPage2.Padding = new System.Windows.Forms.Padding(4);
             this.TabPage2.Size = new System.Drawing.Size(1178, 260);
             this.TabPage2.TabIndex = 1;
             this.TabPage2.Text = "LIN";
@@ -483,9 +484,9 @@
             this.GroupBox3.Controls.Add(this.cmdLINTransmit);
             this.GroupBox3.Controls.Add(this.LabelLIN4);
             this.GroupBox3.Location = new System.Drawing.Point(8, 7);
-            this.GroupBox3.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.GroupBox3.Margin = new System.Windows.Forms.Padding(4);
             this.GroupBox3.Name = "GroupBox3";
-            this.GroupBox3.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.GroupBox3.Padding = new System.Windows.Forms.Padding(4);
             this.GroupBox3.Size = new System.Drawing.Size(715, 178);
             this.GroupBox3.TabIndex = 45;
             this.GroupBox3.TabStop = false;
@@ -504,7 +505,7 @@
             // 
             this.lstLINNetwork.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.lstLINNetwork.Location = new System.Drawing.Point(533, 10);
-            this.lstLINNetwork.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.lstLINNetwork.Margin = new System.Windows.Forms.Padding(4);
             this.lstLINNetwork.Name = "lstLINNetwork";
             this.lstLINNetwork.Size = new System.Drawing.Size(116, 24);
             this.lstLINNetwork.TabIndex = 28;
@@ -513,7 +514,7 @@
             // 
             this.chkEnhancedChecksum.AutoSize = true;
             this.chkEnhancedChecksum.Location = new System.Drawing.Point(11, 144);
-            this.chkEnhancedChecksum.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.chkEnhancedChecksum.Margin = new System.Windows.Forms.Padding(4);
             this.chkEnhancedChecksum.Name = "chkEnhancedChecksum";
             this.chkEnhancedChecksum.Size = new System.Drawing.Size(184, 20);
             this.chkEnhancedChecksum.TabIndex = 27;
@@ -532,7 +533,7 @@
             this.pnlDataP2.Controls.Add(this.txtLINDataByte4);
             this.pnlDataP2.Controls.Add(this.txtLINDataByte8);
             this.pnlDataP2.Location = new System.Drawing.Point(329, 43);
-            this.pnlDataP2.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.pnlDataP2.Margin = new System.Windows.Forms.Padding(4);
             this.pnlDataP2.Name = "pnlDataP2";
             this.pnlDataP2.Size = new System.Drawing.Size(321, 91);
             this.pnlDataP2.TabIndex = 26;
@@ -549,7 +550,7 @@
             // txtLINDataByte3
             // 
             this.txtLINDataByte3.Location = new System.Drawing.Point(7, 37);
-            this.txtLINDataByte3.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.txtLINDataByte3.Margin = new System.Windows.Forms.Padding(4);
             this.txtLINDataByte3.Name = "txtLINDataByte3";
             this.txtLINDataByte3.Size = new System.Drawing.Size(41, 22);
             this.txtLINDataByte3.TabIndex = 9;
@@ -558,7 +559,7 @@
             // txtLINDataByte7
             // 
             this.txtLINDataByte7.Location = new System.Drawing.Point(179, 37);
-            this.txtLINDataByte7.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.txtLINDataByte7.Margin = new System.Windows.Forms.Padding(4);
             this.txtLINDataByte7.Name = "txtLINDataByte7";
             this.txtLINDataByte7.Size = new System.Drawing.Size(41, 22);
             this.txtLINDataByte7.TabIndex = 13;
@@ -567,7 +568,7 @@
             // txtLINDataByte6
             // 
             this.txtLINDataByte6.Location = new System.Drawing.Point(136, 37);
-            this.txtLINDataByte6.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.txtLINDataByte6.Margin = new System.Windows.Forms.Padding(4);
             this.txtLINDataByte6.Name = "txtLINDataByte6";
             this.txtLINDataByte6.Size = new System.Drawing.Size(41, 22);
             this.txtLINDataByte6.TabIndex = 12;
@@ -576,7 +577,7 @@
             // txtLINDataByte5
             // 
             this.txtLINDataByte5.Location = new System.Drawing.Point(93, 37);
-            this.txtLINDataByte5.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.txtLINDataByte5.Margin = new System.Windows.Forms.Padding(4);
             this.txtLINDataByte5.Name = "txtLINDataByte5";
             this.txtLINDataByte5.Size = new System.Drawing.Size(41, 22);
             this.txtLINDataByte5.TabIndex = 11;
@@ -594,7 +595,7 @@
             // txtLINDataByte4
             // 
             this.txtLINDataByte4.Location = new System.Drawing.Point(51, 37);
-            this.txtLINDataByte4.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.txtLINDataByte4.Margin = new System.Windows.Forms.Padding(4);
             this.txtLINDataByte4.Name = "txtLINDataByte4";
             this.txtLINDataByte4.Size = new System.Drawing.Size(41, 22);
             this.txtLINDataByte4.TabIndex = 10;
@@ -603,7 +604,7 @@
             // txtLINDataByte8
             // 
             this.txtLINDataByte8.Location = new System.Drawing.Point(221, 37);
-            this.txtLINDataByte8.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.txtLINDataByte8.Margin = new System.Windows.Forms.Padding(4);
             this.txtLINDataByte8.Name = "txtLINDataByte8";
             this.txtLINDataByte8.Size = new System.Drawing.Size(41, 22);
             this.txtLINDataByte8.TabIndex = 14;
@@ -619,7 +620,7 @@
             this.pnlIdData.Controls.Add(this.txtLINDataByteProtectedID);
             this.pnlIdData.Controls.Add(this.txtLINDataByte1);
             this.pnlIdData.Location = new System.Drawing.Point(88, 43);
-            this.pnlIdData.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.pnlIdData.Margin = new System.Windows.Forms.Padding(4);
             this.pnlIdData.Name = "pnlIdData";
             this.pnlIdData.Size = new System.Drawing.Size(240, 91);
             this.pnlIdData.TabIndex = 25;
@@ -632,7 +633,7 @@
             "Standard ID",
             "Protected ID"});
             this.cboIDType.Location = new System.Drawing.Point(3, 9);
-            this.cboIDType.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.cboIDType.Margin = new System.Windows.Forms.Padding(4);
             this.cboIDType.Name = "cboIDType";
             this.cboIDType.Size = new System.Drawing.Size(119, 24);
             this.cboIDType.TabIndex = 27;
@@ -658,7 +659,7 @@
             // txtLINDataByte2
             // 
             this.txtLINDataByte2.Location = new System.Drawing.Point(176, 38);
-            this.txtLINDataByte2.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.txtLINDataByte2.Margin = new System.Windows.Forms.Padding(4);
             this.txtLINDataByte2.Name = "txtLINDataByte2";
             this.txtLINDataByte2.Size = new System.Drawing.Size(41, 22);
             this.txtLINDataByte2.TabIndex = 8;
@@ -667,7 +668,7 @@
             // txtLINDataByteProtectedID
             // 
             this.txtLINDataByteProtectedID.Location = new System.Drawing.Point(33, 38);
-            this.txtLINDataByteProtectedID.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.txtLINDataByteProtectedID.Margin = new System.Windows.Forms.Padding(4);
             this.txtLINDataByteProtectedID.Name = "txtLINDataByteProtectedID";
             this.txtLINDataByteProtectedID.Size = new System.Drawing.Size(41, 22);
             this.txtLINDataByteProtectedID.TabIndex = 6;
@@ -676,7 +677,7 @@
             // txtLINDataByte1
             // 
             this.txtLINDataByte1.Location = new System.Drawing.Point(131, 38);
-            this.txtLINDataByte1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.txtLINDataByte1.Margin = new System.Windows.Forms.Padding(4);
             this.txtLINDataByte1.Name = "txtLINDataByte1";
             this.txtLINDataByte1.Size = new System.Drawing.Size(41, 22);
             this.txtLINDataByte1.TabIndex = 7;
@@ -691,7 +692,7 @@
             "Header only",
             "Responder"});
             this.cboLINMessageType.Location = new System.Drawing.Point(276, 10);
-            this.cboLINMessageType.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.cboLINMessageType.Margin = new System.Windows.Forms.Padding(4);
             this.cboLINMessageType.Name = "cboLINMessageType";
             this.cboLINMessageType.Size = new System.Drawing.Size(165, 24);
             this.cboLINMessageType.TabIndex = 22;
@@ -721,7 +722,7 @@
             "7",
             "8"});
             this.lstLINNumberOfBytes.Location = new System.Drawing.Point(16, 73);
-            this.lstLINNumberOfBytes.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.lstLINNumberOfBytes.Margin = new System.Windows.Forms.Padding(4);
             this.lstLINNumberOfBytes.Name = "lstLINNumberOfBytes";
             this.lstLINNumberOfBytes.Size = new System.Drawing.Size(63, 24);
             this.lstLINNumberOfBytes.TabIndex = 17;
@@ -729,7 +730,7 @@
             // cmdLINTransmit
             // 
             this.cmdLINTransmit.Location = new System.Drawing.Point(219, 142);
-            this.cmdLINTransmit.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.cmdLINTransmit.Margin = new System.Windows.Forms.Padding(4);
             this.cmdLINTransmit.Name = "cmdLINTransmit";
             this.cmdLINTransmit.Size = new System.Drawing.Size(256, 30);
             this.cmdLINTransmit.TabIndex = 18;
@@ -767,7 +768,7 @@
             this.TabPage3.Controls.Add(this.txtOtherData8);
             this.TabPage3.Controls.Add(this.txtOtherData1);
             this.TabPage3.Location = new System.Drawing.Point(46, 4);
-            this.TabPage3.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.TabPage3.Margin = new System.Windows.Forms.Padding(4);
             this.TabPage3.Name = "TabPage3";
             this.TabPage3.Size = new System.Drawing.Size(1178, 260);
             this.TabPage3.TabIndex = 2;
@@ -786,7 +787,7 @@
             // txtOtherSrc
             // 
             this.txtOtherSrc.Location = new System.Drawing.Point(168, 36);
-            this.txtOtherSrc.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.txtOtherSrc.Margin = new System.Windows.Forms.Padding(4);
             this.txtOtherSrc.Name = "txtOtherSrc";
             this.txtOtherSrc.Size = new System.Drawing.Size(41, 22);
             this.txtOtherSrc.TabIndex = 21;
@@ -795,7 +796,7 @@
             // txtOtherPT
             // 
             this.txtOtherPT.Location = new System.Drawing.Point(83, 36);
-            this.txtOtherPT.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.txtOtherPT.Margin = new System.Windows.Forms.Padding(4);
             this.txtOtherPT.Name = "txtOtherPT";
             this.txtOtherPT.Size = new System.Drawing.Size(41, 22);
             this.txtOtherPT.TabIndex = 19;
@@ -804,7 +805,7 @@
             // txtOtherTrgt
             // 
             this.txtOtherTrgt.Location = new System.Drawing.Point(125, 36);
-            this.txtOtherTrgt.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.txtOtherTrgt.Margin = new System.Windows.Forms.Padding(4);
             this.txtOtherTrgt.Name = "txtOtherTrgt";
             this.txtOtherTrgt.Size = new System.Drawing.Size(41, 22);
             this.txtOtherTrgt.TabIndex = 20;
@@ -827,7 +828,7 @@
             "10",
             "11"});
             this.lstNumberOfOtherBytes.Location = new System.Drawing.Point(147, 71);
-            this.lstNumberOfOtherBytes.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.lstNumberOfOtherBytes.Margin = new System.Windows.Forms.Padding(4);
             this.lstNumberOfOtherBytes.Name = "lstNumberOfOtherBytes";
             this.lstNumberOfOtherBytes.Size = new System.Drawing.Size(63, 24);
             this.lstNumberOfOtherBytes.TabIndex = 31;
@@ -845,7 +846,7 @@
             // 
             this.lstOtherNetwork.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.lstOtherNetwork.Location = new System.Drawing.Point(303, 68);
-            this.lstOtherNetwork.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.lstOtherNetwork.Margin = new System.Windows.Forms.Padding(4);
             this.lstOtherNetwork.Name = "lstOtherNetwork";
             this.lstOtherNetwork.Size = new System.Drawing.Size(137, 24);
             this.lstOtherNetwork.TabIndex = 34;
@@ -862,7 +863,7 @@
             // txtOtherData2
             // 
             this.txtOtherData2.Location = new System.Drawing.Point(277, 36);
-            this.txtOtherData2.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.txtOtherData2.Margin = new System.Windows.Forms.Padding(4);
             this.txtOtherData2.Name = "txtOtherData2";
             this.txtOtherData2.Size = new System.Drawing.Size(41, 22);
             this.txtOtherData2.TabIndex = 23;
@@ -871,7 +872,7 @@
             // cmdOtherTransmit
             // 
             this.cmdOtherTransmit.Location = new System.Drawing.Point(53, 119);
-            this.cmdOtherTransmit.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.cmdOtherTransmit.Margin = new System.Windows.Forms.Padding(4);
             this.cmdOtherTransmit.Name = "cmdOtherTransmit";
             this.cmdOtherTransmit.Size = new System.Drawing.Size(523, 57);
             this.cmdOtherTransmit.TabIndex = 33;
@@ -881,7 +882,7 @@
             // txtOtherData3
             // 
             this.txtOtherData3.Location = new System.Drawing.Point(320, 36);
-            this.txtOtherData3.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.txtOtherData3.Margin = new System.Windows.Forms.Padding(4);
             this.txtOtherData3.Name = "txtOtherData3";
             this.txtOtherData3.Size = new System.Drawing.Size(41, 22);
             this.txtOtherData3.TabIndex = 24;
@@ -900,7 +901,7 @@
             // txtOtherData4
             // 
             this.txtOtherData4.Location = new System.Drawing.Point(363, 36);
-            this.txtOtherData4.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.txtOtherData4.Margin = new System.Windows.Forms.Padding(4);
             this.txtOtherData4.Name = "txtOtherData4";
             this.txtOtherData4.Size = new System.Drawing.Size(41, 22);
             this.txtOtherData4.TabIndex = 25;
@@ -909,7 +910,7 @@
             // txtOtherData5
             // 
             this.txtOtherData5.Location = new System.Drawing.Point(405, 36);
-            this.txtOtherData5.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.txtOtherData5.Margin = new System.Windows.Forms.Padding(4);
             this.txtOtherData5.Name = "txtOtherData5";
             this.txtOtherData5.Size = new System.Drawing.Size(41, 22);
             this.txtOtherData5.TabIndex = 26;
@@ -918,7 +919,7 @@
             // txtOtherData6
             // 
             this.txtOtherData6.Location = new System.Drawing.Point(448, 36);
-            this.txtOtherData6.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.txtOtherData6.Margin = new System.Windows.Forms.Padding(4);
             this.txtOtherData6.Name = "txtOtherData6";
             this.txtOtherData6.Size = new System.Drawing.Size(41, 22);
             this.txtOtherData6.TabIndex = 27;
@@ -927,7 +928,7 @@
             // txtOtherData7
             // 
             this.txtOtherData7.Location = new System.Drawing.Point(491, 36);
-            this.txtOtherData7.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.txtOtherData7.Margin = new System.Windows.Forms.Padding(4);
             this.txtOtherData7.Name = "txtOtherData7";
             this.txtOtherData7.Size = new System.Drawing.Size(41, 22);
             this.txtOtherData7.TabIndex = 28;
@@ -936,7 +937,7 @@
             // txtOtherData8
             // 
             this.txtOtherData8.Location = new System.Drawing.Point(533, 36);
-            this.txtOtherData8.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.txtOtherData8.Margin = new System.Windows.Forms.Padding(4);
             this.txtOtherData8.Name = "txtOtherData8";
             this.txtOtherData8.Size = new System.Drawing.Size(41, 22);
             this.txtOtherData8.TabIndex = 29;
@@ -945,7 +946,7 @@
             // txtOtherData1
             // 
             this.txtOtherData1.Location = new System.Drawing.Point(235, 36);
-            this.txtOtherData1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.txtOtherData1.Margin = new System.Windows.Forms.Padding(4);
             this.txtOtherData1.Name = "txtOtherData1";
             this.txtOtherData1.Size = new System.Drawing.Size(41, 22);
             this.txtOtherData1.TabIndex = 22;
@@ -955,7 +956,7 @@
             // 
             this.tabPage4.Controls.Add(this.GroupBox7);
             this.tabPage4.Location = new System.Drawing.Point(46, 4);
-            this.tabPage4.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.tabPage4.Margin = new System.Windows.Forms.Padding(4);
             this.tabPage4.Name = "tabPage4";
             this.tabPage4.Size = new System.Drawing.Size(1178, 260);
             this.tabPage4.TabIndex = 0;
@@ -975,9 +976,9 @@
             this.GroupBox7.Controls.Add(this.txtCANFDArbID);
             this.GroupBox7.Controls.Add(this.Label26);
             this.GroupBox7.Location = new System.Drawing.Point(4, 4);
-            this.GroupBox7.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.GroupBox7.Margin = new System.Windows.Forms.Padding(4);
             this.GroupBox7.Name = "GroupBox7";
-            this.GroupBox7.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.GroupBox7.Padding = new System.Windows.Forms.Padding(4);
             this.GroupBox7.Size = new System.Drawing.Size(901, 217);
             this.GroupBox7.TabIndex = 48;
             this.GroupBox7.TabStop = false;
@@ -986,7 +987,7 @@
             // txtFDByteList
             // 
             this.txtFDByteList.Location = new System.Drawing.Point(205, 53);
-            this.txtFDByteList.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.txtFDByteList.Margin = new System.Windows.Forms.Padding(4);
             this.txtFDByteList.Name = "txtFDByteList";
             this.txtFDByteList.Size = new System.Drawing.Size(671, 22);
             this.txtFDByteList.TabIndex = 27;
@@ -997,7 +998,7 @@
             // chkCANFDExtended
             // 
             this.chkCANFDExtended.Location = new System.Drawing.Point(81, 27);
-            this.chkCANFDExtended.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.chkCANFDExtended.Margin = new System.Windows.Forms.Padding(4);
             this.chkCANFDExtended.Name = "chkCANFDExtended";
             this.chkCANFDExtended.Size = new System.Drawing.Size(213, 20);
             this.chkCANFDExtended.TabIndex = 26;
@@ -1024,7 +1025,7 @@
             "48",
             "64"});
             this.lstNumberOfCANFDBytes.Location = new System.Drawing.Point(117, 90);
-            this.lstNumberOfCANFDBytes.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.lstNumberOfCANFDBytes.Margin = new System.Windows.Forms.Padding(4);
             this.lstNumberOfCANFDBytes.Name = "lstNumberOfCANFDBytes";
             this.lstNumberOfCANFDBytes.Size = new System.Drawing.Size(63, 24);
             this.lstNumberOfCANFDBytes.TabIndex = 17;
@@ -1042,7 +1043,7 @@
             // 
             this.lstCANFDNetwork.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.lstCANFDNetwork.Location = new System.Drawing.Point(273, 86);
-            this.lstCANFDNetwork.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.lstCANFDNetwork.Margin = new System.Windows.Forms.Padding(4);
             this.lstCANFDNetwork.Name = "lstCANFDNetwork";
             this.lstCANFDNetwork.Size = new System.Drawing.Size(137, 24);
             this.lstCANFDNetwork.TabIndex = 20;
@@ -1059,7 +1060,7 @@
             // cmdCANFDTransmit
             // 
             this.cmdCANFDTransmit.Location = new System.Drawing.Point(24, 138);
-            this.cmdCANFDTransmit.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.cmdCANFDTransmit.Margin = new System.Windows.Forms.Padding(4);
             this.cmdCANFDTransmit.Name = "cmdCANFDTransmit";
             this.cmdCANFDTransmit.Size = new System.Drawing.Size(523, 57);
             this.cmdCANFDTransmit.TabIndex = 18;
@@ -1079,7 +1080,7 @@
             // txtCANFDArbID
             // 
             this.txtCANFDArbID.Location = new System.Drawing.Point(81, 53);
-            this.txtCANFDArbID.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.txtCANFDArbID.Margin = new System.Windows.Forms.Padding(4);
             this.txtCANFDArbID.Name = "txtCANFDArbID";
             this.txtCANFDArbID.Size = new System.Drawing.Size(99, 22);
             this.txtCANFDArbID.TabIndex = 5;
@@ -1114,7 +1115,7 @@
             this.tabPage6.Controls.Add(this.txtISO15765ArbID);
             this.tabPage6.Controls.Add(this.Label30);
             this.tabPage6.Location = new System.Drawing.Point(46, 4);
-            this.tabPage6.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.tabPage6.Margin = new System.Windows.Forms.Padding(4);
             this.tabPage6.Name = "tabPage6";
             this.tabPage6.Size = new System.Drawing.Size(1178, 260);
             this.tabPage6.TabIndex = 3;
@@ -1125,7 +1126,7 @@
             // 
             this.chkISO15765CANFD.AutoSize = true;
             this.chkISO15765CANFD.Location = new System.Drawing.Point(632, 39);
-            this.chkISO15765CANFD.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.chkISO15765CANFD.Margin = new System.Windows.Forms.Padding(4);
             this.chkISO15765CANFD.Name = "chkISO15765CANFD";
             this.chkISO15765CANFD.Size = new System.Drawing.Size(106, 20);
             this.chkISO15765CANFD.TabIndex = 76;
@@ -1135,7 +1136,7 @@
             // cmdISO15765Disable
             // 
             this.cmdISO15765Disable.Location = new System.Drawing.Point(436, 172);
-            this.cmdISO15765Disable.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.cmdISO15765Disable.Margin = new System.Windows.Forms.Padding(4);
             this.cmdISO15765Disable.Name = "cmdISO15765Disable";
             this.cmdISO15765Disable.Size = new System.Drawing.Size(204, 44);
             this.cmdISO15765Disable.TabIndex = 75;
@@ -1146,7 +1147,7 @@
             // cmdConFigISO15765Rx
             // 
             this.cmdConFigISO15765Rx.Location = new System.Drawing.Point(224, 172);
-            this.cmdConFigISO15765Rx.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.cmdConFigISO15765Rx.Margin = new System.Windows.Forms.Padding(4);
             this.cmdConFigISO15765Rx.Name = "cmdConFigISO15765Rx";
             this.cmdConFigISO15765Rx.Size = new System.Drawing.Size(204, 44);
             this.cmdConFigISO15765Rx.TabIndex = 74;
@@ -1158,7 +1159,7 @@
             // 
             this.chkISO15765FCExtendedID.AutoSize = true;
             this.chkISO15765FCExtendedID.Location = new System.Drawing.Point(193, 126);
-            this.chkISO15765FCExtendedID.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.chkISO15765FCExtendedID.Margin = new System.Windows.Forms.Padding(4);
             this.chkISO15765FCExtendedID.Name = "chkISO15765FCExtendedID";
             this.chkISO15765FCExtendedID.Size = new System.Drawing.Size(178, 20);
             this.chkISO15765FCExtendedID.TabIndex = 73;
@@ -1169,7 +1170,7 @@
             // 
             this.chkIS015765PaddingEnable.AutoSize = true;
             this.chkIS015765PaddingEnable.Location = new System.Drawing.Point(632, 11);
-            this.chkIS015765PaddingEnable.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.chkIS015765PaddingEnable.Margin = new System.Windows.Forms.Padding(4);
             this.chkIS015765PaddingEnable.Name = "chkIS015765PaddingEnable";
             this.chkIS015765PaddingEnable.Size = new System.Drawing.Size(239, 20);
             this.chkIS015765PaddingEnable.TabIndex = 72;
@@ -1179,7 +1180,7 @@
             // txtISO15765Data
             // 
             this.txtISO15765Data.Location = new System.Drawing.Point(193, 69);
-            this.txtISO15765Data.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.txtISO15765Data.Margin = new System.Windows.Forms.Padding(4);
             this.txtISO15765Data.Name = "txtISO15765Data";
             this.txtISO15765Data.Size = new System.Drawing.Size(671, 22);
             this.txtISO15765Data.TabIndex = 71;
@@ -1189,7 +1190,7 @@
             // txtISO15765FlowControlArbID
             // 
             this.txtISO15765FlowControlArbID.Location = new System.Drawing.Point(85, 126);
-            this.txtISO15765FlowControlArbID.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.txtISO15765FlowControlArbID.Margin = new System.Windows.Forms.Padding(4);
             this.txtISO15765FlowControlArbID.Name = "txtISO15765FlowControlArbID";
             this.txtISO15765FlowControlArbID.Size = new System.Drawing.Size(99, 22);
             this.txtISO15765FlowControlArbID.TabIndex = 69;
@@ -1207,7 +1208,7 @@
             // nudISO15765NumberOfBytes
             // 
             this.nudISO15765NumberOfBytes.Location = new System.Drawing.Point(101, 43);
-            this.nudISO15765NumberOfBytes.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.nudISO15765NumberOfBytes.Margin = new System.Windows.Forms.Padding(4);
             this.nudISO15765NumberOfBytes.Maximum = new decimal(new int[] {
             4094,
             0,
@@ -1225,7 +1226,7 @@
             // chkISO15765ExtendedID
             // 
             this.chkISO15765ExtendedID.Location = new System.Drawing.Point(193, 11);
-            this.chkISO15765ExtendedID.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.chkISO15765ExtendedID.Margin = new System.Windows.Forms.Padding(4);
             this.chkISO15765ExtendedID.Name = "chkISO15765ExtendedID";
             this.chkISO15765ExtendedID.Size = new System.Drawing.Size(164, 22);
             this.chkISO15765ExtendedID.TabIndex = 67;
@@ -1244,7 +1245,7 @@
             // 
             this.lstISO15765Network.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.lstISO15765Network.Location = new System.Drawing.Point(459, 9);
-            this.lstISO15765Network.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.lstISO15765Network.Margin = new System.Windows.Forms.Padding(4);
             this.lstISO15765Network.Name = "lstISO15765Network";
             this.lstISO15765Network.Size = new System.Drawing.Size(137, 24);
             this.lstISO15765Network.TabIndex = 65;
@@ -1261,7 +1262,7 @@
             // cmdISO15765SendMessage
             // 
             this.cmdISO15765SendMessage.Location = new System.Drawing.Point(12, 172);
-            this.cmdISO15765SendMessage.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.cmdISO15765SendMessage.Margin = new System.Windows.Forms.Padding(4);
             this.cmdISO15765SendMessage.Name = "cmdISO15765SendMessage";
             this.cmdISO15765SendMessage.Size = new System.Drawing.Size(204, 44);
             this.cmdISO15765SendMessage.TabIndex = 64;
@@ -1281,7 +1282,7 @@
             // txtISO15765ArbID
             // 
             this.txtISO15765ArbID.Location = new System.Drawing.Point(69, 9);
-            this.txtISO15765ArbID.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.txtISO15765ArbID.Margin = new System.Windows.Forms.Padding(4);
             this.txtISO15765ArbID.Name = "txtISO15765ArbID";
             this.txtISO15765ArbID.Size = new System.Drawing.Size(115, 22);
             this.txtISO15765ArbID.TabIndex = 60;
@@ -1306,9 +1307,9 @@
             this.tabPage7.Controls.Add(this.cmdTxEthernet);
             this.tabPage7.Controls.Add(this.Label34);
             this.tabPage7.Location = new System.Drawing.Point(46, 4);
-            this.tabPage7.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.tabPage7.Margin = new System.Windows.Forms.Padding(4);
             this.tabPage7.Name = "tabPage7";
-            this.tabPage7.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.tabPage7.Padding = new System.Windows.Forms.Padding(4);
             this.tabPage7.Size = new System.Drawing.Size(1178, 260);
             this.tabPage7.TabIndex = 4;
             this.tabPage7.Text = "Ethernet";
@@ -1317,7 +1318,7 @@
             // nudEthernetNumberOfBytes
             // 
             this.nudEthernetNumberOfBytes.Location = new System.Drawing.Point(115, 82);
-            this.nudEthernetNumberOfBytes.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.nudEthernetNumberOfBytes.Margin = new System.Windows.Forms.Padding(4);
             this.nudEthernetNumberOfBytes.Maximum = new decimal(new int[] {
             4094,
             0,
@@ -1335,7 +1336,7 @@
             // txtEthernetData
             // 
             this.txtEthernetData.Location = new System.Drawing.Point(29, 46);
-            this.txtEthernetData.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.txtEthernetData.Margin = new System.Windows.Forms.Padding(4);
             this.txtEthernetData.Name = "txtEthernetData";
             this.txtEthernetData.Size = new System.Drawing.Size(671, 22);
             this.txtEthernetData.TabIndex = 59;
@@ -1356,7 +1357,7 @@
             // 
             this.cboEthernetNetworks.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cboEthernetNetworks.Location = new System.Drawing.Point(279, 81);
-            this.cboEthernetNetworks.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.cboEthernetNetworks.Margin = new System.Windows.Forms.Padding(4);
             this.cboEthernetNetworks.Name = "cboEthernetNetworks";
             this.cboEthernetNetworks.Size = new System.Drawing.Size(137, 24);
             this.cboEthernetNetworks.TabIndex = 57;
@@ -1373,7 +1374,7 @@
             // cmdTxEthernet
             // 
             this.cmdTxEthernet.Location = new System.Drawing.Point(29, 133);
-            this.cmdTxEthernet.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.cmdTxEthernet.Margin = new System.Windows.Forms.Padding(4);
             this.cmdTxEthernet.Name = "cmdTxEthernet";
             this.cmdTxEthernet.Size = new System.Drawing.Size(523, 57);
             this.cmdTxEthernet.TabIndex = 56;
@@ -1401,9 +1402,9 @@
             this.GroupBox5.Controls.Add(this.cmdSetBitRate);
             this.GroupBox5.Controls.Add(this.lstBaudRateToUse);
             this.GroupBox5.Location = new System.Drawing.Point(8, 10);
-            this.GroupBox5.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.GroupBox5.Margin = new System.Windows.Forms.Padding(4);
             this.GroupBox5.Name = "GroupBox5";
-            this.GroupBox5.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.GroupBox5.Padding = new System.Windows.Forms.Padding(4);
             this.GroupBox5.Size = new System.Drawing.Size(437, 114);
             this.GroupBox5.TabIndex = 0;
             this.GroupBox5.TabStop = false;
@@ -1439,7 +1440,7 @@
             // cmdSetFDBitRate
             // 
             this.cmdSetFDBitRate.Location = new System.Drawing.Point(283, 69);
-            this.cmdSetFDBitRate.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.cmdSetFDBitRate.Margin = new System.Windows.Forms.Padding(4);
             this.cmdSetFDBitRate.Name = "cmdSetFDBitRate";
             this.cmdSetFDBitRate.Size = new System.Drawing.Size(128, 30);
             this.cmdSetFDBitRate.TabIndex = 46;
@@ -1450,7 +1451,7 @@
             // 
             this.lstNetworkBaudRate.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.lstNetworkBaudRate.Location = new System.Drawing.Point(8, 39);
-            this.lstNetworkBaudRate.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.lstNetworkBaudRate.Margin = new System.Windows.Forms.Padding(4);
             this.lstNetworkBaudRate.Name = "lstNetworkBaudRate";
             this.lstNetworkBaudRate.Size = new System.Drawing.Size(127, 24);
             this.lstNetworkBaudRate.TabIndex = 43;
@@ -1459,7 +1460,7 @@
             // 
             this.lstFDBaudRateToUse.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.lstFDBaudRateToUse.Location = new System.Drawing.Point(283, 39);
-            this.lstFDBaudRateToUse.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.lstFDBaudRateToUse.Margin = new System.Windows.Forms.Padding(4);
             this.lstFDBaudRateToUse.Name = "lstFDBaudRateToUse";
             this.lstFDBaudRateToUse.Size = new System.Drawing.Size(127, 24);
             this.lstFDBaudRateToUse.TabIndex = 45;
@@ -1467,7 +1468,7 @@
             // cmdSetBitRate
             // 
             this.cmdSetBitRate.Location = new System.Drawing.Point(147, 69);
-            this.cmdSetBitRate.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.cmdSetBitRate.Margin = new System.Windows.Forms.Padding(4);
             this.cmdSetBitRate.Name = "cmdSetBitRate";
             this.cmdSetBitRate.Size = new System.Drawing.Size(128, 30);
             this.cmdSetBitRate.TabIndex = 46;
@@ -1478,7 +1479,7 @@
             // 
             this.lstBaudRateToUse.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.lstBaudRateToUse.Location = new System.Drawing.Point(147, 39);
-            this.lstBaudRateToUse.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.lstBaudRateToUse.Margin = new System.Windows.Forms.Padding(4);
             this.lstBaudRateToUse.Name = "lstBaudRateToUse";
             this.lstBaudRateToUse.Size = new System.Drawing.Size(127, 24);
             this.lstBaudRateToUse.TabIndex = 45;
@@ -1499,9 +1500,9 @@
             this.GroupBox6.Controls.Add(this.txt3GSJumpW);
             this.GroupBox6.Controls.Add(this.Label20);
             this.GroupBox6.Location = new System.Drawing.Point(8, 132);
-            this.GroupBox6.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.GroupBox6.Margin = new System.Windows.Forms.Padding(4);
             this.GroupBox6.Name = "GroupBox6";
-            this.GroupBox6.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.GroupBox6.Padding = new System.Windows.Forms.Padding(4);
             this.GroupBox6.Size = new System.Drawing.Size(344, 327);
             this.GroupBox6.TabIndex = 1;
             this.GroupBox6.TabStop = false;
@@ -1510,7 +1511,7 @@
             // txt3GBRP
             // 
             this.txt3GBRP.Location = new System.Drawing.Point(17, 236);
-            this.txt3GBRP.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.txt3GBRP.Margin = new System.Windows.Forms.Padding(4);
             this.txt3GBRP.Name = "txt3GBRP";
             this.txt3GBRP.Size = new System.Drawing.Size(137, 22);
             this.txt3GBRP.TabIndex = 25;
@@ -1519,7 +1520,7 @@
             // cmd3GGetSettings
             // 
             this.cmd3GGetSettings.Location = new System.Drawing.Point(12, 30);
-            this.cmd3GGetSettings.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.cmd3GGetSettings.Margin = new System.Windows.Forms.Padding(4);
             this.cmd3GGetSettings.Name = "cmd3GGetSettings";
             this.cmd3GGetSettings.Size = new System.Drawing.Size(299, 39);
             this.cmd3GGetSettings.TabIndex = 11;
@@ -1548,7 +1549,7 @@
             // cmd3GSetSettings
             // 
             this.cmd3GSetSettings.Location = new System.Drawing.Point(12, 268);
-            this.cmd3GSetSettings.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.cmd3GSetSettings.Margin = new System.Windows.Forms.Padding(4);
             this.cmd3GSetSettings.Name = "cmd3GSetSettings";
             this.cmd3GSetSettings.Size = new System.Drawing.Size(304, 39);
             this.cmd3GSetSettings.TabIndex = 21;
@@ -1558,7 +1559,7 @@
             // txt3GPSeg1
             // 
             this.txt3GPSeg1.Location = new System.Drawing.Point(17, 122);
-            this.txt3GPSeg1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.txt3GPSeg1.Margin = new System.Windows.Forms.Padding(4);
             this.txt3GPSeg1.Name = "txt3GPSeg1";
             this.txt3GPSeg1.Size = new System.Drawing.Size(132, 22);
             this.txt3GPSeg1.TabIndex = 13;
@@ -1576,7 +1577,7 @@
             // txt3GPSeg2
             // 
             this.txt3GPSeg2.Location = new System.Drawing.Point(183, 122);
-            this.txt3GPSeg2.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.txt3GPSeg2.Margin = new System.Windows.Forms.Padding(4);
             this.txt3GPSeg2.Name = "txt3GPSeg2";
             this.txt3GPSeg2.Size = new System.Drawing.Size(132, 22);
             this.txt3GPSeg2.TabIndex = 14;
@@ -1594,7 +1595,7 @@
             // txt3GPropDelay
             // 
             this.txt3GPropDelay.Location = new System.Drawing.Point(17, 181);
-            this.txt3GPropDelay.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.txt3GPropDelay.Margin = new System.Windows.Forms.Padding(4);
             this.txt3GPropDelay.Name = "txt3GPropDelay";
             this.txt3GPropDelay.Size = new System.Drawing.Size(132, 22);
             this.txt3GPropDelay.TabIndex = 15;
@@ -1612,7 +1613,7 @@
             // txt3GSJumpW
             // 
             this.txt3GSJumpW.Location = new System.Drawing.Point(183, 181);
-            this.txt3GSJumpW.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.txt3GSJumpW.Margin = new System.Windows.Forms.Padding(4);
             this.txt3GSJumpW.Name = "txt3GSJumpW";
             this.txt3GSJumpW.Size = new System.Drawing.Size(132, 22);
             this.txt3GSJumpW.TabIndex = 16;
@@ -1632,9 +1633,9 @@
             this.tpSettings.Controls.Add(this.GroupBox6);
             this.tpSettings.Controls.Add(this.GroupBox5);
             this.tpSettings.Location = new System.Drawing.Point(4, 25);
-            this.tpSettings.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.tpSettings.Margin = new System.Windows.Forms.Padding(4);
             this.tpSettings.Name = "tpSettings";
-            this.tpSettings.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.tpSettings.Padding = new System.Windows.Forms.Padding(4);
             this.tpSettings.Size = new System.Drawing.Size(1240, 679);
             this.tpSettings.TabIndex = 1;
             this.tpSettings.Text = "Hardware Settings";
@@ -1657,7 +1658,7 @@
             // cmdVersion
             // 
             this.cmdVersion.Location = new System.Drawing.Point(461, 59);
-            this.cmdVersion.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.cmdVersion.Margin = new System.Windows.Forms.Padding(4);
             this.cmdVersion.Name = "cmdVersion";
             this.cmdVersion.Size = new System.Drawing.Size(160, 30);
             this.cmdVersion.TabIndex = 43;
@@ -1681,9 +1682,9 @@
             this.GroupBox1.Controls.Add(this.CmdOpenFirstDevice);
             this.GroupBox1.Controls.Add(this.cmdCloseDevice);
             this.GroupBox1.Location = new System.Drawing.Point(1, -1);
-            this.GroupBox1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.GroupBox1.Margin = new System.Windows.Forms.Padding(4);
             this.GroupBox1.Name = "GroupBox1";
-            this.GroupBox1.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.GroupBox1.Padding = new System.Windows.Forms.Padding(4);
             this.GroupBox1.Size = new System.Drawing.Size(1248, 108);
             this.GroupBox1.TabIndex = 50;
             this.GroupBox1.TabStop = false;
@@ -1692,7 +1693,7 @@
             // CmdOpenFirstDevice
             // 
             this.CmdOpenFirstDevice.Location = new System.Drawing.Point(20, 21);
-            this.CmdOpenFirstDevice.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.CmdOpenFirstDevice.Margin = new System.Windows.Forms.Padding(4);
             this.CmdOpenFirstDevice.Name = "CmdOpenFirstDevice";
             this.CmdOpenFirstDevice.Size = new System.Drawing.Size(160, 28);
             this.CmdOpenFirstDevice.TabIndex = 0;
@@ -1702,7 +1703,7 @@
             // cmdCloseDevice
             // 
             this.cmdCloseDevice.Location = new System.Drawing.Point(20, 60);
-            this.cmdCloseDevice.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.cmdCloseDevice.Margin = new System.Windows.Forms.Padding(4);
             this.cmdCloseDevice.Name = "cmdCloseDevice";
             this.cmdCloseDevice.Size = new System.Drawing.Size(160, 28);
             this.cmdCloseDevice.TabIndex = 1;
@@ -1714,9 +1715,9 @@
             this.tpTxRX.Controls.Add(this.TabControl2);
             this.tpTxRX.Controls.Add(this.GroupBox4);
             this.tpTxRX.Location = new System.Drawing.Point(4, 25);
-            this.tpTxRX.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.tpTxRX.Margin = new System.Windows.Forms.Padding(4);
             this.tpTxRX.Name = "tpTxRX";
-            this.tpTxRX.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.tpTxRX.Padding = new System.Windows.Forms.Padding(4);
             this.tpTxRX.Size = new System.Drawing.Size(1240, 679);
             this.tpTxRX.TabIndex = 0;
             this.tpTxRX.Text = "Tx and RX";
@@ -1724,6 +1725,7 @@
             // 
             // GroupBox4
             // 
+            this.GroupBox4.Controls.Add(this.setACL);
             this.GroupBox4.Controls.Add(this.getACL);
             this.GroupBox4.Controls.Add(this.lblWaitForRxMessageWithTimeOutResult);
             this.GroupBox4.Controls.Add(this.cmdWaitForMessageWithTimeOut);
@@ -1735,13 +1737,33 @@
             this.GroupBox4.Controls.Add(this.lstErrorHolder);
             this.GroupBox4.Controls.Add(this.cmdGetErrors);
             this.GroupBox4.Location = new System.Drawing.Point(4, 282);
-            this.GroupBox4.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.GroupBox4.Margin = new System.Windows.Forms.Padding(4);
             this.GroupBox4.Name = "GroupBox4";
-            this.GroupBox4.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.GroupBox4.Padding = new System.Windows.Forms.Padding(4);
             this.GroupBox4.Size = new System.Drawing.Size(1229, 386);
             this.GroupBox4.TabIndex = 47;
             this.GroupBox4.TabStop = false;
             this.GroupBox4.Text = "Receive Message";
+            // 
+            // setACL
+            // 
+            this.setACL.Location = new System.Drawing.Point(748, 36);
+            this.setACL.Name = "setACL";
+            this.setACL.Size = new System.Drawing.Size(72, 22);
+            this.setACL.TabIndex = 28;
+            this.setACL.Text = "Set ACL";
+            this.setACL.UseVisualStyleBackColor = true;
+            this.setACL.Click += new System.EventHandler(this.setACL_Click);
+            // 
+            // getACL
+            // 
+            this.getACL.Location = new System.Drawing.Point(651, 33);
+            this.getACL.Name = "getACL";
+            this.getACL.Size = new System.Drawing.Size(75, 23);
+            this.getACL.TabIndex = 27;
+            this.getACL.Text = "Get ACL";
+            this.getACL.UseVisualStyleBackColor = true;
+            this.getACL.Click += new System.EventHandler(this.getACL_Click);
             // 
             // lblWaitForRxMessageWithTimeOutResult
             // 
@@ -1755,7 +1777,7 @@
             // cmdWaitForMessageWithTimeOut
             // 
             this.cmdWaitForMessageWithTimeOut.Location = new System.Drawing.Point(448, 20);
-            this.cmdWaitForMessageWithTimeOut.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.cmdWaitForMessageWithTimeOut.Margin = new System.Windows.Forms.Padding(4);
             this.cmdWaitForMessageWithTimeOut.Name = "cmdWaitForMessageWithTimeOut";
             this.cmdWaitForMessageWithTimeOut.Size = new System.Drawing.Size(139, 49);
             this.cmdWaitForMessageWithTimeOut.TabIndex = 26;
@@ -1765,7 +1787,7 @@
             // chkAutoRead
             // 
             this.chkAutoRead.Location = new System.Drawing.Point(160, 39);
-            this.chkAutoRead.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.chkAutoRead.Margin = new System.Windows.Forms.Padding(4);
             this.chkAutoRead.Name = "chkAutoRead";
             this.chkAutoRead.Size = new System.Drawing.Size(107, 20);
             this.chkAutoRead.TabIndex = 25;
@@ -1797,7 +1819,7 @@
             this.lstMessage.IntegralHeight = false;
             this.lstMessage.ItemHeight = 17;
             this.lstMessage.Location = new System.Drawing.Point(11, 79);
-            this.lstMessage.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.lstMessage.Margin = new System.Windows.Forms.Padding(4);
             this.lstMessage.Name = "lstMessage";
             this.lstMessage.ScrollAlwaysVisible = true;
             this.lstMessage.Size = new System.Drawing.Size(1209, 181);
@@ -1806,7 +1828,7 @@
             // cmdReceive
             // 
             this.cmdReceive.Location = new System.Drawing.Point(11, 20);
-            this.cmdReceive.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.cmdReceive.Margin = new System.Windows.Forms.Padding(4);
             this.cmdReceive.Name = "cmdReceive";
             this.cmdReceive.Size = new System.Drawing.Size(139, 49);
             this.cmdReceive.TabIndex = 20;
@@ -1819,7 +1841,7 @@
             this.lstErrorHolder.HorizontalScrollbar = true;
             this.lstErrorHolder.ItemHeight = 17;
             this.lstErrorHolder.Location = new System.Drawing.Point(11, 300);
-            this.lstErrorHolder.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.lstErrorHolder.Margin = new System.Windows.Forms.Padding(4);
             this.lstErrorHolder.Name = "lstErrorHolder";
             this.lstErrorHolder.ScrollAlwaysVisible = true;
             this.lstErrorHolder.Size = new System.Drawing.Size(1209, 72);
@@ -1828,7 +1850,7 @@
             // cmdGetErrors
             // 
             this.cmdGetErrors.Location = new System.Drawing.Point(11, 263);
-            this.cmdGetErrors.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.cmdGetErrors.Margin = new System.Windows.Forms.Padding(4);
             this.cmdGetErrors.Name = "cmdGetErrors";
             this.cmdGetErrors.Size = new System.Drawing.Size(1211, 30);
             this.cmdGetErrors.TabIndex = 22;
@@ -1842,7 +1864,7 @@
             this.TabControl1.Controls.Add(this.tpPHY);
             this.TabControl1.Controls.Add(this.tabPage8);
             this.TabControl1.Location = new System.Drawing.Point(1, 111);
-            this.TabControl1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.TabControl1.Margin = new System.Windows.Forms.Padding(4);
             this.TabControl1.Name = "TabControl1";
             this.TabControl1.SelectedIndex = 0;
             this.TabControl1.Size = new System.Drawing.Size(1248, 708);
@@ -1864,9 +1886,9 @@
             this.tpPHY.Controls.Add(this.nudAddressOrPort);
             this.tpPHY.Controls.Add(this.cmdPhyRequest);
             this.tpPHY.Location = new System.Drawing.Point(4, 25);
-            this.tpPHY.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.tpPHY.Margin = new System.Windows.Forms.Padding(4);
             this.tpPHY.Name = "tpPHY";
-            this.tpPHY.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.tpPHY.Padding = new System.Windows.Forms.Padding(4);
             this.tpPHY.Size = new System.Drawing.Size(1240, 679);
             this.tpPHY.TabIndex = 2;
             this.tpPHY.Text = "PHY Settings";
@@ -1903,7 +1925,7 @@
             // 
             this.nudReqValue.Hexadecimal = true;
             this.nudReqValue.Location = new System.Drawing.Point(8, 303);
-            this.nudReqValue.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.nudReqValue.Margin = new System.Windows.Forms.Padding(4);
             this.nudReqValue.Maximum = new decimal(new int[] {
             65535,
             0,
@@ -1927,7 +1949,7 @@
             // 
             this.chkPhyWrite.AutoSize = true;
             this.chkPhyWrite.Location = new System.Drawing.Point(281, 175);
-            this.chkPhyWrite.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.chkPhyWrite.Margin = new System.Windows.Forms.Padding(4);
             this.chkPhyWrite.Name = "chkPhyWrite";
             this.chkPhyWrite.Size = new System.Drawing.Size(106, 20);
             this.chkPhyWrite.TabIndex = 62;
@@ -1940,7 +1962,7 @@
             this.chkphyClause45Enable.Checked = true;
             this.chkphyClause45Enable.CheckState = System.Windows.Forms.CheckState.Checked;
             this.chkphyClause45Enable.Location = new System.Drawing.Point(281, 118);
-            this.chkphyClause45Enable.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.chkphyClause45Enable.Margin = new System.Windows.Forms.Padding(4);
             this.chkphyClause45Enable.Name = "chkphyClause45Enable";
             this.chkphyClause45Enable.Size = new System.Drawing.Size(128, 20);
             this.chkphyClause45Enable.TabIndex = 61;
@@ -1953,7 +1975,7 @@
             this.chkPhyEnabled.Checked = true;
             this.chkPhyEnabled.CheckState = System.Windows.Forms.CheckState.Checked;
             this.chkPhyEnabled.Location = new System.Drawing.Point(281, 146);
-            this.chkPhyEnabled.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.chkPhyEnabled.Margin = new System.Windows.Forms.Padding(4);
             this.chkPhyEnabled.Name = "chkPhyEnabled";
             this.chkPhyEnabled.Size = new System.Drawing.Size(80, 20);
             this.chkPhyEnabled.TabIndex = 60;
@@ -1973,7 +1995,7 @@
             // 
             this.nudReqAddress.Hexadecimal = true;
             this.nudReqAddress.Location = new System.Drawing.Point(9, 225);
-            this.nudReqAddress.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.nudReqAddress.Margin = new System.Windows.Forms.Padding(4);
             this.nudReqAddress.Maximum = new decimal(new int[] {
             65535,
             0,
@@ -1992,7 +2014,7 @@
             // 
             this.nudPhyPageOrDevice.Hexadecimal = true;
             this.nudPhyPageOrDevice.Location = new System.Drawing.Point(9, 156);
-            this.nudPhyPageOrDevice.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.nudPhyPageOrDevice.Margin = new System.Windows.Forms.Padding(4);
             this.nudPhyPageOrDevice.Maximum = new decimal(new int[] {
             255,
             0,
@@ -2011,7 +2033,7 @@
             // 
             this.nudAddressOrPort.Hexadecimal = true;
             this.nudAddressOrPort.Location = new System.Drawing.Point(9, 75);
-            this.nudAddressOrPort.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.nudAddressOrPort.Margin = new System.Windows.Forms.Padding(4);
             this.nudAddressOrPort.Maximum = new decimal(new int[] {
             255,
             0,
@@ -2029,7 +2051,7 @@
             // cmdPhyRequest
             // 
             this.cmdPhyRequest.Location = new System.Drawing.Point(281, 288);
-            this.cmdPhyRequest.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.cmdPhyRequest.Margin = new System.Windows.Forms.Padding(4);
             this.cmdPhyRequest.Name = "cmdPhyRequest";
             this.cmdPhyRequest.Size = new System.Drawing.Size(212, 39);
             this.cmdPhyRequest.TabIndex = 53;
@@ -2044,9 +2066,9 @@
             this.tabPage8.Controls.Add(this.GroupBox9);
             this.tabPage8.Controls.Add(this.GroupBox8);
             this.tabPage8.Location = new System.Drawing.Point(4, 25);
-            this.tabPage8.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.tabPage8.Margin = new System.Windows.Forms.Padding(4);
             this.tabPage8.Name = "tabPage8";
-            this.tabPage8.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.tabPage8.Padding = new System.Windows.Forms.Padding(4);
             this.tabPage8.Size = new System.Drawing.Size(1240, 679);
             this.tabPage8.TabIndex = 3;
             this.tabPage8.Text = "Misc";
@@ -2057,9 +2079,9 @@
             this.GroupBox11.Controls.Add(this.txtFirmwareCheck);
             this.GroupBox11.Controls.Add(this.cmdFirmwareCheck);
             this.GroupBox11.Location = new System.Drawing.Point(304, 7);
-            this.GroupBox11.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.GroupBox11.Margin = new System.Windows.Forms.Padding(4);
             this.GroupBox11.Name = "GroupBox11";
-            this.GroupBox11.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.GroupBox11.Padding = new System.Windows.Forms.Padding(4);
             this.GroupBox11.Size = new System.Drawing.Size(292, 86);
             this.GroupBox11.TabIndex = 6;
             this.GroupBox11.TabStop = false;
@@ -2068,7 +2090,7 @@
             // txtFirmwareCheck
             // 
             this.txtFirmwareCheck.Location = new System.Drawing.Point(109, 22);
-            this.txtFirmwareCheck.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.txtFirmwareCheck.Margin = new System.Windows.Forms.Padding(4);
             this.txtFirmwareCheck.Multiline = true;
             this.txtFirmwareCheck.Name = "txtFirmwareCheck";
             this.txtFirmwareCheck.Size = new System.Drawing.Size(173, 52);
@@ -2077,7 +2099,7 @@
             // cmdFirmwareCheck
             // 
             this.cmdFirmwareCheck.Location = new System.Drawing.Point(12, 22);
-            this.cmdFirmwareCheck.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.cmdFirmwareCheck.Margin = new System.Windows.Forms.Padding(4);
             this.cmdFirmwareCheck.Name = "cmdFirmwareCheck";
             this.cmdFirmwareCheck.Size = new System.Drawing.Size(89, 53);
             this.cmdFirmwareCheck.TabIndex = 3;
@@ -2089,9 +2111,9 @@
             // 
             this.GroupBox10.Controls.Add(this.cmdGetGPTP);
             this.GroupBox10.Location = new System.Drawing.Point(304, 101);
-            this.GroupBox10.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.GroupBox10.Margin = new System.Windows.Forms.Padding(4);
             this.GroupBox10.Name = "GroupBox10";
-            this.GroupBox10.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.GroupBox10.Padding = new System.Windows.Forms.Padding(4);
             this.GroupBox10.Size = new System.Drawing.Size(292, 102);
             this.GroupBox10.TabIndex = 3;
             this.GroupBox10.TabStop = false;
@@ -2100,7 +2122,7 @@
             // cmdGetGPTP
             // 
             this.cmdGetGPTP.Location = new System.Drawing.Point(59, 23);
-            this.cmdGetGPTP.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.cmdGetGPTP.Margin = new System.Windows.Forms.Padding(4);
             this.cmdGetGPTP.Name = "cmdGetGPTP";
             this.cmdGetGPTP.Size = new System.Drawing.Size(161, 62);
             this.cmdGetGPTP.TabIndex = 0;
@@ -2113,9 +2135,9 @@
             this.GroupBox9.Controls.Add(this.cmdSetRTC);
             this.GroupBox9.Controls.Add(this.cmdGetRTC);
             this.GroupBox9.Location = new System.Drawing.Point(4, 101);
-            this.GroupBox9.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.GroupBox9.Margin = new System.Windows.Forms.Padding(4);
             this.GroupBox9.Name = "GroupBox9";
-            this.GroupBox9.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.GroupBox9.Padding = new System.Windows.Forms.Padding(4);
             this.GroupBox9.Size = new System.Drawing.Size(292, 138);
             this.GroupBox9.TabIndex = 2;
             this.GroupBox9.TabStop = false;
@@ -2124,7 +2146,7 @@
             // cmdSetRTC
             // 
             this.cmdSetRTC.Location = new System.Drawing.Point(12, 89);
-            this.cmdSetRTC.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.cmdSetRTC.Margin = new System.Windows.Forms.Padding(4);
             this.cmdSetRTC.Name = "cmdSetRTC";
             this.cmdSetRTC.Size = new System.Drawing.Size(272, 36);
             this.cmdSetRTC.TabIndex = 7;
@@ -2135,7 +2157,7 @@
             // cmdGetRTC
             // 
             this.cmdGetRTC.Location = new System.Drawing.Point(12, 23);
-            this.cmdGetRTC.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.cmdGetRTC.Margin = new System.Windows.Forms.Padding(4);
             this.cmdGetRTC.Name = "cmdGetRTC";
             this.cmdGetRTC.Size = new System.Drawing.Size(272, 58);
             this.cmdGetRTC.TabIndex = 0;
@@ -2148,9 +2170,9 @@
             this.GroupBox8.Controls.Add(this.chkDoIPState);
             this.GroupBox8.Controls.Add(this.cmdSetDoIPState);
             this.GroupBox8.Location = new System.Drawing.Point(4, 7);
-            this.GroupBox8.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.GroupBox8.Margin = new System.Windows.Forms.Padding(4);
             this.GroupBox8.Name = "GroupBox8";
-            this.GroupBox8.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.GroupBox8.Padding = new System.Windows.Forms.Padding(4);
             this.GroupBox8.Size = new System.Drawing.Size(292, 86);
             this.GroupBox8.TabIndex = 1;
             this.GroupBox8.TabStop = false;
@@ -2160,7 +2182,7 @@
             // 
             this.chkDoIPState.AutoSize = true;
             this.chkDoIPState.Location = new System.Drawing.Point(133, 33);
-            this.chkDoIPState.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.chkDoIPState.Margin = new System.Windows.Forms.Padding(4);
             this.chkDoIPState.Name = "chkDoIPState";
             this.chkDoIPState.Size = new System.Drawing.Size(80, 20);
             this.chkDoIPState.TabIndex = 1;
@@ -2170,7 +2192,7 @@
             // cmdSetDoIPState
             // 
             this.cmdSetDoIPState.Location = new System.Drawing.Point(12, 23);
-            this.cmdSetDoIPState.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.cmdSetDoIPState.Margin = new System.Windows.Forms.Padding(4);
             this.cmdSetDoIPState.Name = "cmdSetDoIPState";
             this.cmdSetDoIPState.Size = new System.Drawing.Size(113, 52);
             this.cmdSetDoIPState.TabIndex = 0;
@@ -2187,16 +2209,6 @@
             this.tabPage5.Text = "ISO15765";
             this.tabPage5.UseVisualStyleBackColor = true;
             // 
-            // getACL
-            // 
-            this.getACL.Location = new System.Drawing.Point(651, 33);
-            this.getACL.Name = "getACL";
-            this.getACL.Size = new System.Drawing.Size(75, 23);
-            this.getACL.TabIndex = 27;
-            this.getACL.Text = "Get ACL";
-            this.getACL.UseVisualStyleBackColor = true;
-            this.getACL.Click += new System.EventHandler(this.getACL_Click);
-            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
@@ -2204,7 +2216,7 @@
             this.ClientSize = new System.Drawing.Size(1256, 828);
             this.Controls.Add(this.GroupBox1);
             this.Controls.Add(this.TabControl1);
-            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "Form1";
             this.Text = "Form1";
             this.Load += new System.EventHandler(this.Form1_Load);
@@ -2431,6 +2443,7 @@
         internal System.Windows.Forms.Button cmdFirmwareCheck;
         internal System.Windows.Forms.Button cmdSetRTC;
         internal System.Windows.Forms.Button getACL;
+        internal System.Windows.Forms.Button setACL;
     }
 }
 
