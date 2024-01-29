@@ -32,7 +32,7 @@ namespace CSnet
         {
             int iResult;
             NeoDeviceEx[] ndNeoToOpenex = new NeoDeviceEx[16];	//Struct holding detected hardware information
-            OptionsOpenNeoEx OptionOpenNeoEX = new OptionsOpenNeoEx(); 
+            OptionsOpenNeoEx OptionOpenNeoEX = new OptionsOpenNeoEx();
             byte[] bNetwork = new byte[255];    //List of hardware IDs
             int iNumberOfDevices;   //Number of hardware devices to look for 
             int iCount;		 //counter
@@ -54,7 +54,7 @@ namespace CSnet
 
             //Search for connected hardware
             //iResult = icsNeoDll.icsneoFindNeoDevices((uint)eHardwareTypes.NEODEVICE_ALL, ref ndNeoToOpen, ref iNumberOfDevices);
-            iResult = icsNeoDll.icsneoFindDevices(ref ndNeoToOpenex[0],ref iNumberOfDevices, 0, 0,ref neoDeviceOption, 0);
+            iResult = icsNeoDll.icsneoFindDevices(ref ndNeoToOpenex[0], ref iNumberOfDevices, 0, 0, ref neoDeviceOption, 0);
             if (iResult == 0)
             {
                 MessageBox.Show("Problem finding devices");
@@ -68,7 +68,7 @@ namespace CSnet
             }
 
             //Open the first found device
-            iResult = icsNeoDll.icsneoOpenDevice(ref ndNeoToOpenex[0], ref m_hObject, ref bNetwork[0], 1, 0,ref OptionOpenNeoEX,0);
+            iResult = icsNeoDll.icsneoOpenDevice(ref ndNeoToOpenex[0], ref m_hObject, ref bNetwork[0], 1, 0, ref OptionOpenNeoEX, 0);
             if (iResult == 1)
             {
                 MessageBox.Show("Port Opened OK!");
@@ -170,25 +170,25 @@ namespace CSnet
             int iResult;
             int iNumberOfErrors = 0;
 
-            if(Timer1.Enabled == true) 
+            if (Timer1.Enabled == true)
             {
-                Timer1.Enabled = false; 
+                Timer1.Enabled = false;
                 chkAutoRead.Checked = false;
             }
-                
-    	    //close the port
-          iResult = icsNeoDll.icsneoClosePort(m_hObject,ref iNumberOfErrors);
-          if (iResult == 1)
-    	    {
-    		    MessageBox.Show("Port Closed OK!");
-        	}
+
+            //close the port
+            iResult = icsNeoDll.icsneoClosePort(m_hObject, ref iNumberOfErrors);
+            if (iResult == 1)
+            {
+                MessageBox.Show("Port Closed OK!");
+            }
             else
-        	{   
-    		    MessageBox.Show("Problem ClosingPort");
-	        }
-    
+            {
+                MessageBox.Show("Problem ClosingPort");
+            }
+
             lblneoInfo.Text = "Port Not Opened";
-    
+
             //Clear device type and open flag
             iOpenDeviceType = 0;
             m_bPortOpen = false;
@@ -212,7 +212,7 @@ namespace CSnet
             int lRestart = 0;  //tells if a restart is needed
             StringBuilder sErrorShort = new StringBuilder(256);  //String for Error
             StringBuilder sErrorLong = new StringBuilder(256);  //String for Error
-            
+
             iMaxLengthShort = 255; //Set initial conditions
             iMaxLengthLong = 255; //Set initial conditions
             // Read Out the errors
@@ -231,7 +231,7 @@ namespace CSnet
                     {
                         lstErrorHolder.Items.Clear();
                         //Get Text Description of the Error
-                         iResult = icsNeoDll.icsneoGetErrorInfo(iErrors[iCount], sErrorShort ,sErrorLong, ref  iMaxLengthShort, ref iMaxLengthLong, ref iSeverity, ref lRestart);
+                        iResult = icsNeoDll.icsneoGetErrorInfo(iErrors[iCount], sErrorShort, sErrorLong, ref iMaxLengthShort, ref iMaxLengthLong, ref iSeverity, ref lRestart);
                         lstErrorHolder.Items.Add(sErrorShort + " - Description " + sErrorLong + " - Errornum: " + iErrors[iCount]);
                     }
                 }
@@ -257,7 +257,7 @@ namespace CSnet
                     Timer1.Enabled = false;
                 }
             }
-            
+
         }
 
         private void cmdWaitForMessageWithTimeOut_Click(object sender, EventArgs e)
@@ -332,6 +332,7 @@ namespace CSnet
                 return;  // do not read messages if we haven't opened neoVI yet
             }
 
+            /*
             //set mode to active
             //adi_wil_SetMode(m_hObject, 3);
             byte functionError = 0;
@@ -340,7 +341,9 @@ namespace CSnet
 
             parameters[0] = 3; //3 = active mode
 
-            icsNeoDll.icsneoGenericAPISendCommand(m_hObject, 1, 0, function, Marshal.UnsafeAddrOfPinnedArrayElement(parameters, 0), 1, out functionError);
+            icsNeoDll.icsneoGenericAPISendCommand(m_hObject, 1, 0, function, Marshal.UnsafeAddrOfPinnedArrayElement(parameters, 0), 1, out functionError);1
+            */
+            setMode(ADI_WIL_MODE_ACTIVE);
 
             // read the messages from the driver
             lResult = icsNeoDll.icsneoGetMessages(m_hObject, ref stMessages[0], ref lNumberOfMessages, ref lNumberOfErrors);
@@ -394,7 +397,7 @@ namespace CSnet
                             else
                             {
                                 //This is not a wBMS message
-                                sListString += "Unknown ";                                
+                                sListString += "Unknown ";
                             }
                             // Grab wBMS specific fields from the ArbIDOrHeader value
                             uint uiPacketType = GetPacketTypeFromArbId((uint)stMessages[lCount - 1].ArbIDOrHeader);
@@ -437,17 +440,17 @@ namespace CSnet
                                     //TODO: ignore
                                     break;
                                 case BMS_PACKET_TYPE:
-                                    sListString +="BMS ";
+                                    sListString += "BMS ";
 
                                     //TODO: look in ICS WIL DLL Deliverables\wbmsapitester\wbmsapitester\containers for information on decoding bms payload
                                     break;
                                 case PMS_PACKET_TYPE:
-                                    sListString +="PMS ";
+                                    sListString += "PMS ";
 
                                     //TODO: look in ICS WIL DLL Deliverables\wbmsapitester\wbmsapitester\containers for information on decoding pms payload
                                     break;
                                 case EMS_PACKET_TYPE:
-                                    sListString +="EMS ";
+                                    sListString += "EMS ";
 
                                     //TODO: look in ICS WIL DLL Deliverables\wbmsapitester\wbmsapitester\containers for information on decoding ems payload
                                     break;
@@ -457,22 +460,22 @@ namespace CSnet
                                     //TODO: decode payload
                                     break;
                                 case HEALTH_REPORTS_PACKET_TYPE:
-                                    sListString +="Health Report ";
+                                    sListString += "Health Report ";
 
                                     //TODO: decode payload
                                     break;
                                 case SPI_STATS_PACKET_TYPE:
-                                    sListString +="SPI Port Statistics ";
+                                    sListString += "SPI Port Statistics ";
 
                                     //TODO: decode payload
                                     break;
                                 case WIL_STATS_PACKET_TYPE:
-                                    sListString +="WIL Statistics ";
+                                    sListString += "WIL Statistics ";
 
                                     //TODO: decode payload
                                     break;
                                 case EVENT_PACKET_TYPE:
-                                    sListString +="Event Notification ";
+                                    sListString += "Event Notification ";
 
                                     //TODO: decode payload
                                     break;
@@ -502,7 +505,7 @@ namespace CSnet
                                     sListString += data;
                                 }
 
-                                
+
                             }
                             else
                             {
@@ -524,24 +527,24 @@ namespace CSnet
                             else
                             {
 
-                                if (stMessages[lCount - 1].Protocol == Convert.ToByte (ePROTOCOL.SPY_PROTOCOL_CANFD))
+                                if (stMessages[lCount - 1].Protocol == Convert.ToByte(ePROTOCOL.SPY_PROTOCOL_CANFD))
                                 {
                                     //Count for CAN FD
-                                    iLongMessageTotalByteCount = stMessages[lCount - 1].NumberBytesData ;
+                                    iLongMessageTotalByteCount = stMessages[lCount - 1].NumberBytesData;
                                 }
                                 else
                                 {
                                     //Count for Ethernet
-                                    iLongMessageTotalByteCount = ((stMessages[lCount - 1].NumberBytesHeader * 0x100) + stMessages[lCount - 1].NumberBytesData) ;
+                                    iLongMessageTotalByteCount = ((stMessages[lCount - 1].NumberBytesHeader * 0x100) + stMessages[lCount - 1].NumberBytesData);
                                 }
-                                
+
                                 //More than 8 bytes of data
                                 iDataBytes = new byte[iLongMessageTotalByteCount];
 
                                 System.Runtime.InteropServices.Marshal.Copy(stMessages[lCount - 1].iExtraDataPtr, iDataBytes, 0, iLongMessageTotalByteCount);
                                 System.Runtime.InteropServices.GCHandle gcHandle = System.Runtime.InteropServices.GCHandle.Alloc(iDataBytes, System.Runtime.InteropServices.GCHandleType.Pinned);
 
-                                if (stMessages[lCount - 1].Protocol == (int)ePROTOCOL.SPY_PROTOCOL_CANFD) sListString = sListString + " FD ArbID : "+ Convert.ToString(stMessages[lCount - 1].ArbIDOrHeader, 16);
+                                if (stMessages[lCount - 1].Protocol == (int)ePROTOCOL.SPY_PROTOCOL_CANFD) sListString = sListString + " FD ArbID : " + Convert.ToString(stMessages[lCount - 1].ArbIDOrHeader, 16);
                                 sListString = sListString + "  Data ";
                                 for (iByteCount = 0; iByteCount < iLongMessageTotalByteCount; iByteCount++)
                                 {
@@ -592,165 +595,165 @@ namespace CSnet
         private void Form1_Load(object sender, EventArgs e)
         {
 
-        iOpenDeviceType = 0;
+            iOpenDeviceType = 0;
 
-        TabControl1.SelectTab(0);
-        TabControl2.SelectTab(0);
+            TabControl1.SelectTab(0);
+            TabControl2.SelectTab(0);
 
-        //Fill dropdowns
-        lstNetwork.Items.Add("DEVICE");
-        lstNetwork.Items.Add("HSCAN");
-        lstNetwork.Items.Add("MSCAN");
-        lstNetwork.Items.Add("SWCAN");
-        lstNetwork.Items.Add("LSFTCAN");
-        lstNetwork.Items.Add("HSCAN2");
-        lstNetwork.Items.Add("HSCAN3");
-        lstNetwork.Items.Add("HSCAN4");
-        lstNetwork.Items.Add("HSCAN5");
-        lstNetwork.Items.Add("HSCAN6");
-        lstNetwork.Items.Add("HSCAN7");
-        lstNetwork.Items.Add("DWCAN9");
-        lstNetwork.Items.Add("DWCAN10");
-        lstNetwork.Items.Add("DWCAN11");
-        lstNetwork.Items.Add("DWCAN12");
-        lstNetwork.Items.Add("DWCAN13");
-        lstNetwork.Items.Add("DWCAN14");
-        lstNetwork.Items.Add("DWCAN15");
-        lstNetwork.Items.Add("DWCAN16");
-
-
-        lstISO15765Network.Items.Add("DEVICE");
-        lstISO15765Network.Items.Add("HSCAN");
-        lstISO15765Network.Items.Add("MSCAN");
-        lstISO15765Network.Items.Add("SWCAN");
-        lstISO15765Network.Items.Add("LSFTCAN");
-        lstISO15765Network.Items.Add("HSCAN2");
-        lstISO15765Network.Items.Add("HSCAN3");
-        lstISO15765Network.Items.Add("HSCAN4");
-        lstISO15765Network.Items.Add("HSCAN5");
-        lstISO15765Network.Items.Add("HSCAN6");
-        lstISO15765Network.Items.Add("HSCAN7");
-        lstISO15765Network.Items.Add("DWCAN9");
-        lstISO15765Network.Items.Add("DWCAN10");
-        lstISO15765Network.Items.Add("DWCAN11");
-        lstISO15765Network.Items.Add("DWCAN12");
-        lstISO15765Network.Items.Add("DWCAN13");
-        lstISO15765Network.Items.Add("DWCAN14");
-        lstISO15765Network.Items.Add("DWCAN15");
-        lstISO15765Network.Items.Add("DWCAN16");
-
-        lstOtherNetwork.Items.Add("ISO");
-        lstOtherNetwork.Items.Add("ISO2");
-        lstOtherNetwork.Items.Add("ISO3");
-        lstOtherNetwork.Items.Add("ISO4");
-
-        lstLINNetwork.Items.Add("LIN1");
-        lstLINNetwork.Items.Add("LIN2");
-        lstLINNetwork.Items.Add("LIN3");
-        lstLINNetwork.Items.Add("LIN4");
-        lstLINNetwork.Items.Add("LIN5");
-        lstLINNetwork.Items.Add("LIN6");
-        lstLINNetwork.Items.Add("LIN7");
-        lstLINNetwork.Items.Add("LIN8");
-
-        lstCANFDNetwork.Items.Add("HSCAN");
-        lstCANFDNetwork.Items.Add("MSCAN");
-        lstCANFDNetwork.Items.Add("HSCAN2");
-        lstCANFDNetwork.Items.Add("HSCAN3");
-        lstCANFDNetwork.Items.Add("HSCAN4");
-        lstCANFDNetwork.Items.Add("HSCAN5");
-        lstCANFDNetwork.Items.Add("HSCAN6");
-        lstCANFDNetwork.Items.Add("HSCAN7");
-        lstCANFDNetwork.Items.Add("DWCAN9");
-        lstCANFDNetwork.Items.Add("DWCAN10");
-        lstCANFDNetwork.Items.Add("DWCAN11");
-        lstCANFDNetwork.Items.Add("DWCAN12");
-        lstCANFDNetwork.Items.Add("DWCAN13");
-        lstCANFDNetwork.Items.Add("DWCAN14");
-        lstCANFDNetwork.Items.Add("DWCAN15");
-        lstCANFDNetwork.Items.Add("DWCAN16"); 
-
-        cboEthernetNetworks.Items.Add("ETHERNET");
-        cboEthernetNetworks.Items.Add("OP_ETHERNET1");
-        cboEthernetNetworks.Items.Add("OP_ETHERNET2");
-        cboEthernetNetworks.Items.Add("OP_ETHERNET3");
-        cboEthernetNetworks.Items.Add("OP_ETHERNET4");
-        cboEthernetNetworks.Items.Add("OP_ETHERNET5");
-        cboEthernetNetworks.Items.Add("OP_ETHERNET6");
-        cboEthernetNetworks.Items.Add("OP_ETHERNET7");
-        cboEthernetNetworks.Items.Add("OP_ETHERNET8");
-        cboEthernetNetworks.Items.Add("OP_ETHERNET9");
-        cboEthernetNetworks.Items.Add("OP_ETHERNET10");
-        cboEthernetNetworks.Items.Add("OP_ETHERNET11");
-        cboEthernetNetworks.Items.Add("OP_ETHERNET12");
-
-        lstNetwork.SelectedIndex = 1;
-        lstLINNetwork.SelectedIndex = 0;
-        lstOtherNetwork.SelectedIndex = 0;
-        lstCANFDNetwork.SelectedIndex = 0;
-        cboLINMessageType.SelectedIndex = 0;
-        cboIDType.SelectedIndex = 0;
-        lstNumberOfBytes.SelectedIndex = 8;
-        lstISO15765Network.SelectedIndex = 1;
-        lstNumberOfOtherBytes.SelectedIndex = 8;
-        lstLINNumberOfBytes.SelectedIndex = 8;
-        lstNumberOfCANFDBytes.SelectedIndex = 8;
-        cboEthernetNetworks.SelectedIndex = 0;
-
-        lstBaudRateToUse.Items.Add("20000");
-        lstBaudRateToUse.Items.Add("33333");
-        lstBaudRateToUse.Items.Add("50000");
-        lstBaudRateToUse.Items.Add("62500");
-        lstBaudRateToUse.Items.Add("83333");
-        lstBaudRateToUse.Items.Add("100000");
-        lstBaudRateToUse.Items.Add("125000");
-        lstBaudRateToUse.Items.Add("250000");
-        lstBaudRateToUse.Items.Add("500000");
-        lstBaudRateToUse.Items.Add("800000");
-        lstBaudRateToUse.Items.Add("1000000");
-        lstBaudRateToUse.SelectedIndex = 0;
-
-        lstFDBaudRateToUse.Items.Add("1000000");
-        lstFDBaudRateToUse.Items.Add("2000000");
-        lstFDBaudRateToUse.Items.Add("4000000");
-        lstFDBaudRateToUse.Items.Add("5000000");
-        lstFDBaudRateToUse.Items.Add("8000000");
-        lstFDBaudRateToUse.Items.Add("10000000");
-        lstFDBaudRateToUse.SelectedIndex = 0;
-
-        lstNetworkBaudRate.Items.Add("HSCAN");
-        lstNetworkBaudRate.Items.Add("MSCAN");
-        lstNetworkBaudRate.Items.Add("SWCAN");
-        lstNetworkBaudRate.Items.Add("LSFTCAN");
-        lstNetworkBaudRate.Items.Add("HSCAN2");
-        lstNetworkBaudRate.Items.Add("HSCAN3");
-        lstNetworkBaudRate.Items.Add("HSCAN4");
-        lstNetworkBaudRate.Items.Add("HSCAN5");
-        lstNetworkBaudRate.Items.Add("HSCAN6");
-        lstNetworkBaudRate.Items.Add("HSCAN7");
-        lstNetworkBaudRate.Items.Add("DWCAN9");
-        lstNetworkBaudRate.Items.Add("DWCAN10");
-        lstNetworkBaudRate.Items.Add("DWCAN11");
-        lstNetworkBaudRate.Items.Add("DWCAN12");
-        lstNetworkBaudRate.Items.Add("DWCAN13");
-        lstNetworkBaudRate.Items.Add("DWCAN14");
-        lstNetworkBaudRate.Items.Add("DWCAN15");
-        lstNetworkBaudRate.Items.Add("DWCAN16");
-        lstNetworkBaudRate.SelectedIndex = 0;
-
-        lstNetwork.SelectedIndex = 1;
-        lstNumberOfBytes.SelectedIndex = 8;
+            //Fill dropdowns
+            lstNetwork.Items.Add("DEVICE");
+            lstNetwork.Items.Add("HSCAN");
+            lstNetwork.Items.Add("MSCAN");
+            lstNetwork.Items.Add("SWCAN");
+            lstNetwork.Items.Add("LSFTCAN");
+            lstNetwork.Items.Add("HSCAN2");
+            lstNetwork.Items.Add("HSCAN3");
+            lstNetwork.Items.Add("HSCAN4");
+            lstNetwork.Items.Add("HSCAN5");
+            lstNetwork.Items.Add("HSCAN6");
+            lstNetwork.Items.Add("HSCAN7");
+            lstNetwork.Items.Add("DWCAN9");
+            lstNetwork.Items.Add("DWCAN10");
+            lstNetwork.Items.Add("DWCAN11");
+            lstNetwork.Items.Add("DWCAN12");
+            lstNetwork.Items.Add("DWCAN13");
+            lstNetwork.Items.Add("DWCAN14");
+            lstNetwork.Items.Add("DWCAN15");
+            lstNetwork.Items.Add("DWCAN16");
 
 
-        //Add the version number to the title of the application.  
-        try
-        {
-            this.Text = "ICS API Example API Version " + Convert.ToString(icsNeoDll.icsneoGetDLLVersion());
-        }
-        catch
-        {
-            this.Text = "ICS API Example, DLL Missing or Not Accessable";
-        }
+            lstISO15765Network.Items.Add("DEVICE");
+            lstISO15765Network.Items.Add("HSCAN");
+            lstISO15765Network.Items.Add("MSCAN");
+            lstISO15765Network.Items.Add("SWCAN");
+            lstISO15765Network.Items.Add("LSFTCAN");
+            lstISO15765Network.Items.Add("HSCAN2");
+            lstISO15765Network.Items.Add("HSCAN3");
+            lstISO15765Network.Items.Add("HSCAN4");
+            lstISO15765Network.Items.Add("HSCAN5");
+            lstISO15765Network.Items.Add("HSCAN6");
+            lstISO15765Network.Items.Add("HSCAN7");
+            lstISO15765Network.Items.Add("DWCAN9");
+            lstISO15765Network.Items.Add("DWCAN10");
+            lstISO15765Network.Items.Add("DWCAN11");
+            lstISO15765Network.Items.Add("DWCAN12");
+            lstISO15765Network.Items.Add("DWCAN13");
+            lstISO15765Network.Items.Add("DWCAN14");
+            lstISO15765Network.Items.Add("DWCAN15");
+            lstISO15765Network.Items.Add("DWCAN16");
+
+            lstOtherNetwork.Items.Add("ISO");
+            lstOtherNetwork.Items.Add("ISO2");
+            lstOtherNetwork.Items.Add("ISO3");
+            lstOtherNetwork.Items.Add("ISO4");
+
+            lstLINNetwork.Items.Add("LIN1");
+            lstLINNetwork.Items.Add("LIN2");
+            lstLINNetwork.Items.Add("LIN3");
+            lstLINNetwork.Items.Add("LIN4");
+            lstLINNetwork.Items.Add("LIN5");
+            lstLINNetwork.Items.Add("LIN6");
+            lstLINNetwork.Items.Add("LIN7");
+            lstLINNetwork.Items.Add("LIN8");
+
+            lstCANFDNetwork.Items.Add("HSCAN");
+            lstCANFDNetwork.Items.Add("MSCAN");
+            lstCANFDNetwork.Items.Add("HSCAN2");
+            lstCANFDNetwork.Items.Add("HSCAN3");
+            lstCANFDNetwork.Items.Add("HSCAN4");
+            lstCANFDNetwork.Items.Add("HSCAN5");
+            lstCANFDNetwork.Items.Add("HSCAN6");
+            lstCANFDNetwork.Items.Add("HSCAN7");
+            lstCANFDNetwork.Items.Add("DWCAN9");
+            lstCANFDNetwork.Items.Add("DWCAN10");
+            lstCANFDNetwork.Items.Add("DWCAN11");
+            lstCANFDNetwork.Items.Add("DWCAN12");
+            lstCANFDNetwork.Items.Add("DWCAN13");
+            lstCANFDNetwork.Items.Add("DWCAN14");
+            lstCANFDNetwork.Items.Add("DWCAN15");
+            lstCANFDNetwork.Items.Add("DWCAN16");
+
+            cboEthernetNetworks.Items.Add("ETHERNET");
+            cboEthernetNetworks.Items.Add("OP_ETHERNET1");
+            cboEthernetNetworks.Items.Add("OP_ETHERNET2");
+            cboEthernetNetworks.Items.Add("OP_ETHERNET3");
+            cboEthernetNetworks.Items.Add("OP_ETHERNET4");
+            cboEthernetNetworks.Items.Add("OP_ETHERNET5");
+            cboEthernetNetworks.Items.Add("OP_ETHERNET6");
+            cboEthernetNetworks.Items.Add("OP_ETHERNET7");
+            cboEthernetNetworks.Items.Add("OP_ETHERNET8");
+            cboEthernetNetworks.Items.Add("OP_ETHERNET9");
+            cboEthernetNetworks.Items.Add("OP_ETHERNET10");
+            cboEthernetNetworks.Items.Add("OP_ETHERNET11");
+            cboEthernetNetworks.Items.Add("OP_ETHERNET12");
+
+            lstNetwork.SelectedIndex = 1;
+            lstLINNetwork.SelectedIndex = 0;
+            lstOtherNetwork.SelectedIndex = 0;
+            lstCANFDNetwork.SelectedIndex = 0;
+            cboLINMessageType.SelectedIndex = 0;
+            cboIDType.SelectedIndex = 0;
+            lstNumberOfBytes.SelectedIndex = 8;
+            lstISO15765Network.SelectedIndex = 1;
+            lstNumberOfOtherBytes.SelectedIndex = 8;
+            lstLINNumberOfBytes.SelectedIndex = 8;
+            lstNumberOfCANFDBytes.SelectedIndex = 8;
+            cboEthernetNetworks.SelectedIndex = 0;
+
+            lstBaudRateToUse.Items.Add("20000");
+            lstBaudRateToUse.Items.Add("33333");
+            lstBaudRateToUse.Items.Add("50000");
+            lstBaudRateToUse.Items.Add("62500");
+            lstBaudRateToUse.Items.Add("83333");
+            lstBaudRateToUse.Items.Add("100000");
+            lstBaudRateToUse.Items.Add("125000");
+            lstBaudRateToUse.Items.Add("250000");
+            lstBaudRateToUse.Items.Add("500000");
+            lstBaudRateToUse.Items.Add("800000");
+            lstBaudRateToUse.Items.Add("1000000");
+            lstBaudRateToUse.SelectedIndex = 0;
+
+            lstFDBaudRateToUse.Items.Add("1000000");
+            lstFDBaudRateToUse.Items.Add("2000000");
+            lstFDBaudRateToUse.Items.Add("4000000");
+            lstFDBaudRateToUse.Items.Add("5000000");
+            lstFDBaudRateToUse.Items.Add("8000000");
+            lstFDBaudRateToUse.Items.Add("10000000");
+            lstFDBaudRateToUse.SelectedIndex = 0;
+
+            lstNetworkBaudRate.Items.Add("HSCAN");
+            lstNetworkBaudRate.Items.Add("MSCAN");
+            lstNetworkBaudRate.Items.Add("SWCAN");
+            lstNetworkBaudRate.Items.Add("LSFTCAN");
+            lstNetworkBaudRate.Items.Add("HSCAN2");
+            lstNetworkBaudRate.Items.Add("HSCAN3");
+            lstNetworkBaudRate.Items.Add("HSCAN4");
+            lstNetworkBaudRate.Items.Add("HSCAN5");
+            lstNetworkBaudRate.Items.Add("HSCAN6");
+            lstNetworkBaudRate.Items.Add("HSCAN7");
+            lstNetworkBaudRate.Items.Add("DWCAN9");
+            lstNetworkBaudRate.Items.Add("DWCAN10");
+            lstNetworkBaudRate.Items.Add("DWCAN11");
+            lstNetworkBaudRate.Items.Add("DWCAN12");
+            lstNetworkBaudRate.Items.Add("DWCAN13");
+            lstNetworkBaudRate.Items.Add("DWCAN14");
+            lstNetworkBaudRate.Items.Add("DWCAN15");
+            lstNetworkBaudRate.Items.Add("DWCAN16");
+            lstNetworkBaudRate.SelectedIndex = 0;
+
+            lstNetwork.SelectedIndex = 1;
+            lstNumberOfBytes.SelectedIndex = 8;
+
+
+            //Add the version number to the title of the application.  
+            try
+            {
+                this.Text = "ICS API Example API Version " + Convert.ToString(icsNeoDll.icsneoGetDLLVersion());
+            }
+            catch
+            {
+                this.Text = "ICS API Example, DLL Missing or Not Accessable";
+            }
         }
 
         private void Timer1_Tick(object sender, EventArgs e)
@@ -764,56 +767,56 @@ namespace CSnet
         private void cmdTransmit_Click(object sender, EventArgs e)
         {
             long lResult;
-			icsSpyMessage stMessagesTx = new icsSpyMessage();
-			long lNetworkID;
+            icsSpyMessage stMessagesTx = new icsSpyMessage();
+            long lNetworkID;
             string sTempString;
-			
 
-			// Has the uset open neoVI yet?;
-			if (m_bPortOpen==false) 
-			{
-				MessageBox.Show("neoVI not opened");
-				return; // do not read messages if we haven't opened neoVI yet
-			}
-    
+
+            // Has the uset open neoVI yet?;
+            if (m_bPortOpen == false)
+            {
+                MessageBox.Show("neoVI not opened");
+                return; // do not read messages if we haven't opened neoVI yet
+            }
+
             // Read the Network we will transmit on (indicated by lstNetwork ListBox)
-            sTempString = lstNetwork.Text; 
+            sTempString = lstNetwork.Text;
             lNetworkID = icsNeoDll.GetNetworkIDfromString(ref sTempString);
-    
+
             // Is this a CAN network or a J1850/ISO one?
             // load the message structure
-    
-            	if (chkExtendedID.Checked == true)
-				{
-					//Make id Extended
-					stMessagesTx.StatusBitField = Convert.ToInt16(eDATA_STATUS_BITFIELD_1.SPY_STATUS_XTD_FRAME); 
-				}
-				else
-				{
-					//Use Normal ID
-					stMessagesTx.StatusBitField = 0;
-				}
-				stMessagesTx.ArbIDOrHeader = Convert.ToInt32( txtArbID.Text,16);            // The ArbID
-				stMessagesTx.NumberBytesData = Convert.ToByte(lstNumberOfBytes.SelectedIndex);         // The number of Data Bytes
-				if (stMessagesTx.NumberBytesData > 8) stMessagesTx.NumberBytesData = 8; // You can only have 8 databytes with CAN
-				// Load all of the data bytes in the structure
-	
-				stMessagesTx.Data1 = Convert.ToByte(txtDataByte1.Text,16);
-                stMessagesTx.Data2 = Convert.ToByte(txtDataByte2.Text,16);
-				stMessagesTx.Data3 = Convert.ToByte(txtDataByte3.Text,16);
-				stMessagesTx.Data4 = Convert.ToByte(txtDataByte4.Text,16);
-				stMessagesTx.Data5 = Convert.ToByte(txtDataByte5.Text,16);
-				stMessagesTx.Data6 = Convert.ToByte(txtDataByte6.Text,16);
-				stMessagesTx.Data7 = Convert.ToByte(txtDataByte7.Text,16);
-				stMessagesTx.Data8 = Convert.ToByte(txtDataByte8.Text,16);
 
-                // Transmit the assembled message
-                lResult = icsNeoDll.icsneoTxMessages(m_hObject, ref stMessagesTx, Convert.ToInt32(lNetworkID), 1);
-                // Test the returned result
-                if (lResult != 1)
-                {
-                    MessageBox.Show("Problem Transmitting Message");
-                }
+            if (chkExtendedID.Checked == true)
+            {
+                //Make id Extended
+                stMessagesTx.StatusBitField = Convert.ToInt16(eDATA_STATUS_BITFIELD_1.SPY_STATUS_XTD_FRAME);
+            }
+            else
+            {
+                //Use Normal ID
+                stMessagesTx.StatusBitField = 0;
+            }
+            stMessagesTx.ArbIDOrHeader = Convert.ToInt32(txtArbID.Text, 16);            // The ArbID
+            stMessagesTx.NumberBytesData = Convert.ToByte(lstNumberOfBytes.SelectedIndex);         // The number of Data Bytes
+            if (stMessagesTx.NumberBytesData > 8) stMessagesTx.NumberBytesData = 8; // You can only have 8 databytes with CAN
+                                                                                    // Load all of the data bytes in the structure
+
+            stMessagesTx.Data1 = Convert.ToByte(txtDataByte1.Text, 16);
+            stMessagesTx.Data2 = Convert.ToByte(txtDataByte2.Text, 16);
+            stMessagesTx.Data3 = Convert.ToByte(txtDataByte3.Text, 16);
+            stMessagesTx.Data4 = Convert.ToByte(txtDataByte4.Text, 16);
+            stMessagesTx.Data5 = Convert.ToByte(txtDataByte5.Text, 16);
+            stMessagesTx.Data6 = Convert.ToByte(txtDataByte6.Text, 16);
+            stMessagesTx.Data7 = Convert.ToByte(txtDataByte7.Text, 16);
+            stMessagesTx.Data8 = Convert.ToByte(txtDataByte8.Text, 16);
+
+            // Transmit the assembled message
+            lResult = icsNeoDll.icsneoTxMessages(m_hObject, ref stMessagesTx, Convert.ToInt32(lNetworkID), 1);
+            // Test the returned result
+            if (lResult != 1)
+            {
+                MessageBox.Show("Problem Transmitting Message");
+            }
         }
 
         private void cboLINMessageType_SelectedIndexChanged(object sender, EventArgs e)
@@ -821,12 +824,12 @@ namespace CSnet
             //0 = Commander  = ID and data section
             //1 = Header(only) = ID 
             //2 = Responder = Responder data
-    
+
             //Show everything
             pnlDataP2.Visible = true;
             txtLINDataByte1.Visible = true;
             txtLINDataByte2.Visible = true;
-    
+
             //Hide un-needed stuff
             switch (cboLINMessageType.SelectedIndex)
             {
@@ -851,1257 +854,1257 @@ namespace CSnet
 
         private void SendCommanderFrame()
         {
-        long lResult;
-        icsSpyMessageJ1850 stJMsg = new icsSpyMessageJ1850();
-        int lNetworkID;
-        string sTempString;
+            long lResult;
+            icsSpyMessageJ1850 stJMsg = new icsSpyMessageJ1850();
+            int lNetworkID;
+            string sTempString;
 
 
-        //This message type will send out the break, header, and Data.
+            //This message type will send out the break, header, and Data.
 
-        //Set message as Commander frame
-        stJMsg.StatusBitField = Convert.ToInt32(eDATA_STATUS_BITFIELD_1.SPY_STATUS_INIT_MESSAGE);
+            //Set message as Commander frame
+            stJMsg.StatusBitField = Convert.ToInt32(eDATA_STATUS_BITFIELD_1.SPY_STATUS_INIT_MESSAGE);
 
-        // Set the network (LIN 1 in this case)
-        sTempString = lstLINNetwork.Text;
-        lNetworkID = icsNeoDll.GetNetworkIDfromString(ref sTempString);
+            // Set the network (LIN 1 in this case)
+            sTempString = lstLINNetwork.Text;
+            lNetworkID = icsNeoDll.GetNetworkIDfromString(ref sTempString);
 
-        // for all the header bytes
-        if (cboIDType.SelectedIndex == 0)
-        {
-            //standard ID, need to convert!
-            stJMsg.Header1 = GetProtectedIDFromID(Convert.ToByte(txtLINDataByteProtectedID.Text,16));
-        }
-        else
-        {
-            //Protected ID, we can use it
-            stJMsg.Header1 = Convert.ToByte(txtLINDataByteProtectedID.Text,16); //The lin Protected ID goes into the First header bytes
-        }
-        
-        //Copy the data
-        stJMsg.Data1 = Convert.ToByte(txtLINDataByte3.Text,16);
-        stJMsg.Data2 = Convert.ToByte(txtLINDataByte4.Text,16);
-        stJMsg.Data3 = Convert.ToByte(txtLINDataByte5.Text,16);
-        stJMsg.Data4 = Convert.ToByte(txtLINDataByte6.Text,16);
-        stJMsg.Data5 = Convert.ToByte(txtLINDataByte7.Text,16);
-        stJMsg.Data6 = Convert.ToByte(txtLINDataByte8.Text,16);
-
-        switch(lstLINNumberOfBytes.SelectedIndex)
+            // for all the header bytes
+            if (cboIDType.SelectedIndex == 0)
             {
-            case 0:
-                //Make a header only type frame
-                stJMsg.NumberBytesHeader = 1;
-                stJMsg.NumberBytesData = 0;
-                break;
-            case 1:
-                //Only 1 byte of data
-                stJMsg.NumberBytesHeader = 2;
-                stJMsg.Header2 = Convert.ToByte(txtLINDataByte1.Text,16);
-                stJMsg.NumberBytesData = 0;
-                //checksum goes into header byte 3 for this instance
-                stJMsg.Header3 = CalculateLINCheckSum(chkEnhancedChecksum.Checked,ref stJMsg);
-                stJMsg.NumberBytesHeader = 3;
-                break;
-            default:
-                //2 or more 
-                stJMsg.NumberBytesHeader = 3;
-                stJMsg.Header2 = Convert.ToByte(txtLINDataByte1.Text,16);
-                stJMsg.Header3 = Convert.ToByte(txtLINDataByte2.Text,16);
-                stJMsg.NumberBytesData = Convert.ToByte(lstLINNumberOfBytes.SelectedIndex - 2);
+                //standard ID, need to convert!
+                stJMsg.Header1 = GetProtectedIDFromID(Convert.ToByte(txtLINDataByteProtectedID.Text, 16));
+            }
+            else
+            {
+                //Protected ID, we can use it
+                stJMsg.Header1 = Convert.ToByte(txtLINDataByteProtectedID.Text, 16); //The lin Protected ID goes into the First header bytes
+            }
 
-                //header byte
-                if (lstLINNumberOfBytes.SelectedIndex == 2) stJMsg.Data1 = CalculateLINCheckSum(chkEnhancedChecksum.Checked, ref stJMsg);
-                if (lstLINNumberOfBytes.SelectedIndex == 3) stJMsg.Data2 = CalculateLINCheckSum(chkEnhancedChecksum.Checked, ref stJMsg);
-                if (lstLINNumberOfBytes.SelectedIndex == 4) stJMsg.Data3 = CalculateLINCheckSum(chkEnhancedChecksum.Checked, ref stJMsg);
-                if (lstLINNumberOfBytes.SelectedIndex == 5) stJMsg.Data4 = CalculateLINCheckSum(chkEnhancedChecksum.Checked, ref stJMsg);
-                if (lstLINNumberOfBytes.SelectedIndex == 6) stJMsg.Data5 = CalculateLINCheckSum(chkEnhancedChecksum.Checked, ref stJMsg);
-                if (lstLINNumberOfBytes.SelectedIndex == 7) stJMsg.Data6 = CalculateLINCheckSum(chkEnhancedChecksum.Checked, ref stJMsg);
-                if (lstLINNumberOfBytes.SelectedIndex == 8) stJMsg.Data7 = CalculateLINCheckSum(chkEnhancedChecksum.Checked, ref stJMsg);
-                stJMsg.NumberBytesData = Convert.ToByte(lstLINNumberOfBytes.SelectedIndex - 1);
-                break;
-        }
+            //Copy the data
+            stJMsg.Data1 = Convert.ToByte(txtLINDataByte3.Text, 16);
+            stJMsg.Data2 = Convert.ToByte(txtLINDataByte4.Text, 16);
+            stJMsg.Data3 = Convert.ToByte(txtLINDataByte5.Text, 16);
+            stJMsg.Data4 = Convert.ToByte(txtLINDataByte6.Text, 16);
+            stJMsg.Data5 = Convert.ToByte(txtLINDataByte7.Text, 16);
+            stJMsg.Data6 = Convert.ToByte(txtLINDataByte8.Text, 16);
+
+            switch (lstLINNumberOfBytes.SelectedIndex)
+            {
+                case 0:
+                    //Make a header only type frame
+                    stJMsg.NumberBytesHeader = 1;
+                    stJMsg.NumberBytesData = 0;
+                    break;
+                case 1:
+                    //Only 1 byte of data
+                    stJMsg.NumberBytesHeader = 2;
+                    stJMsg.Header2 = Convert.ToByte(txtLINDataByte1.Text, 16);
+                    stJMsg.NumberBytesData = 0;
+                    //checksum goes into header byte 3 for this instance
+                    stJMsg.Header3 = CalculateLINCheckSum(chkEnhancedChecksum.Checked, ref stJMsg);
+                    stJMsg.NumberBytesHeader = 3;
+                    break;
+                default:
+                    //2 or more 
+                    stJMsg.NumberBytesHeader = 3;
+                    stJMsg.Header2 = Convert.ToByte(txtLINDataByte1.Text, 16);
+                    stJMsg.Header3 = Convert.ToByte(txtLINDataByte2.Text, 16);
+                    stJMsg.NumberBytesData = Convert.ToByte(lstLINNumberOfBytes.SelectedIndex - 2);
+
+                    //header byte
+                    if (lstLINNumberOfBytes.SelectedIndex == 2) stJMsg.Data1 = CalculateLINCheckSum(chkEnhancedChecksum.Checked, ref stJMsg);
+                    if (lstLINNumberOfBytes.SelectedIndex == 3) stJMsg.Data2 = CalculateLINCheckSum(chkEnhancedChecksum.Checked, ref stJMsg);
+                    if (lstLINNumberOfBytes.SelectedIndex == 4) stJMsg.Data3 = CalculateLINCheckSum(chkEnhancedChecksum.Checked, ref stJMsg);
+                    if (lstLINNumberOfBytes.SelectedIndex == 5) stJMsg.Data4 = CalculateLINCheckSum(chkEnhancedChecksum.Checked, ref stJMsg);
+                    if (lstLINNumberOfBytes.SelectedIndex == 6) stJMsg.Data5 = CalculateLINCheckSum(chkEnhancedChecksum.Checked, ref stJMsg);
+                    if (lstLINNumberOfBytes.SelectedIndex == 7) stJMsg.Data6 = CalculateLINCheckSum(chkEnhancedChecksum.Checked, ref stJMsg);
+                    if (lstLINNumberOfBytes.SelectedIndex == 8) stJMsg.Data7 = CalculateLINCheckSum(chkEnhancedChecksum.Checked, ref stJMsg);
+                    stJMsg.NumberBytesData = Convert.ToByte(lstLINNumberOfBytes.SelectedIndex - 1);
+                    break;
+            }
 
 
             // Transmit the assembled message
-            lResult = icsNeoDll.icsneoTxMessages(m_hObject,ref stJMsg, lNetworkID, 1);
-			// Test the returned result
-			if (lResult!=1) 
-			{
-				MessageBox.Show("Problem Transmitting Message");
-			}
+            lResult = icsNeoDll.icsneoTxMessages(m_hObject, ref stJMsg, lNetworkID, 1);
+            // Test the returned result
+            if (lResult != 1)
+            {
+                MessageBox.Show("Problem Transmitting Message");
+            }
         }
 
-    private void SendHeaderOnlyFrame()
-    {
-        long lResult;
-        icsSpyMessageJ1850 stJMsg= new icsSpyMessageJ1850();
-        int lNetworkID;
-        string sTempString;
-
-        //This message type will send out the break and the header.  The data will come back from the Responder ECU (if connected)
-
-        //Set message as Commander frame
-        stJMsg.StatusBitField = Convert.ToInt32(eDATA_STATUS_BITFIELD_1.SPY_STATUS_INIT_MESSAGE);
-
-        // Set the network (LIN 1 in this case)
-        sTempString = lstLINNetwork.Text;
-        lNetworkID = icsNeoDll.GetNetworkIDfromString(ref sTempString);
-
-        stJMsg.NumberBytesHeader = 1;
-        // for all the header bytes
-        if (cboIDType.SelectedIndex == 0)
+        private void SendHeaderOnlyFrame()
         {
-            //standard ID, need to convert!
-            stJMsg.Header1 = GetProtectedIDFromID(Convert.ToByte(txtLINDataByteProtectedID.Text,16));
+            long lResult;
+            icsSpyMessageJ1850 stJMsg = new icsSpyMessageJ1850();
+            int lNetworkID;
+            string sTempString;
+
+            //This message type will send out the break and the header.  The data will come back from the Responder ECU (if connected)
+
+            //Set message as Commander frame
+            stJMsg.StatusBitField = Convert.ToInt32(eDATA_STATUS_BITFIELD_1.SPY_STATUS_INIT_MESSAGE);
+
+            // Set the network (LIN 1 in this case)
+            sTempString = lstLINNetwork.Text;
+            lNetworkID = icsNeoDll.GetNetworkIDfromString(ref sTempString);
+
+            stJMsg.NumberBytesHeader = 1;
+            // for all the header bytes
+            if (cboIDType.SelectedIndex == 0)
+            {
+                //standard ID, need to convert!
+                stJMsg.Header1 = GetProtectedIDFromID(Convert.ToByte(txtLINDataByteProtectedID.Text, 16));
+            }
+            else
+            {
+                //Protected ID, we can use it
+                stJMsg.Header1 = Convert.ToByte(txtLINDataByteProtectedID.Text, 16); //The lin Protected ID goes into the First header bytes
+            }
+
+            //No data bytes for this type of message.  Also the Responder will have the checksum.
+            stJMsg.NumberBytesData = 0;
+
+            // Transmit the assembled message
+            lResult = icsNeoDll.icsneoTxMessages(m_hObject, ref stJMsg, lNetworkID, 1);
+            // Test the returned result
+            if (lResult != 1)
+            {
+                MessageBox.Show("Problem Transmitting Message");
+            }
         }
-        else
+
+        private void SendResponderFrame()
         {
-            //Protected ID, we can use it
-            stJMsg.Header1 = Convert.ToByte(txtLINDataByteProtectedID.Text,16); //The lin Protected ID goes into the First header bytes
+            long lResult;
+            icsSpyMessageJ1850 stJMsg = new icsSpyMessageJ1850();
+            int lNetworkID;
+            string sTempString;
+
+            //This message type will send out the break, header, and Data.
+
+            //Set message as Save frame
+            stJMsg.StatusBitField = 0;
+
+            // Set the network (LIN 1 in this case)
+            sTempString = lstLINNetwork.Text;
+            lNetworkID = icsNeoDll.GetNetworkIDfromString(ref sTempString);
+
+
+            // for all the header bytes
+            if (cboIDType.SelectedIndex == 0)
+            {
+                //standard ID, need to convert!
+                stJMsg.Header1 = GetProtectedIDFromID(Convert.ToByte(txtLINDataByteProtectedID.Text, 16));
+            }
+            else
+            {
+                //Protected ID, we can use it
+                stJMsg.Header1 = Convert.ToByte(txtLINDataByteProtectedID.Text, 16); //The lin Protected ID goes into the First header bytes
+            }
+
+            //Copy the data
+            stJMsg.Data1 = Convert.ToByte(txtLINDataByte3.Text, 16);
+            stJMsg.Data2 = Convert.ToByte(txtLINDataByte4.Text, 16);
+            stJMsg.Data3 = Convert.ToByte(txtLINDataByte5.Text, 16);
+            stJMsg.Data4 = Convert.ToByte(txtLINDataByte6.Text, 16);
+            stJMsg.Data5 = Convert.ToByte(txtLINDataByte7.Text, 16);
+            stJMsg.Data6 = Convert.ToByte(txtLINDataByte8.Text, 16);
+
+            switch (lstLINNumberOfBytes.SelectedIndex)
+            {
+                case 0:
+                    //Make a header only type frame
+                    stJMsg.NumberBytesHeader = 1;
+                    stJMsg.NumberBytesData = 0;
+                    break;
+                case 1:
+                    //Only 1 byte of data
+                    stJMsg.NumberBytesHeader = 2;
+                    stJMsg.Header2 = Convert.ToByte(txtLINDataByte1.Text, 16);
+                    stJMsg.NumberBytesData = 0;
+                    //checksum goes into header byte 3 for this instance
+                    stJMsg.Header3 = CalculateLINCheckSum(chkEnhancedChecksum.Checked, ref stJMsg);
+                    stJMsg.NumberBytesHeader = 3;
+                    break;
+                default:
+                    //2 or more 
+                    stJMsg.NumberBytesHeader = 3;
+                    stJMsg.Header2 = Convert.ToByte(txtLINDataByte1.Text, 16);
+                    stJMsg.Header3 = Convert.ToByte(txtLINDataByte2.Text, 16);
+                    stJMsg.NumberBytesData = Convert.ToByte(lstLINNumberOfBytes.SelectedIndex - 2);
+
+                    //header byte
+                    if (lstLINNumberOfBytes.SelectedIndex == 2) stJMsg.Data1 = CalculateLINCheckSum(chkEnhancedChecksum.Checked, ref stJMsg);
+                    if (lstLINNumberOfBytes.SelectedIndex == 3) stJMsg.Data2 = CalculateLINCheckSum(chkEnhancedChecksum.Checked, ref stJMsg);
+                    if (lstLINNumberOfBytes.SelectedIndex == 4) stJMsg.Data3 = CalculateLINCheckSum(chkEnhancedChecksum.Checked, ref stJMsg);
+                    if (lstLINNumberOfBytes.SelectedIndex == 5) stJMsg.Data4 = CalculateLINCheckSum(chkEnhancedChecksum.Checked, ref stJMsg);
+                    if (lstLINNumberOfBytes.SelectedIndex == 6) stJMsg.Data5 = CalculateLINCheckSum(chkEnhancedChecksum.Checked, ref stJMsg);
+                    if (lstLINNumberOfBytes.SelectedIndex == 7) stJMsg.Data6 = CalculateLINCheckSum(chkEnhancedChecksum.Checked, ref stJMsg);
+                    if (lstLINNumberOfBytes.SelectedIndex == 8) stJMsg.Data7 = CalculateLINCheckSum(chkEnhancedChecksum.Checked, ref stJMsg);
+                    stJMsg.NumberBytesData = Convert.ToByte(lstLINNumberOfBytes.SelectedIndex - 1);
+                    break;
+            }
+
+
+            // Transmit the assembled message
+            lResult = icsNeoDll.icsneoTxMessages(m_hObject, ref stJMsg, lNetworkID, 1);
+            // Test the returned result
+            if (lResult != 1)
+            {
+                MessageBox.Show("Problem Transmitting Message");
+            }
         }
 
-        //No data bytes for this type of message.  Also the Responder will have the checksum.
-        stJMsg.NumberBytesData = 0;
 
-        // Transmit the assembled message
-        lResult = icsNeoDll.icsneoTxMessages(m_hObject,ref stJMsg, lNetworkID, 1);
-			// Test the returned result
-			if (lResult!=1) 
-			{
-				MessageBox.Show("Problem Transmitting Message");
-			}
-    }
-
-    private void SendResponderFrame()
-    {
-        long lResult;
-        icsSpyMessageJ1850 stJMsg = new icsSpyMessageJ1850();
-        int lNetworkID;
-        string sTempString;
-
-        //This message type will send out the break, header, and Data.
-
-        //Set message as Save frame
-        stJMsg.StatusBitField = 0;
-
-        // Set the network (LIN 1 in this case)
-        sTempString = lstLINNetwork.Text;
-        lNetworkID = icsNeoDll.GetNetworkIDfromString(ref sTempString);
-
-
-        // for all the header bytes
-        if(cboIDType.SelectedIndex == 0) 
+        private byte CalculateLINCheckSum(bool UseEnhanced, ref icsSpyMessageJ1850 SpyMessageJ1850)
         {
-            //standard ID, need to convert!
-            stJMsg.Header1 = GetProtectedIDFromID(Convert.ToByte(txtLINDataByteProtectedID.Text,16));
+            int ChecksumCalculation = 0;
+
+            //Add a little error checking
+            if (SpyMessageJ1850.NumberBytesHeader == 0 || SpyMessageJ1850.NumberBytesHeader == 1) return (0);
+
+            //Get sum of all the bytes
+            if (SpyMessageJ1850.NumberBytesHeader >= 2) ChecksumCalculation = ChecksumCalculation + SpyMessageJ1850.Header2;
+            if (SpyMessageJ1850.NumberBytesHeader >= 3) ChecksumCalculation = ChecksumCalculation + SpyMessageJ1850.Header3;
+            if (SpyMessageJ1850.NumberBytesData >= 1) ChecksumCalculation = ChecksumCalculation + SpyMessageJ1850.Data1;
+            if (SpyMessageJ1850.NumberBytesData >= 2) ChecksumCalculation = ChecksumCalculation + SpyMessageJ1850.Data2;
+            if (SpyMessageJ1850.NumberBytesData >= 3) ChecksumCalculation = ChecksumCalculation + SpyMessageJ1850.Data3;
+            if (SpyMessageJ1850.NumberBytesData >= 4) ChecksumCalculation = ChecksumCalculation + SpyMessageJ1850.Data4;
+            if (SpyMessageJ1850.NumberBytesData >= 5) ChecksumCalculation = ChecksumCalculation + SpyMessageJ1850.Data5;
+            if (SpyMessageJ1850.NumberBytesData >= 6) ChecksumCalculation = ChecksumCalculation + SpyMessageJ1850.Data6;
+
+            //If enhanced add in the protected ID
+            if (UseEnhanced == true) ChecksumCalculation = ChecksumCalculation + SpyMessageJ1850.Header1;
+
+            //Get number of carries and add to LSB
+            ChecksumCalculation = ((ChecksumCalculation / 0x100) + ChecksumCalculation) - (ChecksumCalculation & 0xff00);
+            ChecksumCalculation = ((ChecksumCalculation / 0x100) + ChecksumCalculation) & 0xFF;
+
+            //Invert to get checksum
+            return Convert.ToByte(0xFF ^ ChecksumCalculation);
         }
-        else
+
+        private byte GetProtectedIDFromID(byte ID)
         {
-            //Protected ID, we can use it
-            stJMsg.Header1 = Convert.ToByte(txtLINDataByteProtectedID.Text,16); //The lin Protected ID goes into the First header bytes
-        }
-
-        //Copy the data
-        stJMsg.Data1 = Convert.ToByte(txtLINDataByte3.Text,16);
-        stJMsg.Data2 = Convert.ToByte(txtLINDataByte4.Text,16);
-        stJMsg.Data3 = Convert.ToByte(txtLINDataByte5.Text,16);
-        stJMsg.Data4 = Convert.ToByte(txtLINDataByte6.Text,16);
-        stJMsg.Data5 = Convert.ToByte(txtLINDataByte7.Text,16);
-        stJMsg.Data6 = Convert.ToByte(txtLINDataByte8.Text,16);
-
-        switch(lstLINNumberOfBytes.SelectedIndex)
-        {
-            case 0:
-                //Make a header only type frame
-                stJMsg.NumberBytesHeader = 1;
-                stJMsg.NumberBytesData = 0;
-                break;
-            case 1:
-                //Only 1 byte of data
-                stJMsg.NumberBytesHeader = 2;
-                stJMsg.Header2 = Convert.ToByte(txtLINDataByte1.Text,16);
-                stJMsg.NumberBytesData = 0;
-                //checksum goes into header byte 3 for this instance
-                stJMsg.Header3 = CalculateLINCheckSum(chkEnhancedChecksum.Checked,ref stJMsg);
-                stJMsg.NumberBytesHeader = 3;
-                break;
-            default:
-                //2 or more 
-                stJMsg.NumberBytesHeader = 3;
-                stJMsg.Header2 = Convert.ToByte(txtLINDataByte1.Text,16);
-                stJMsg.Header3 = Convert.ToByte(txtLINDataByte2.Text,16);
-                stJMsg.NumberBytesData = Convert.ToByte(lstLINNumberOfBytes.SelectedIndex - 2);
-
-                //header byte
-                if (lstLINNumberOfBytes.SelectedIndex == 2) stJMsg.Data1 = CalculateLINCheckSum(chkEnhancedChecksum.Checked, ref stJMsg);
-                if (lstLINNumberOfBytes.SelectedIndex == 3) stJMsg.Data2 = CalculateLINCheckSum(chkEnhancedChecksum.Checked, ref stJMsg);
-                if (lstLINNumberOfBytes.SelectedIndex == 4) stJMsg.Data3 = CalculateLINCheckSum(chkEnhancedChecksum.Checked, ref stJMsg);
-                if (lstLINNumberOfBytes.SelectedIndex == 5) stJMsg.Data4 = CalculateLINCheckSum(chkEnhancedChecksum.Checked, ref stJMsg);
-                if (lstLINNumberOfBytes.SelectedIndex == 6) stJMsg.Data5 = CalculateLINCheckSum(chkEnhancedChecksum.Checked, ref stJMsg);
-                if (lstLINNumberOfBytes.SelectedIndex == 7) stJMsg.Data6 = CalculateLINCheckSum(chkEnhancedChecksum.Checked, ref stJMsg);
-                if (lstLINNumberOfBytes.SelectedIndex == 8) stJMsg.Data7 = CalculateLINCheckSum(chkEnhancedChecksum.Checked, ref stJMsg);
-                stJMsg.NumberBytesData = Convert.ToByte(lstLINNumberOfBytes.SelectedIndex-1);
-                break;
-        }
+            bool[] bID = new bool[8];
+            int iCntr;
+            int iOutput;
+            int iPower;
 
 
-        // Transmit the assembled message
-        lResult = icsNeoDll.icsneoTxMessages(m_hObject,ref stJMsg, lNetworkID, 1);
-			// Test the returned result
-			if (lResult!=1) 
-			{
-				MessageBox.Show("Problem Transmitting Message");
-			}
-    }
-
-
-    private byte CalculateLINCheckSum(bool UseEnhanced, ref icsSpyMessageJ1850 SpyMessageJ1850) 
-    {
-        int ChecksumCalculation = 0;
-
-        //Add a little error checking
-        if(SpyMessageJ1850.NumberBytesHeader == 0 || SpyMessageJ1850.NumberBytesHeader == 1) return(0);
-
-        //Get sum of all the bytes
-        if(SpyMessageJ1850.NumberBytesHeader >= 2) ChecksumCalculation = ChecksumCalculation + SpyMessageJ1850.Header2;
-        if(SpyMessageJ1850.NumberBytesHeader >= 3) ChecksumCalculation = ChecksumCalculation + SpyMessageJ1850.Header3;
-        if(SpyMessageJ1850.NumberBytesData >= 1) ChecksumCalculation = ChecksumCalculation + SpyMessageJ1850.Data1;
-        if(SpyMessageJ1850.NumberBytesData >= 2) ChecksumCalculation = ChecksumCalculation + SpyMessageJ1850.Data2;
-        if(SpyMessageJ1850.NumberBytesData >= 3) ChecksumCalculation = ChecksumCalculation + SpyMessageJ1850.Data3;
-        if(SpyMessageJ1850.NumberBytesData >= 4) ChecksumCalculation = ChecksumCalculation + SpyMessageJ1850.Data4;
-        if(SpyMessageJ1850.NumberBytesData >= 5) ChecksumCalculation = ChecksumCalculation + SpyMessageJ1850.Data5;
-        if(SpyMessageJ1850.NumberBytesData >= 6) ChecksumCalculation = ChecksumCalculation + SpyMessageJ1850.Data6;
-
-        //If enhanced add in the protected ID
-        if (UseEnhanced == true) ChecksumCalculation = ChecksumCalculation + SpyMessageJ1850.Header1;
-
-        //Get number of carries and add to LSB
-        ChecksumCalculation = ((ChecksumCalculation / 0x100) + ChecksumCalculation) - (ChecksumCalculation & 0xff00);
-        ChecksumCalculation = ((ChecksumCalculation / 0x100) + ChecksumCalculation) & 0xFF;
-
-        //Invert to get checksum
-        return Convert.ToByte(0xFF ^ ChecksumCalculation);
-    }
-
-    private byte GetProtectedIDFromID(byte ID) 
-    {
-        bool[] bID = new bool[8];
-        int iCntr;
-        int iOutput;
-        int iPower;
-        
-
-        //Get bit values
-        for (iCntr = 0; iCntr <= 7; iCntr++)
-        {
-            iPower = Convert.ToInt32(Math.Pow(2 ,iCntr));
-            bID[iCntr] = ((ID & iPower)!=0);
-        }
+            //Get bit values
+            for (iCntr = 0; iCntr <= 7; iCntr++)
+            {
+                iPower = Convert.ToInt32(Math.Pow(2, iCntr));
+                bID[iCntr] = ((ID & iPower) != 0);
+            }
 
             //Calculate ProtectedID
             bID[6] = bID[0] ^ bID[1] ^ bID[2] ^ bID[4];
             bID[7] = !(bID[1] ^ bID[3] ^ bID[4] ^ bID[5]);
 
-        //Get byte value
-        iOutput = 0;
-        for (iCntr = 0; iCntr <= 7; iCntr++)
-        {
-            iOutput = iOutput + Convert.ToByte(bID[iCntr]) * Convert.ToInt32(Math.Pow(2, iCntr));
+            //Get byte value
+            iOutput = 0;
+            for (iCntr = 0; iCntr <= 7; iCntr++)
+            {
+                iOutput = iOutput + Convert.ToByte(bID[iCntr]) * Convert.ToInt32(Math.Pow(2, iCntr));
+            }
+
+            return Convert.ToByte(iOutput);
         }
 
-        return Convert.ToByte(iOutput);
-    }
-
-    private void cmdOtherTransmit_Click(object sender, EventArgs e)
-    {
+        private void cmdOtherTransmit_Click(object sender, EventArgs e)
+        {
             long lResult;
             icsSpyMessageJ1850 stMessagesTxJ1850 = new icsSpyMessageJ1850();
-			long lNetworkID;
+            long lNetworkID;
             string sTempString;
 
-			// Has the uset open neoVI yet?;
-			if (m_bPortOpen==false) 
-			{
-				MessageBox.Show("neoVI not opened");
-				return; // do not read messages if we haven't opened neoVI yet
-			}
+            // Has the uset open neoVI yet?;
+            if (m_bPortOpen == false)
+            {
+                MessageBox.Show("neoVI not opened");
+                return; // do not read messages if we haven't opened neoVI yet
+            }
 
             // Read the Network we will transmit on (indicated by lstNetwork ListBox)
-            sTempString = lstOtherNetwork.Text; 
+            sTempString = lstOtherNetwork.Text;
             lNetworkID = icsNeoDll.GetNetworkIDfromString(ref sTempString);
 
 
-        // load the message structure
-        //copy headder bytes
-        stMessagesTxJ1850.Header1 = Convert.ToByte(txtOtherPT.Text,16);
-        stMessagesTxJ1850.Header2 = Convert.ToByte(txtOtherTrgt.Text,16);
-        stMessagesTxJ1850.Header3 = Convert.ToByte(txtOtherSrc.Text,16);
-        stMessagesTxJ1850.NumberBytesHeader = 3;
-        stMessagesTxJ1850.NumberBytesData = Convert.ToByte(lstNumberOfOtherBytes.SelectedIndex);         // The number of Data Bytes
-        // Load all of the data bytes in the structure
-        stMessagesTxJ1850.Data1 = Convert.ToByte(txtOtherData1.Text,16);
-        stMessagesTxJ1850.Data2 = Convert.ToByte(txtOtherData2.Text,16);
-        stMessagesTxJ1850.Data3 = Convert.ToByte(txtOtherData3.Text,16);
-        stMessagesTxJ1850.Data4 = Convert.ToByte(txtOtherData4.Text,16);
-        stMessagesTxJ1850.Data5 = Convert.ToByte(txtOtherData5.Text,16);
-        stMessagesTxJ1850.Data6 = Convert.ToByte(txtOtherData6.Text,16);
-        stMessagesTxJ1850.Data7 = Convert.ToByte(txtOtherData7.Text,16);
-        stMessagesTxJ1850.Data8 = Convert.ToByte(txtOtherData8.Text,16);
-
-        // Transmit the assembled message
-        lResult = icsNeoDll.icsneoTxMessages(m_hObject, ref stMessagesTxJ1850, Convert.ToInt32(lNetworkID), 1);
-        // Test the returned result
-        if (lResult != 1)
-        {
-            MessageBox.Show("Problem Transmitting Message");
-        }
-    }
-
-    private void cmdSetBitRate_Click(object sender, EventArgs e)
-    {
-        int iBitRateToUse=0;
-        int iNetworkID=0;
-        int iResult;
-
-        //Get the network name index to set the baud rate of 
-        switch(lstNetworkBaudRate.SelectedIndex)
-        {
-            case 0:
-                iNetworkID = (int)eNETWORK_ID.NETID_HSCAN;
-                break;
-            case 1:
-                iNetworkID = (int)eNETWORK_ID.NETID_MSCAN;
-                break;
-            case 2:
-                iNetworkID = (int)eNETWORK_ID.NETID_SWCAN;
-                break;
-            case 3:
-                iNetworkID = (int)eNETWORK_ID.NETID_LSFTCAN;
-                break;
-            case 4:
-                iNetworkID = (int)eNETWORK_ID.NETID_HSCAN2;
-                break;
-            case 5:
-                iNetworkID = (int)eNETWORK_ID.NETID_HSCAN3;
-                break;
-            case 6:
-                iNetworkID = (int)eNETWORK_ID.NETID_HSCAN4;
-                break;
-            case 7:
-                iNetworkID = (int)eNETWORK_ID.NETID_HSCAN5;
-                break;
-            case 8:
-                iNetworkID = (int)eNETWORK_ID.NETID_HSCAN6;
-                break;
-            case 9:
-                iNetworkID = (int)eNETWORK_ID.NETID_HSCAN7;
-                break;
-            case 10:
-                iNetworkID = (int)eNETWORK_ID.NETID_HSCAN7;
-                break;
-            case 11:
-                iNetworkID = (int)eNETWORK_ID.NETID_DWCAN_09;
-                break;
-            case 12:
-                iNetworkID = (int)eNETWORK_ID.NETID_DWCAN_10;
-                break;
-            case 13:
-                iNetworkID = (int)eNETWORK_ID.NETID_DWCAN_11;
-                break;
-            case 14:
-                iNetworkID = (int)eNETWORK_ID.NETID_DWCAN_12;
-                break;
-            case 15:
-                iNetworkID = (int)eNETWORK_ID.NETID_DWCAN_13;
-                break;
-            case 16:
-                iNetworkID = (int)eNETWORK_ID.NETID_DWCAN_14;
-                break;
-            default:
-                MessageBox.Show("Incorrect Network selected");
-                return;
-        }
-
-        iBitRateToUse = Convert.ToInt32(lstBaudRateToUse.Text);
-
-        //Set the bit rate
-        iResult = icsNeoDll.icsneoSetBitRate(m_hObject, iBitRateToUse, iNetworkID);
-        if (iResult != 1)
-        {
-            MessageBox.Show("Problem setting bit rate");
-        }
-        else 
-        {
-            MessageBox.Show("Bit Rate Set");
-        }
-    }
-
-    private void cmdSetFDBitRate_Click(object sender, EventArgs e)
-    {
-        int iBitRateToUse = 0;
-        int iNetworkID = 0;
-        int iResult;
-
-        //Get the network name index to set the baud rate of 
-        switch (lstNetworkBaudRate.SelectedIndex)
-        {
-            case 0:
-                iNetworkID = (int)eNETWORK_ID.NETID_HSCAN;
-                break;
-            case 1:
-                iNetworkID = (int)eNETWORK_ID.NETID_MSCAN;
-                break;
-            case 2:
-                iNetworkID = -1;
-                break;
-            case 3:
-                iNetworkID = -1;
-                break;
-            case 4:
-                iNetworkID = (int)eNETWORK_ID.NETID_HSCAN2;
-                break;
-            case 5:
-                iNetworkID = (int)eNETWORK_ID.NETID_HSCAN3;
-                break;
-            case 6:
-                iNetworkID = (int)eNETWORK_ID.NETID_HSCAN4;
-                break;
-            case 7:
-                iNetworkID = (int)eNETWORK_ID.NETID_HSCAN5;
-                break;
-            case 8:
-                iNetworkID = (int)eNETWORK_ID.NETID_HSCAN6;
-                break;
-            case 9:
-                iNetworkID = (int)eNETWORK_ID.NETID_HSCAN7;
-                break;
-            case 10:
-                iNetworkID = (int)eNETWORK_ID.NETID_HSCAN7;
-                break;
-            case 11:
-                iNetworkID = (int)eNETWORK_ID.NETID_DWCAN_09;
-                break;
-            case 12:
-                iNetworkID = (int)eNETWORK_ID.NETID_DWCAN_10;
-                break;
-            case 13:
-                iNetworkID = (int)eNETWORK_ID.NETID_DWCAN_11;
-                break;
-            case 14:
-                iNetworkID = (int)eNETWORK_ID.NETID_DWCAN_12;
-                break;
-            case 15:
-                iNetworkID = (int)eNETWORK_ID.NETID_DWCAN_13;
-                break;
-            case 16:
-                iNetworkID = (int)eNETWORK_ID.NETID_DWCAN_14;
-                break;
-            default:
-                MessageBox.Show("Incorrect Network selected");
-                return;
-        }
-
-        if (iNetworkID == -1) 
-        {
-            MessageBox.Show("Not a Valid CAN FD Channel");
-            return;
-        }
-
-        iBitRateToUse = Convert.ToInt32(lstFDBaudRateToUse.Text);
-
-        //Set the bit rate
-        iResult = icsNeoDll.icsneoSetFDBitRate(m_hObject, iBitRateToUse, iNetworkID);
-        if (iResult != 1)
-        {
-            MessageBox.Show("Problem setting FD bit rate");
-        }
-        else
-        {
-            MessageBox.Show("FD Bit Rate Set");
-        }
-    }
-
-    private void cmd3GGetSettings_Click(object sender, EventArgs e)
-    {
-        SVCAN3SettingsPack VcanReadSettings = new SVCAN3SettingsPack();
-        SFireSettingsPack FireReadSettings = new SFireSettingsPack();
-        SFire2SettingsPack Fire2ReadSettings = new SFire2SettingsPack();
-        SRADGalaxySettingsPack RadGalaxyReadSettings = new SRADGalaxySettingsPack();
-        SVCANRFSettingsPack VcanRFReadSettings = new SVCANRFSettingsPack();
-        SVCAN412SettingsPack Vcan412ReadSettings = new SVCAN412SettingsPack();
-        SRADPlutoSettingsPack RADPlutoSettings = new  SRADPlutoSettingsPack();
-        SVCAN4IndSettingsPack VCAN4IndSettings = new SVCAN4IndSettingsPack();
-        SJupiterSettingsPack JupiterSettings = new SJupiterSettingsPack();
-        SRED2SettingsPack RED2Settings = new SRED2SettingsPack();
-        SFire3SettingsPack FIRE3Settings = new SFire3SettingsPack();
-        SFire3FRSettingsPack FIRE3FlexSettings = new SFire3FRSettingsPack();
-                
-        CAN_SETTINGS HSCanSettings = new CAN_SETTINGS();
-        int iNumberOfBytes = 0;
-        int iResult;
-
-                if (m_bPortOpen == false)  //Check to see if the port is opened first
-        {
-            MessageBox.Show("Device is Not Opened!");
-            return;
-        }
-
- 
-        //Get the settigns of the connected hardware
-        switch (iOpenDeviceType)
-        {
-             case (int)eHardwareTypes.NEODEVICE_FIRE:		  //FIRE
-                //Get the settings
-                FireReadSettings.uiDevice = (UInt32)EDeviceSettingsType.DeviceFireSettingsType;
-                iNumberOfBytes = System.Runtime.InteropServices.Marshal.SizeOf(FireReadSettings);
-                iResult = icsNeoDll.icsneoGetDeviceSettings(m_hObject, ref FireReadSettings, iNumberOfBytes, 0);
-                if (iResult == 0)
-                {
-                    MessageBox.Show("Problem reading FIRE configuration");
-                    return;
-                }
-                //Copy the HS CAN settings from the structure to sub struct
-                HSCanSettings = FireReadSettings.FireSettings.can1;
-                break;
-
-            case (int)eHardwareTypes.NEODEVICE_VCAN3:			 //Vcan3
-                //Get the setting
-                VcanReadSettings.uiDevice = (UInt32)EDeviceSettingsType.DeviceVCAN3SettingsType;
-                iNumberOfBytes = System.Runtime.InteropServices.Marshal.SizeOf(VcanReadSettings);
-                iResult = icsNeoDll.icsneoGetDeviceSettings(m_hObject, ref VcanReadSettings, iNumberOfBytes, 0);
-                if (iResult == 0)
-                {
-                    MessageBox.Show("Problem reading VCAN3 configuration");
-                    return;
-                }
-                //Copy the HS CAN settings from the structure to sub struct
-                HSCanSettings = VcanReadSettings.VCAN3Settings.Can1;
-                break;
-
-            case (int)eHardwareTypes.NEODEVICE_FIRE2:			 //FIRE2
-                //Get the setting
-                Fire2ReadSettings.uiDevice = (UInt32)EDeviceSettingsType.DeviceFire2SettingsType;
-                iNumberOfBytes = System.Runtime.InteropServices.Marshal.SizeOf(Fire2ReadSettings);
-                iResult = icsNeoDll.icsneoGetDeviceSettings(m_hObject, ref Fire2ReadSettings, iNumberOfBytes, 0);
-                if (iResult == 0)
-                {
-                    MessageBox.Show("Problem reading FIRE2 configuration");
-                    return;
-                }
-                //Copy the HS CAN settings from the structure to sub struct
-                HSCanSettings = Fire2ReadSettings.Fire2Settings.can1;
-                break;
-
-            case (int)eHardwareTypes.NEODEVICE_RADGALAXY:			 //RadGalaxy
-                //Get the setting
-                RadGalaxyReadSettings.uiDevice = (UInt32)EDeviceSettingsType.DeviceRADGalaxySettingsType;
-                iNumberOfBytes = System.Runtime.InteropServices.Marshal.SizeOf(RadGalaxyReadSettings);
-                iResult = icsNeoDll.icsneoGetDeviceSettings(m_hObject, ref RadGalaxyReadSettings, iNumberOfBytes, 0);
-                if (iResult == 0)
-                {
-                    MessageBox.Show("Problem reading RADGalaxy configuration");
-                    return;
-                }
-                //Copy the HS CAN settings from the structure to sub struct
-                HSCanSettings = RadGalaxyReadSettings.RADGalaxySettings.can1;
-                break;
-
-            case (int)eHardwareTypes.NEODEVICE_VCANRF:			 //VcanRF
-                //Get the setting
-                VcanRFReadSettings.uiDevice = (UInt32)EDeviceSettingsType.DeviceVCANRFSettingsType;
-                iNumberOfBytes = System.Runtime.InteropServices.Marshal.SizeOf(VcanRFReadSettings);
-                iResult = icsNeoDll.icsneoGetDeviceSettings(m_hObject, ref VcanRFReadSettings, iNumberOfBytes, 0);
-                if (iResult == 0)
-                {
-                    MessageBox.Show("Problem reading VCANRF configuration");
-                    return;
-                }
-                //Copy the HS CAN settings from the structure to sub struct
-                HSCanSettings = VcanRFReadSettings.VCANRFSettings.can1;
-                break;
-
-            case (int)eHardwareTypes.NEODEVICE_VCAN42:			 //Vcan4-2
-            case (int)eHardwareTypes.NEODEVICE_VCAN41:			 //Vcan4-1  (Same steps for both)
-                //Get the setting
-                Vcan412ReadSettings.uiDevice = (UInt32)EDeviceSettingsType.DeviceVCAN412SettingsType;
-                iNumberOfBytes = System.Runtime.InteropServices.Marshal.SizeOf(Vcan412ReadSettings);
-                iResult = icsNeoDll.icsneoGetDeviceSettings(m_hObject, ref Vcan412ReadSettings, iNumberOfBytes, 0);
-                if (iResult == 0)
-                {
-                    MessageBox.Show("Problem reading VCAN412 configuration");
-                    return;
-                }
-                //Copy the HS CAN settings from the structure to sub struct
-                HSCanSettings = Vcan412ReadSettings.VCAN412Settings.can1;
-                break;
-
-            case (int)eHardwareTypes.NEODEVICE_RADPLUTO:			 //RAD Pluto
-                //Get the setting
-                RADPlutoSettings.uiDevice = (UInt32)EDeviceSettingsType.DeviceRADPlutoSettingsType;
-                iNumberOfBytes = System.Runtime.InteropServices.Marshal.SizeOf(RADPlutoSettings);
-                iResult = icsNeoDll.icsneoGetDeviceSettings(m_hObject, ref RADPlutoSettings, iNumberOfBytes,0);
-                if (iResult == 0)
-                {
-                    MessageBox.Show("Problem reading RAD Pluto configuration");
-                    return;
-                }
-                //Copy the HS CAN settings from the structure to sub struct
-                HSCanSettings = RADPlutoSettings.PlutoSettings.can1;
-                break;
-
-            case (int)eHardwareTypes.NEODEVICE_VCAN4_IND:			 //ValueCAN 4-Ind
-                //Get the setting
-                VCAN4IndSettings.uiDevice = (UInt32)EDeviceSettingsType.DeviceVCAN4IndSettingsType;
-                iNumberOfBytes = System.Runtime.InteropServices.Marshal.SizeOf(VCAN4IndSettings);
-                iResult = icsNeoDll.icsneoGetDeviceSettings(m_hObject, ref VCAN4IndSettings, iNumberOfBytes, 0);
-                if (iResult == 0)
-                {
-                    MessageBox.Show("Problem reading ValueCAN4 Ind configuration");
-                    return;
-                }
-                //Copy the HS CAN settings from the structure to sub struct
-                HSCanSettings = VCAN4IndSettings.VCAN4IndSettings.can1;
-                break;
-
-            case (int)eHardwareTypes.NEODEVICE_RADJUPITER:			 //RAD Jupiter
-                //Get the setting
-                JupiterSettings.uiDevice = (UInt32)EDeviceSettingsType.DeviceRADJupiterSettingsType;
-                iNumberOfBytes = System.Runtime.InteropServices.Marshal.SizeOf(JupiterSettings);
-                iResult = icsNeoDll.icsneoGetDeviceSettings(m_hObject, ref JupiterSettings, iNumberOfBytes, 0);
-                if (iResult == 0)
-                {
-                    MessageBox.Show("Problem reading RAD Jupiter configuration");
-                    return;
-                }
-                //Copy the HS CAN settings from the structure to sub struct
-                HSCanSettings = JupiterSettings.JupiterSettings.can1;
-                break;
-            case (int)eHardwareTypes.NEODEVICE_RED2:			 //RAD Jupiter
-                //Get the setting
-                RED2Settings.uiDevice = (UInt32)EDeviceSettingsType.DeviceRed2SettingsType;
-                iNumberOfBytes = System.Runtime.InteropServices.Marshal.SizeOf(RED2Settings);
-                iResult = icsNeoDll.icsneoGetDeviceSettings(m_hObject, ref RED2Settings, iNumberOfBytes, 0);
-                if (iResult == 0)
-                {
-                    MessageBox.Show("Problem reading RED 2 configuration");
-                    return;
-                }
-                //Copy the HS CAN settings from the structure to sub struct
-                HSCanSettings = RED2Settings.RED2Settings.can1;
-                break;
-
-
-            case (int)eHardwareTypes.NEODEVICE_FIRE3:			 //RAD Jupiter
-                //Get the setting
-                FIRE3Settings.uiDevice = (UInt32)EDeviceSettingsType.DeviceFire3SettingsType;
-                iNumberOfBytes = System.Runtime.InteropServices.Marshal.SizeOf(FIRE3Settings);
-                iResult = icsNeoDll.icsneoGetDeviceSettings(m_hObject, ref FIRE3Settings, iNumberOfBytes, 0);
-                if (iResult == 0)
-                {
-                    MessageBox.Show("Problem reading Fire 3 configuration");
-                    return;
-                }
-                //Copy the HS CAN settings from the structure to sub struct
-                HSCanSettings = FIRE3Settings.Fire3Settings.can1;
-                break;
-
-
-            case (int)eHardwareTypes.NEODEVICE_FIRE3_FLEXRAY:			 //RAD Jupiter
-                //Get the setting
-                FIRE3FlexSettings.uiDevice = (UInt32)EDeviceSettingsType.DeviceFire3FlexraySettingsType;
-                iNumberOfBytes = System.Runtime.InteropServices.Marshal.SizeOf(FIRE3FlexSettings);
-                iResult = icsNeoDll.icsneoGetDeviceSettings(m_hObject, ref FIRE3FlexSettings, iNumberOfBytes, 0);
-                if (iResult == 0)
-                {
-                    MessageBox.Show("Problem reading neoVI FIRE 3 Flexray configuration");
-                    return;
-                }
-                //Copy the HS CAN settings from the structure to sub struct
-                HSCanSettings = FIRE3FlexSettings.Fire3FRSettings.can1;
-                break;
-
-              default:
-                //Connected hardware does not support this command
-                MessageBox.Show("Problem reading configuration, unsupported device");
-                return;
-        }
-
-        //fill text boxes with data from sub struct
-        txt3GPSeg1.Text = Convert.ToString(HSCanSettings.TqSeg1);
-        txt3GPSeg2.Text = Convert.ToString(HSCanSettings.TqSeg2);
-        txt3GPropDelay.Text = Convert.ToString(HSCanSettings.TqProp);
-        txt3GSJumpW.Text = Convert.ToString(HSCanSettings.TqSync);
-        txt3GBRP.Text = Convert.ToString(HSCanSettings.BRP);
-    }
-
-    private void cmd3GSetSettings_Click(object sender, EventArgs e)
-    {
-        SVCAN3SettingsPack VcanReadSettings = new SVCAN3SettingsPack();
-        SFireSettingsPack FireReadSettings = new SFireSettingsPack();
-        SFire2SettingsPack Fire2ReadSettings = new SFire2SettingsPack();
-        SRADGalaxySettingsPack RadGalaxyReadSettings = new SRADGalaxySettingsPack();
-        SVCANRFSettingsPack VcanRFReadSettings = new SVCANRFSettingsPack();
-        SVCAN412SettingsPack Vcan412ReadSettings = new SVCAN412SettingsPack();
-        SRADPlutoSettingsPack RADPlutoSettings = new SRADPlutoSettingsPack();
-        SVCAN4IndSettingsPack VCAN4IndSettings = new SVCAN4IndSettingsPack();
-        SJupiterSettingsPack JupiterSettings = new SJupiterSettingsPack();
-        SRED2SettingsPack RED2Settings = new SRED2SettingsPack();
-        SFire3SettingsPack FIRE3Settings = new SFire3SettingsPack();
-        SFire3FRSettingsPack FIRE3FlexSettings = new SFire3FRSettingsPack();
-        CAN_SETTINGS HSCanSettings = new CAN_SETTINGS();
-        int iNumberOfBytes = 0;
-        int iResult;
-
-        if (m_bPortOpen == false)  //Check to see if the port is opened first
-        {
-            MessageBox.Show("Device is Not Opened!");
-            return;
-        }
-
-        switch (iOpenDeviceType)
-        {
-            case (int)eHardwareTypes.NEODEVICE_FIRE:			 //FIRE
-                //Get the settings
-                iNumberOfBytes = System.Runtime.InteropServices.Marshal.SizeOf(FireReadSettings);
-                iResult = icsNeoDll.icsneoGetDeviceSettings(m_hObject, ref  FireReadSettings, iNumberOfBytes, 0);
-                if (iResult == 0)
-                {
-                    MessageBox.Show("Problem reading FIRE configuration");
-                    return;
-                }
-                //Copy the HS CAN settings from the structure to sub struct
-                HSCanSettings = FireReadSettings.FireSettings.can1;
-                break;
-
-            case (int)eHardwareTypes.NEODEVICE_VCAN3:			 //Vcan3
-                //Get the setting
-                iNumberOfBytes = System.Runtime.InteropServices.Marshal.SizeOf(VcanReadSettings);
-                iResult = icsNeoDll.icsneoGetDeviceSettings(m_hObject, ref VcanReadSettings, iNumberOfBytes, 0);
-                if (iResult == 0)
-                {
-                    MessageBox.Show("Problem reading VCAN3 configuration");
-                    return;
-                }
-
-                //Copy the HS CAN settings from the structure to sub struct
-                HSCanSettings = VcanReadSettings.VCAN3Settings.Can1;
-                break;
-
-            case (int)eHardwareTypes.NEODEVICE_FIRE2:			 //FIRE2
-                //Get the setting
-                iNumberOfBytes = System.Runtime.InteropServices.Marshal.SizeOf(Fire2ReadSettings);
-                iResult = icsNeoDll.icsneoGetDeviceSettings(m_hObject, ref Fire2ReadSettings, iNumberOfBytes, 0);
-                if (iResult == 0)
-                {
-                    MessageBox.Show("Problem reading FIRE2 configuration");
-                    return;
-                }
-                //Copy the HS CAN settings from the structure to sub struct
-                HSCanSettings = Fire2ReadSettings.Fire2Settings.can1;
-                break;
-
-            case (int)eHardwareTypes.NEODEVICE_RADGALAXY:			 //RadGalaxy
-                //Get the setting
-                iNumberOfBytes = System.Runtime.InteropServices.Marshal.SizeOf(RadGalaxyReadSettings);
-                iResult = icsNeoDll.icsneoGetDeviceSettings(m_hObject, ref RadGalaxyReadSettings, iNumberOfBytes, 0);
-                if (iResult == 0)
-                {
-                    MessageBox.Show("Problem reading RADGalaxy configuration");
-                    return;
-                }
-                //Copy the HS CAN settings from the structure to sub struct
-                HSCanSettings = RadGalaxyReadSettings.RADGalaxySettings.can1;
-                break;
-
-            case (int)eHardwareTypes.NEODEVICE_VCANRF:			 //VcanRF
-                //Get the setting
-                iNumberOfBytes = System.Runtime.InteropServices.Marshal.SizeOf(VcanRFReadSettings);
-                iResult = icsNeoDll.icsneoGetDeviceSettings(m_hObject, ref VcanRFReadSettings, iNumberOfBytes, 0);
-                if (iResult == 0)
-                {
-                    MessageBox.Show("Problem reading VCANRF configuration");
-                    return;
-                }
-                //Copy the HS CAN settings from the structure to sub struct
-                HSCanSettings = VcanRFReadSettings.VCANRFSettings.can1;
-                break;
-
-            case (int)eHardwareTypes.NEODEVICE_VCAN42:			 //Vcan4-2
-            case (int)eHardwareTypes.NEODEVICE_VCAN41:			 //Vcan4-1 Both are the same
-                //Get the setting
-                iNumberOfBytes = System.Runtime.InteropServices.Marshal.SizeOf(Vcan412ReadSettings);
-                iResult = icsNeoDll.icsneoGetDeviceSettings(m_hObject, ref Vcan412ReadSettings, iNumberOfBytes, 0);
-                if (iResult == 0)
-                {
-                    MessageBox.Show("Problem reading VCAN412 configuration");
-                    return;
-                }
-                //Copy the HS CAN settings from the structure to sub struct
-                HSCanSettings = Vcan412ReadSettings.VCAN412Settings.can1;
-                break;
-            case (int)eHardwareTypes.NEODEVICE_RADPLUTO:			 //RAD Pluto
-                //Get the setting
-                RADPlutoSettings.uiDevice = (UInt32)EDeviceSettingsType.DeviceRADPlutoSettingsType;
-                iNumberOfBytes = System.Runtime.InteropServices.Marshal.SizeOf(RADPlutoSettings);
-                iResult = icsNeoDll.icsneoGetDeviceSettings(m_hObject, ref RADPlutoSettings, iNumberOfBytes, 0);
-                if (iResult == 0)
-                {
-                    MessageBox.Show("Problem reading RAD Pluto configuration");
-                    return;
-                }
-                //Copy the HS CAN settings from the structure to sub struct
-                HSCanSettings = RADPlutoSettings.PlutoSettings.can1;
-                break;
-            case (int)eHardwareTypes.NEODEVICE_VCAN4_IND:			 //ValueCAN 4-Ind
-                //Get the setting
-                VCAN4IndSettings.uiDevice = (UInt32)EDeviceSettingsType.DeviceVCAN4IndSettingsType;
-                iNumberOfBytes = System.Runtime.InteropServices.Marshal.SizeOf(VCAN4IndSettings);
-                iResult = icsNeoDll.icsneoGetDeviceSettings(m_hObject, ref VCAN4IndSettings, iNumberOfBytes, 0);
-                if (iResult == 0)
-                {
-                    MessageBox.Show("Problem reading ValueCAN4 Ind configuration");
-                    return;
-                }
-                //Copy the HS CAN settings from the structure to sub struct
-                HSCanSettings = VCAN4IndSettings.VCAN4IndSettings.can1;
-                break;
-            case (int)eHardwareTypes.NEODEVICE_RADJUPITER:			 //RAD Jupiter
-                //Get the setting
-                JupiterSettings.uiDevice = (UInt32)EDeviceSettingsType.DeviceRADJupiterSettingsType;
-                iNumberOfBytes = System.Runtime.InteropServices.Marshal.SizeOf(JupiterSettings);
-                iResult = icsNeoDll.icsneoGetDeviceSettings(m_hObject, ref JupiterSettings, iNumberOfBytes, 0);
-                if (iResult == 0)
-                {
-                    MessageBox.Show("Problem reading RAD Jupiter configuration");
-                    return;
-                }
-                //Copy the HS CAN settings from the structure to sub struct
-                HSCanSettings = JupiterSettings.JupiterSettings.can1;
-                break;
-            case (int)eHardwareTypes.NEODEVICE_RED2:			 //neoVI RED 2
-                //Get the setting
-                RED2Settings.uiDevice = (UInt32)EDeviceSettingsType.DeviceRed2SettingsType;
-                iNumberOfBytes = System.Runtime.InteropServices.Marshal.SizeOf(RED2Settings);
-                iResult = icsNeoDll.icsneoGetDeviceSettings(m_hObject, ref RED2Settings, iNumberOfBytes, 0);
-                if (iResult == 0)
-                {
-                    MessageBox.Show("Problem reading neoVI RED 2 configuration");
-                    return;
-                }
-                //Copy the HS CAN settings from the structure to sub struct
-                HSCanSettings = RED2Settings.RED2Settings.can1;
-                break;
-            case (int)eHardwareTypes.NEODEVICE_FIRE3:			 //neoVI FIRE 3
-                //Get the setting
-                FIRE3Settings.uiDevice = (UInt32)EDeviceSettingsType.DeviceFire3SettingsType;
-                iNumberOfBytes = System.Runtime.InteropServices.Marshal.SizeOf(FIRE3Settings);
-                iResult = icsNeoDll.icsneoGetDeviceSettings(m_hObject, ref FIRE3Settings, iNumberOfBytes, 0);
-                if (iResult == 0)
-                {
-                    MessageBox.Show("Problem reading neoVI FIRE 3 configuration");
-                    return;
-                }
-                 //Copy the HS CAN settings from the structure to sub struct
-                HSCanSettings = FIRE3Settings.Fire3Settings.can1;
-                break;
-            case (int)eHardwareTypes.NEODEVICE_FIRE3_FLEXRAY :			 //neoVI Fire 3 Flexray
-                //Get the setting
-                FIRE3FlexSettings.uiDevice = (UInt32)EDeviceSettingsType.DeviceFire3FlexraySettingsType;
-                iNumberOfBytes = System.Runtime.InteropServices.Marshal.SizeOf(FIRE3FlexSettings);
-                iResult = icsNeoDll.icsneoGetDeviceSettings(m_hObject, ref FIRE3FlexSettings, iNumberOfBytes, 0);
-                if (iResult == 0)
-                {
-                    MessageBox.Show("Problem reading neoVI FIRE 3 Flexray configuration");
-                    return;
-                }
-                //Copy the HS CAN settings from the structure to sub struct
-                HSCanSettings = FIRE3FlexSettings.Fire3FRSettings.can1;
-                break;
-            default:
-                //Connected hardware does not support this command
-                MessageBox.Show("Problem reading configuration, unsupported device");
-                return;
-        }
-
-        //fill text boxes with data from sub struct
-        HSCanSettings.TqSeg1 = Convert.ToByte(txt3GPSeg1.Text);
-        HSCanSettings.TqSeg2 = Convert.ToByte(txt3GPSeg2.Text);
-        HSCanSettings.TqProp = Convert.ToByte(txt3GPropDelay.Text);
-        HSCanSettings.TqSync = Convert.ToByte(txt3GSJumpW.Text);
-        HSCanSettings.BRP = Convert.ToByte(txt3GBRP.Text);
-        HSCanSettings.SetBaudrate = 1;
-
-        //Check device to make sure correct structure goes to correct device
-        switch (iOpenDeviceType)
-        {
-            case (int)eHardwareTypes.NEODEVICE_FIRE:		  //FIRE
-                //copy sub struct to main struct
-                FireReadSettings.uiDevice = (UInt32)EDeviceSettingsType.DeviceFireSettingsType;
-                FireReadSettings.FireSettings.can1 = HSCanSettings;
-                iResult = icsNeoDll.icsneoSetDeviceSettings(m_hObject, ref FireReadSettings, iNumberOfBytes, 1, 0);
-                if (iResult == 0)
-                {
-                    MessageBox.Show("Problem Sending FIRE configuration");
-                    return;
-                }
-                break;
-            case (int)eHardwareTypes.NEODEVICE_VCAN3:			 //Vcan3
-                //copy sub struct to main struct
-                VcanReadSettings.uiDevice = (UInt32)EDeviceSettingsType.DeviceVCAN3SettingsType;
-                VcanReadSettings.VCAN3Settings.Can1 = HSCanSettings;
-                iResult = icsNeoDll.icsneoSetDeviceSettings(m_hObject, ref VcanReadSettings, iNumberOfBytes, 1, 0);
-                if (iResult == 0)
-                {
-                    MessageBox.Show("Problem Sending Vcan3 configuration");
-                    return;
-                }
-                break;
-
-            case (int)eHardwareTypes.NEODEVICE_FIRE2   ://FIRE2
-                //copy sub struct to main struct
-                Fire2ReadSettings.uiDevice = (UInt32)EDeviceSettingsType.DeviceFire2SettingsType;
-                Fire2ReadSettings.Fire2Settings.can1 = HSCanSettings;
-                iResult = icsNeoDll.icsneoSetDeviceSettings(m_hObject, ref Fire2ReadSettings, iNumberOfBytes, 1, 0);
-                if (iResult == 0)
-                {
-                    MessageBox.Show("Problem Sending FIRE2 configuration");
-                    return;
-                }
-                break;
-
-            case (int)eHardwareTypes.NEODEVICE_RADGALAXY ://RAD Galaxy
-                //copy sub struct to main struct
-                RadGalaxyReadSettings.uiDevice = (UInt32)EDeviceSettingsType.DeviceRADGalaxySettingsType;
-                RadGalaxyReadSettings.RADGalaxySettings.can1 = HSCanSettings;
-                iResult = icsNeoDll.icsneoSetDeviceSettings(m_hObject, ref RadGalaxyReadSettings, iNumberOfBytes, 1, 0);
-                if (iResult == 0)
-                {
-                    MessageBox.Show("Problem Sending RADGalaxy configuration");
-                    return;
-                }
-                break;
-
-            case (int)eHardwareTypes.NEODEVICE_VCANRF  ://Vcanrf
-                //copy sub struct to main struct
-                VcanRFReadSettings.uiDevice = (UInt32)EDeviceSettingsType.DeviceVCANRFSettingsType;
-                VcanRFReadSettings.VCANRFSettings.can1 = HSCanSettings;
-                iResult = icsNeoDll.icsneoSetDeviceSettings(m_hObject, ref VcanRFReadSettings, iNumberOfBytes, 1, 0);
-                if (iResult == 0)
-                {
-                    MessageBox.Show("Problem Sending Vcanrf configuration");
-                    return;
-                }
-                break;
-
-            case (int)eHardwareTypes.NEODEVICE_VCAN42: //VCAN 4-2
-            case (int)eHardwareTypes.NEODEVICE_VCAN41: //VCAN 4-1
-                //copy sub struct to main struct
-                Vcan412ReadSettings.uiDevice = (UInt32)EDeviceSettingsType.DeviceVCAN412SettingsType ;
-                Vcan412ReadSettings.VCAN412Settings.can1 = HSCanSettings;
-                iResult = icsNeoDll.icsneoSetDeviceSettings(m_hObject, ref Vcan412ReadSettings, iNumberOfBytes, 1, 0);
-                if (iResult == 0)
-                {
-                    MessageBox.Show("Problem Sending VCAN 412 configuration");
-                    return;
-                }
-                break;
-            case (int)eHardwareTypes.NEODEVICE_RADPLUTO: //RAD Pluto
-                //copy sub struct to main struct
-                RADPlutoSettings.uiDevice = (UInt32)EDeviceSettingsType.DeviceRADPlutoSettingsType;
-                RADPlutoSettings.PlutoSettings.can1 = HSCanSettings;
-                iResult = icsNeoDll.icsneoSetDeviceSettings(m_hObject, ref RADPlutoSettings, iNumberOfBytes, 1, 0);
-                if (iResult == 0)
-                {
-                    MessageBox.Show("Problem Sending RAD Pluto configuration");
-                    return;
-                }
-                break;
-            case (int)eHardwareTypes.NEODEVICE_VCAN4_IND: //ValueCAN 4 Ind
-                //copy sub struct to main struct
-                VCAN4IndSettings.uiDevice = (UInt32)EDeviceSettingsType.DeviceVCAN4IndSettingsType;
-                VCAN4IndSettings.VCAN4IndSettings.can1 = HSCanSettings;
-                iResult = icsNeoDll.icsneoSetDeviceSettings(m_hObject, ref VCAN4IndSettings, iNumberOfBytes, 1, 0);
-                if (iResult == 0)
-                {
-                    MessageBox.Show("Problem Sending ValueCAN 4 Ind configuration");
-                    return;
-                }
-                break;
-            case (int)eHardwareTypes.NEODEVICE_RADJUPITER: //RAD Jupiter
-                //copy sub struct to main struct
-                JupiterSettings.uiDevice = (UInt32)EDeviceSettingsType.DeviceRADJupiterSettingsType;
-                JupiterSettings.JupiterSettings.can1 = HSCanSettings;
-                iResult = icsNeoDll.icsneoSetDeviceSettings(m_hObject, ref JupiterSettings, iNumberOfBytes, 1, 0);
-                if (iResult == 0)
-                {
-                    MessageBox.Show("Problem Sending RAD Jupiter configuration");
-                    return;
-                }
-                break;
-            case (int)eHardwareTypes.NEODEVICE_RED2:			 //neoVI RED 2
-                //copy sub struct to main struct
-                RED2Settings.uiDevice = (UInt32)EDeviceSettingsType.DeviceRed2SettingsType;
-                RED2Settings.RED2Settings.can1 = HSCanSettings;
-                iResult = icsNeoDll.icsneoSetDeviceSettings(m_hObject, ref RED2Settings, iNumberOfBytes, 1, 0);
-                if (iResult == 0)
-                {
-                    MessageBox.Show("Problem Sending neoVI RED 2 configuration");
-                    return;
-                }
-                break;
-            case (int)eHardwareTypes.NEODEVICE_FIRE3:			 //neoVI FIRE 3
-                //copy sub struct to main struct
-                FIRE3Settings.uiDevice = (UInt32)EDeviceSettingsType.DeviceFire3SettingsType;
-                FIRE3Settings.Fire3Settings.can1 = HSCanSettings;
-                iResult = icsNeoDll.icsneoSetDeviceSettings(m_hObject, ref FIRE3Settings, iNumberOfBytes, 1, 0);
-                if (iResult == 0)
-                {
-                    MessageBox.Show("Problem Sending neoVI FIRE 3 configuration");
-                    return;
-                }
-                break;
-            case (int)eHardwareTypes.NEODEVICE_FIRE3_FLEXRAY:			 //neoVI Fire 3 Flexray
-                //copy sub struct to main struct
-                FIRE3FlexSettings.uiDevice = (UInt32)EDeviceSettingsType.DeviceFire3FlexraySettingsType;
-                FIRE3FlexSettings.Fire3FRSettings.can1 = HSCanSettings;
-                iResult = icsNeoDll.icsneoSetDeviceSettings(m_hObject, ref FIRE3FlexSettings, iNumberOfBytes, 1, 0);
-                if (iResult == 0)
-                {
-                    MessageBox.Show("Problem Sending neoVI FIRE 3 configuration");
-                    return;
-                }
-                break;               
-            default:
-                MessageBox.Show("Problem sending configuration, unsupported device");
-                return;
-        }
-        MessageBox.Show("Settings Changed");
-    }
-
-    private void cmdLINTransmit_Click(object sender, EventArgs e)
-    {
-                // Has the uset open neoVI yet?
-		if (m_bPortOpen==false)
-		{
-	        MessageBox.Show("neoVI not opened");
-			return;   // do not read messages if we haven't opened neoVI yet
-		}
-
-        //0 = Commander  = ID and data section
-		//1 = Header(only) = ID 
-        //2 = Responder = Responder data
-		//Find out what type of messages to send
-
-        switch (cboLINMessageType.SelectedIndex)
-        {
-		case 0:
-                // Commander Frame
-                SendCommanderFrame();
-				break;
-		case 1:
-					//Header, no data bytes
-					SendHeaderOnlyFrame();
-					break;
-		case 2:
-                    //Responder Frame
-                    SendResponderFrame();
-					break;
-		default:
-					//Should never get here
-			break;
-		}
-    }
-
-    private void cmdCANFDTransmit_Click(object sender, EventArgs e)
-    {
-        //Hardware must have CAN FD support for this tor work. 
-        int lResult;
-        icsSpyMessage stMessagesTx = new icsSpyMessage();
-        int lNetworkID;
-        uint iNumberTxed = 0;
-
-        byte[] iDataBytes;
-        int iCounter;
-
-        //Read data from textbox to Byte arraylstNumberOfCANFDBytes
-        String[] sSplitString = txtFDByteList.Text.Split(',');
-        iDataBytes = new byte[sSplitString.GetUpperBound(0) + 1];
-
-
-        for (iCounter = 0; iCounter < sSplitString.GetUpperBound(0) + 1; iCounter++)
-        {
-            iDataBytes[iCounter] = Convert.ToByte(sSplitString[iCounter], 16);
-        }
-
-        //Get pointer to data (could also be done with Unsafe code)
-        System.Runtime.InteropServices.GCHandle gcHandle = System.Runtime.InteropServices.GCHandle.Alloc(iDataBytes, System.Runtime.InteropServices.GCHandleType.Pinned);
-        IntPtr CanFDptr = gcHandle.AddrOfPinnedObject();
-
-        //Send on HS CAN
-        string sNetIDToUse = lstCANFDNetwork.Text;
-        lNetworkID = icsNeoDll.GetNetworkIDfromString(ref sNetIDToUse);
-
-        //Set the ID
-        stMessagesTx.ArbIDOrHeader = Convert.ToInt32(txtCANFDArbID.Text, 16);
-
-        // The number of Data Bytes
-        stMessagesTx.NumberBytesData = Convert.ToByte(lstNumberOfCANFDBytes.Text);
-        stMessagesTx.NumberBytesHeader = 0;
-
-        stMessagesTx.iExtraDataPtr = CanFDptr;
-        stMessagesTx.Protocol = Convert.ToByte(CSnet.ePROTOCOL.SPY_PROTOCOL_CANFD);
-
-        if (chkCANFDExtended.Checked == true)
-        {
-            //Make id Extended
-            stMessagesTx.StatusBitField = Convert.ToInt16(eDATA_STATUS_BITFIELD_1.SPY_STATUS_XTD_FRAME);
-        }
-        else
-        {
-            //Use Normal ID
-            stMessagesTx.StatusBitField = 0;
-        }
-
-        stMessagesTx.StatusBitField2 = 0;
-        stMessagesTx.StatusBitField3 = 16; //Enable bitrate switch
-
-        if (Convert.ToInt32(lstNumberOfCANFDBytes.Text) > 8)
-        {
-            //CAN FD More than 8 bytes
-            //Enable Extra Data Pointer
-            stMessagesTx.ExtraDataPtrEnabled = 1;
-            lResult = icsNeoDll.icsneoTxMessagesEx(m_hObject, ref stMessagesTx, Convert.ToUInt32(lNetworkID), 1, ref iNumberTxed, 0);
-        }
-        else
-        {
-            //CAN FD 8 bytes or less
-            stMessagesTx.ExtraDataPtrEnabled = 0;
-            stMessagesTx.Data1 = Convert.ToByte(txtDataByte1.Text, 16);
-            stMessagesTx.Data2 = Convert.ToByte(txtDataByte2.Text, 16);
-            stMessagesTx.Data3 = Convert.ToByte(txtDataByte3.Text, 16);
-            stMessagesTx.Data4 = Convert.ToByte(txtDataByte4.Text, 16);
-            stMessagesTx.Data5 = Convert.ToByte(txtDataByte5.Text, 16);
-            stMessagesTx.Data6 = Convert.ToByte(txtDataByte6.Text, 16);
-            stMessagesTx.Data7 = Convert.ToByte(txtDataByte7.Text, 16);
-            stMessagesTx.Data8 = Convert.ToByte(txtDataByte8.Text, 16);
+            // load the message structure
+            //copy headder bytes
+            stMessagesTxJ1850.Header1 = Convert.ToByte(txtOtherPT.Text, 16);
+            stMessagesTxJ1850.Header2 = Convert.ToByte(txtOtherTrgt.Text, 16);
+            stMessagesTxJ1850.Header3 = Convert.ToByte(txtOtherSrc.Text, 16);
+            stMessagesTxJ1850.NumberBytesHeader = 3;
+            stMessagesTxJ1850.NumberBytesData = Convert.ToByte(lstNumberOfOtherBytes.SelectedIndex);         // The number of Data Bytes
+                                                                                                             // Load all of the data bytes in the structure
+            stMessagesTxJ1850.Data1 = Convert.ToByte(txtOtherData1.Text, 16);
+            stMessagesTxJ1850.Data2 = Convert.ToByte(txtOtherData2.Text, 16);
+            stMessagesTxJ1850.Data3 = Convert.ToByte(txtOtherData3.Text, 16);
+            stMessagesTxJ1850.Data4 = Convert.ToByte(txtOtherData4.Text, 16);
+            stMessagesTxJ1850.Data5 = Convert.ToByte(txtOtherData5.Text, 16);
+            stMessagesTxJ1850.Data6 = Convert.ToByte(txtOtherData6.Text, 16);
+            stMessagesTxJ1850.Data7 = Convert.ToByte(txtOtherData7.Text, 16);
+            stMessagesTxJ1850.Data8 = Convert.ToByte(txtOtherData8.Text, 16);
 
             // Transmit the assembled message
-            lResult = icsNeoDll.icsneoTxMessages(m_hObject, ref stMessagesTx, Convert.ToInt32(lNetworkID), 1);
+            lResult = icsNeoDll.icsneoTxMessages(m_hObject, ref stMessagesTxJ1850, Convert.ToInt32(lNetworkID), 1);
+            // Test the returned result
+            if (lResult != 1)
+            {
+                MessageBox.Show("Problem Transmitting Message");
+            }
         }
 
-
-        // Test the returned result
-        if (lResult != 1)
+        private void cmdSetBitRate_Click(object sender, EventArgs e)
         {
-            MessageBox.Show("Problem Transmitting Message");
+            int iBitRateToUse = 0;
+            int iNetworkID = 0;
+            int iResult;
+
+            //Get the network name index to set the baud rate of 
+            switch (lstNetworkBaudRate.SelectedIndex)
+            {
+                case 0:
+                    iNetworkID = (int)eNETWORK_ID.NETID_HSCAN;
+                    break;
+                case 1:
+                    iNetworkID = (int)eNETWORK_ID.NETID_MSCAN;
+                    break;
+                case 2:
+                    iNetworkID = (int)eNETWORK_ID.NETID_SWCAN;
+                    break;
+                case 3:
+                    iNetworkID = (int)eNETWORK_ID.NETID_LSFTCAN;
+                    break;
+                case 4:
+                    iNetworkID = (int)eNETWORK_ID.NETID_HSCAN2;
+                    break;
+                case 5:
+                    iNetworkID = (int)eNETWORK_ID.NETID_HSCAN3;
+                    break;
+                case 6:
+                    iNetworkID = (int)eNETWORK_ID.NETID_HSCAN4;
+                    break;
+                case 7:
+                    iNetworkID = (int)eNETWORK_ID.NETID_HSCAN5;
+                    break;
+                case 8:
+                    iNetworkID = (int)eNETWORK_ID.NETID_HSCAN6;
+                    break;
+                case 9:
+                    iNetworkID = (int)eNETWORK_ID.NETID_HSCAN7;
+                    break;
+                case 10:
+                    iNetworkID = (int)eNETWORK_ID.NETID_HSCAN7;
+                    break;
+                case 11:
+                    iNetworkID = (int)eNETWORK_ID.NETID_DWCAN_09;
+                    break;
+                case 12:
+                    iNetworkID = (int)eNETWORK_ID.NETID_DWCAN_10;
+                    break;
+                case 13:
+                    iNetworkID = (int)eNETWORK_ID.NETID_DWCAN_11;
+                    break;
+                case 14:
+                    iNetworkID = (int)eNETWORK_ID.NETID_DWCAN_12;
+                    break;
+                case 15:
+                    iNetworkID = (int)eNETWORK_ID.NETID_DWCAN_13;
+                    break;
+                case 16:
+                    iNetworkID = (int)eNETWORK_ID.NETID_DWCAN_14;
+                    break;
+                default:
+                    MessageBox.Show("Incorrect Network selected");
+                    return;
+            }
+
+            iBitRateToUse = Convert.ToInt32(lstBaudRateToUse.Text);
+
+            //Set the bit rate
+            iResult = icsNeoDll.icsneoSetBitRate(m_hObject, iBitRateToUse, iNetworkID);
+            if (iResult != 1)
+            {
+                MessageBox.Show("Problem setting bit rate");
+            }
+            else
+            {
+                MessageBox.Show("Bit Rate Set");
+            }
         }
 
-        gcHandle.Free();
-    }
-
-    private void cmdISO15765SendMessage_Click(object sender, EventArgs e)
-    {
-        int lResult;
-        int iCounter;
-        int iNetwork = 1;
-        
-        // Has the uset open neoVI yet?
-        if (m_bPortOpen == false)  //Check to see if the port is opened first
+        private void cmdSetFDBitRate_Click(object sender, EventArgs e)
         {
-            MessageBox.Show("Device is Not Opened!");
-            return;
+            int iBitRateToUse = 0;
+            int iNetworkID = 0;
+            int iResult;
+
+            //Get the network name index to set the baud rate of 
+            switch (lstNetworkBaudRate.SelectedIndex)
+            {
+                case 0:
+                    iNetworkID = (int)eNETWORK_ID.NETID_HSCAN;
+                    break;
+                case 1:
+                    iNetworkID = (int)eNETWORK_ID.NETID_MSCAN;
+                    break;
+                case 2:
+                    iNetworkID = -1;
+                    break;
+                case 3:
+                    iNetworkID = -1;
+                    break;
+                case 4:
+                    iNetworkID = (int)eNETWORK_ID.NETID_HSCAN2;
+                    break;
+                case 5:
+                    iNetworkID = (int)eNETWORK_ID.NETID_HSCAN3;
+                    break;
+                case 6:
+                    iNetworkID = (int)eNETWORK_ID.NETID_HSCAN4;
+                    break;
+                case 7:
+                    iNetworkID = (int)eNETWORK_ID.NETID_HSCAN5;
+                    break;
+                case 8:
+                    iNetworkID = (int)eNETWORK_ID.NETID_HSCAN6;
+                    break;
+                case 9:
+                    iNetworkID = (int)eNETWORK_ID.NETID_HSCAN7;
+                    break;
+                case 10:
+                    iNetworkID = (int)eNETWORK_ID.NETID_HSCAN7;
+                    break;
+                case 11:
+                    iNetworkID = (int)eNETWORK_ID.NETID_DWCAN_09;
+                    break;
+                case 12:
+                    iNetworkID = (int)eNETWORK_ID.NETID_DWCAN_10;
+                    break;
+                case 13:
+                    iNetworkID = (int)eNETWORK_ID.NETID_DWCAN_11;
+                    break;
+                case 14:
+                    iNetworkID = (int)eNETWORK_ID.NETID_DWCAN_12;
+                    break;
+                case 15:
+                    iNetworkID = (int)eNETWORK_ID.NETID_DWCAN_13;
+                    break;
+                case 16:
+                    iNetworkID = (int)eNETWORK_ID.NETID_DWCAN_14;
+                    break;
+                default:
+                    MessageBox.Show("Incorrect Network selected");
+                    return;
+            }
+
+            if (iNetworkID == -1)
+            {
+                MessageBox.Show("Not a Valid CAN FD Channel");
+                return;
+            }
+
+            iBitRateToUse = Convert.ToInt32(lstFDBaudRateToUse.Text);
+
+            //Set the bit rate
+            iResult = icsNeoDll.icsneoSetFDBitRate(m_hObject, iBitRateToUse, iNetworkID);
+            if (iResult != 1)
+            {
+                MessageBox.Show("Problem setting FD bit rate");
+            }
+            else
+            {
+                MessageBox.Show("FD Bit Rate Set");
+            }
         }
 
-        //Create Message and adjust array to proper size
-        stCM_ISO157652_TxMessage tx_msg = new stCM_ISO157652_TxMessage();
-        tx_msg.data = new byte[4096];
-        
-
-        //enable ISO15765
-        string sNetIDString = lstISO15765Network.Text;
-        iNetwork = icsNeoDll.GetNetworkIDfromString(ref sNetIDString);
-        lResult = icsNeoDll.icsneoISO15765_EnableNetworks(m_hObject, iNetwork);
-
-        tx_msg.id = Convert.ToUInt32(txtISO15765ArbID.Text, 16);  //ArbID of the message
-        tx_msg.vs_netid = Convert.ToUInt16(iNetwork);  //Network to use
-        tx_msg.num_bytes = Convert.ToUInt32(nudISO15765NumberOfBytes.Value); //The number of data bytes to use
-        tx_msg.padding = 0xAA; //Set Padding Byte
-        tx_msg.flags = 0;
-
-
-
-        int iFlags=0;
-        if (chkIS015765PaddingEnable.Checked == true) iFlags = (iFlags | Convert.ToInt32(CSnet.stCM_ISO157652_TxMessage_Flags.paddingEnable));
-        if (chkISO15765ExtendedID.Checked == true) iFlags = (iFlags | Convert.ToInt32(CSnet.stCM_ISO157652_TxMessage_Flags.id_29_bit_enable));
-        if (chkISO15765FCExtendedID.Checked == true) iFlags = (iFlags | Convert.ToInt32( CSnet.stCM_ISO157652_TxMessage_Flags.fc_id_29_bit_enable));
-        if (chkISO15765CANFD.Checked == true) iFlags = (iFlags | Convert.ToInt32(CSnet.stCM_ISO157652_TxMessage_Flags.iscanFD));
-        if (chkISO15765CANFD.Checked == true) iFlags = (iFlags | Convert.ToInt32(CSnet.stCM_ISO157652_TxMessage_Flags.isBSREnabled));
-        tx_msg.flags = Convert.ToUInt16(iFlags);
-
-        tx_msg.fc_id = Convert.ToUInt32(txtISO15765FlowControlArbID.Text, 16); //ArbID for the flow control Frame
-        tx_msg.fc_id_mask = 0xFFF; //The flow control arb filter mask (response id from receiver)
-        tx_msg.flowControlExtendedAddress = Convert.ToByte(chkISO15765ExtendedID.Checked); //Extended ID
-        tx_msg.fs_timeout = 0x100;  //Flow Control Time out in ms
-        tx_msg.fs_wait = 0x3000; //Flow Control FS=Wait Timeout ms
-        tx_msg.blockSize = 0;//Block size (for sending flow Control)
-        tx_msg.stMin = 0;
-
-        //Fill data
-        String[] SplitString = txtISO15765Data.Text.Split(',');
-        for (iCounter = 0; iCounter < SplitString.GetUpperBound(0)+1;iCounter ++)
+        private void cmd3GGetSettings_Click(object sender, EventArgs e)
         {
-            tx_msg.data[iCounter] = Convert.ToByte(SplitString[iCounter], 16);
+            SVCAN3SettingsPack VcanReadSettings = new SVCAN3SettingsPack();
+            SFireSettingsPack FireReadSettings = new SFireSettingsPack();
+            SFire2SettingsPack Fire2ReadSettings = new SFire2SettingsPack();
+            SRADGalaxySettingsPack RadGalaxyReadSettings = new SRADGalaxySettingsPack();
+            SVCANRFSettingsPack VcanRFReadSettings = new SVCANRFSettingsPack();
+            SVCAN412SettingsPack Vcan412ReadSettings = new SVCAN412SettingsPack();
+            SRADPlutoSettingsPack RADPlutoSettings = new SRADPlutoSettingsPack();
+            SVCAN4IndSettingsPack VCAN4IndSettings = new SVCAN4IndSettingsPack();
+            SJupiterSettingsPack JupiterSettings = new SJupiterSettingsPack();
+            SRED2SettingsPack RED2Settings = new SRED2SettingsPack();
+            SFire3SettingsPack FIRE3Settings = new SFire3SettingsPack();
+            SFire3FRSettingsPack FIRE3FlexSettings = new SFire3FRSettingsPack();
+
+            CAN_SETTINGS HSCanSettings = new CAN_SETTINGS();
+            int iNumberOfBytes = 0;
+            int iResult;
+
+            if (m_bPortOpen == false)  //Check to see if the port is opened first
+            {
+                MessageBox.Show("Device is Not Opened!");
+                return;
+            }
+
+
+            //Get the settigns of the connected hardware
+            switch (iOpenDeviceType)
+            {
+                case (int)eHardwareTypes.NEODEVICE_FIRE:          //FIRE
+                                                                  //Get the settings
+                    FireReadSettings.uiDevice = (UInt32)EDeviceSettingsType.DeviceFireSettingsType;
+                    iNumberOfBytes = System.Runtime.InteropServices.Marshal.SizeOf(FireReadSettings);
+                    iResult = icsNeoDll.icsneoGetDeviceSettings(m_hObject, ref FireReadSettings, iNumberOfBytes, 0);
+                    if (iResult == 0)
+                    {
+                        MessageBox.Show("Problem reading FIRE configuration");
+                        return;
+                    }
+                    //Copy the HS CAN settings from the structure to sub struct
+                    HSCanSettings = FireReadSettings.FireSettings.can1;
+                    break;
+
+                case (int)eHardwareTypes.NEODEVICE_VCAN3:            //Vcan3
+                                                                     //Get the setting
+                    VcanReadSettings.uiDevice = (UInt32)EDeviceSettingsType.DeviceVCAN3SettingsType;
+                    iNumberOfBytes = System.Runtime.InteropServices.Marshal.SizeOf(VcanReadSettings);
+                    iResult = icsNeoDll.icsneoGetDeviceSettings(m_hObject, ref VcanReadSettings, iNumberOfBytes, 0);
+                    if (iResult == 0)
+                    {
+                        MessageBox.Show("Problem reading VCAN3 configuration");
+                        return;
+                    }
+                    //Copy the HS CAN settings from the structure to sub struct
+                    HSCanSettings = VcanReadSettings.VCAN3Settings.Can1;
+                    break;
+
+                case (int)eHardwareTypes.NEODEVICE_FIRE2:            //FIRE2
+                                                                     //Get the setting
+                    Fire2ReadSettings.uiDevice = (UInt32)EDeviceSettingsType.DeviceFire2SettingsType;
+                    iNumberOfBytes = System.Runtime.InteropServices.Marshal.SizeOf(Fire2ReadSettings);
+                    iResult = icsNeoDll.icsneoGetDeviceSettings(m_hObject, ref Fire2ReadSettings, iNumberOfBytes, 0);
+                    if (iResult == 0)
+                    {
+                        MessageBox.Show("Problem reading FIRE2 configuration");
+                        return;
+                    }
+                    //Copy the HS CAN settings from the structure to sub struct
+                    HSCanSettings = Fire2ReadSettings.Fire2Settings.can1;
+                    break;
+
+                case (int)eHardwareTypes.NEODEVICE_RADGALAXY:            //RadGalaxy
+                                                                         //Get the setting
+                    RadGalaxyReadSettings.uiDevice = (UInt32)EDeviceSettingsType.DeviceRADGalaxySettingsType;
+                    iNumberOfBytes = System.Runtime.InteropServices.Marshal.SizeOf(RadGalaxyReadSettings);
+                    iResult = icsNeoDll.icsneoGetDeviceSettings(m_hObject, ref RadGalaxyReadSettings, iNumberOfBytes, 0);
+                    if (iResult == 0)
+                    {
+                        MessageBox.Show("Problem reading RADGalaxy configuration");
+                        return;
+                    }
+                    //Copy the HS CAN settings from the structure to sub struct
+                    HSCanSettings = RadGalaxyReadSettings.RADGalaxySettings.can1;
+                    break;
+
+                case (int)eHardwareTypes.NEODEVICE_VCANRF:           //VcanRF
+                                                                     //Get the setting
+                    VcanRFReadSettings.uiDevice = (UInt32)EDeviceSettingsType.DeviceVCANRFSettingsType;
+                    iNumberOfBytes = System.Runtime.InteropServices.Marshal.SizeOf(VcanRFReadSettings);
+                    iResult = icsNeoDll.icsneoGetDeviceSettings(m_hObject, ref VcanRFReadSettings, iNumberOfBytes, 0);
+                    if (iResult == 0)
+                    {
+                        MessageBox.Show("Problem reading VCANRF configuration");
+                        return;
+                    }
+                    //Copy the HS CAN settings from the structure to sub struct
+                    HSCanSettings = VcanRFReadSettings.VCANRFSettings.can1;
+                    break;
+
+                case (int)eHardwareTypes.NEODEVICE_VCAN42:           //Vcan4-2
+                case (int)eHardwareTypes.NEODEVICE_VCAN41:           //Vcan4-1  (Same steps for both)
+                                                                     //Get the setting
+                    Vcan412ReadSettings.uiDevice = (UInt32)EDeviceSettingsType.DeviceVCAN412SettingsType;
+                    iNumberOfBytes = System.Runtime.InteropServices.Marshal.SizeOf(Vcan412ReadSettings);
+                    iResult = icsNeoDll.icsneoGetDeviceSettings(m_hObject, ref Vcan412ReadSettings, iNumberOfBytes, 0);
+                    if (iResult == 0)
+                    {
+                        MessageBox.Show("Problem reading VCAN412 configuration");
+                        return;
+                    }
+                    //Copy the HS CAN settings from the structure to sub struct
+                    HSCanSettings = Vcan412ReadSettings.VCAN412Settings.can1;
+                    break;
+
+                case (int)eHardwareTypes.NEODEVICE_RADPLUTO:             //RAD Pluto
+                                                                         //Get the setting
+                    RADPlutoSettings.uiDevice = (UInt32)EDeviceSettingsType.DeviceRADPlutoSettingsType;
+                    iNumberOfBytes = System.Runtime.InteropServices.Marshal.SizeOf(RADPlutoSettings);
+                    iResult = icsNeoDll.icsneoGetDeviceSettings(m_hObject, ref RADPlutoSettings, iNumberOfBytes, 0);
+                    if (iResult == 0)
+                    {
+                        MessageBox.Show("Problem reading RAD Pluto configuration");
+                        return;
+                    }
+                    //Copy the HS CAN settings from the structure to sub struct
+                    HSCanSettings = RADPlutoSettings.PlutoSettings.can1;
+                    break;
+
+                case (int)eHardwareTypes.NEODEVICE_VCAN4_IND:            //ValueCAN 4-Ind
+                                                                         //Get the setting
+                    VCAN4IndSettings.uiDevice = (UInt32)EDeviceSettingsType.DeviceVCAN4IndSettingsType;
+                    iNumberOfBytes = System.Runtime.InteropServices.Marshal.SizeOf(VCAN4IndSettings);
+                    iResult = icsNeoDll.icsneoGetDeviceSettings(m_hObject, ref VCAN4IndSettings, iNumberOfBytes, 0);
+                    if (iResult == 0)
+                    {
+                        MessageBox.Show("Problem reading ValueCAN4 Ind configuration");
+                        return;
+                    }
+                    //Copy the HS CAN settings from the structure to sub struct
+                    HSCanSettings = VCAN4IndSettings.VCAN4IndSettings.can1;
+                    break;
+
+                case (int)eHardwareTypes.NEODEVICE_RADJUPITER:           //RAD Jupiter
+                                                                         //Get the setting
+                    JupiterSettings.uiDevice = (UInt32)EDeviceSettingsType.DeviceRADJupiterSettingsType;
+                    iNumberOfBytes = System.Runtime.InteropServices.Marshal.SizeOf(JupiterSettings);
+                    iResult = icsNeoDll.icsneoGetDeviceSettings(m_hObject, ref JupiterSettings, iNumberOfBytes, 0);
+                    if (iResult == 0)
+                    {
+                        MessageBox.Show("Problem reading RAD Jupiter configuration");
+                        return;
+                    }
+                    //Copy the HS CAN settings from the structure to sub struct
+                    HSCanSettings = JupiterSettings.JupiterSettings.can1;
+                    break;
+                case (int)eHardwareTypes.NEODEVICE_RED2:             //RAD Jupiter
+                                                                     //Get the setting
+                    RED2Settings.uiDevice = (UInt32)EDeviceSettingsType.DeviceRed2SettingsType;
+                    iNumberOfBytes = System.Runtime.InteropServices.Marshal.SizeOf(RED2Settings);
+                    iResult = icsNeoDll.icsneoGetDeviceSettings(m_hObject, ref RED2Settings, iNumberOfBytes, 0);
+                    if (iResult == 0)
+                    {
+                        MessageBox.Show("Problem reading RED 2 configuration");
+                        return;
+                    }
+                    //Copy the HS CAN settings from the structure to sub struct
+                    HSCanSettings = RED2Settings.RED2Settings.can1;
+                    break;
+
+
+                case (int)eHardwareTypes.NEODEVICE_FIRE3:            //RAD Jupiter
+                                                                     //Get the setting
+                    FIRE3Settings.uiDevice = (UInt32)EDeviceSettingsType.DeviceFire3SettingsType;
+                    iNumberOfBytes = System.Runtime.InteropServices.Marshal.SizeOf(FIRE3Settings);
+                    iResult = icsNeoDll.icsneoGetDeviceSettings(m_hObject, ref FIRE3Settings, iNumberOfBytes, 0);
+                    if (iResult == 0)
+                    {
+                        MessageBox.Show("Problem reading Fire 3 configuration");
+                        return;
+                    }
+                    //Copy the HS CAN settings from the structure to sub struct
+                    HSCanSettings = FIRE3Settings.Fire3Settings.can1;
+                    break;
+
+
+                case (int)eHardwareTypes.NEODEVICE_FIRE3_FLEXRAY:            //RAD Jupiter
+                                                                             //Get the setting
+                    FIRE3FlexSettings.uiDevice = (UInt32)EDeviceSettingsType.DeviceFire3FlexraySettingsType;
+                    iNumberOfBytes = System.Runtime.InteropServices.Marshal.SizeOf(FIRE3FlexSettings);
+                    iResult = icsNeoDll.icsneoGetDeviceSettings(m_hObject, ref FIRE3FlexSettings, iNumberOfBytes, 0);
+                    if (iResult == 0)
+                    {
+                        MessageBox.Show("Problem reading neoVI FIRE 3 Flexray configuration");
+                        return;
+                    }
+                    //Copy the HS CAN settings from the structure to sub struct
+                    HSCanSettings = FIRE3FlexSettings.Fire3FRSettings.can1;
+                    break;
+
+                default:
+                    //Connected hardware does not support this command
+                    MessageBox.Show("Problem reading configuration, unsupported device");
+                    return;
+            }
+
+            //fill text boxes with data from sub struct
+            txt3GPSeg1.Text = Convert.ToString(HSCanSettings.TqSeg1);
+            txt3GPSeg2.Text = Convert.ToString(HSCanSettings.TqSeg2);
+            txt3GPropDelay.Text = Convert.ToString(HSCanSettings.TqProp);
+            txt3GSJumpW.Text = Convert.ToString(HSCanSettings.TqSync);
+            txt3GBRP.Text = Convert.ToString(HSCanSettings.BRP);
         }
 
-        lResult = icsNeoDll.icsneoISO15765_TransmitMessage(m_hObject, iNetwork,ref tx_msg, 3000);
-
-        // Test the returned result
-        if (lResult != 1)
+        private void cmd3GSetSettings_Click(object sender, EventArgs e)
         {
-            MessageBox.Show("Problem Transmitting Message");
+            SVCAN3SettingsPack VcanReadSettings = new SVCAN3SettingsPack();
+            SFireSettingsPack FireReadSettings = new SFireSettingsPack();
+            SFire2SettingsPack Fire2ReadSettings = new SFire2SettingsPack();
+            SRADGalaxySettingsPack RadGalaxyReadSettings = new SRADGalaxySettingsPack();
+            SVCANRFSettingsPack VcanRFReadSettings = new SVCANRFSettingsPack();
+            SVCAN412SettingsPack Vcan412ReadSettings = new SVCAN412SettingsPack();
+            SRADPlutoSettingsPack RADPlutoSettings = new SRADPlutoSettingsPack();
+            SVCAN4IndSettingsPack VCAN4IndSettings = new SVCAN4IndSettingsPack();
+            SJupiterSettingsPack JupiterSettings = new SJupiterSettingsPack();
+            SRED2SettingsPack RED2Settings = new SRED2SettingsPack();
+            SFire3SettingsPack FIRE3Settings = new SFire3SettingsPack();
+            SFire3FRSettingsPack FIRE3FlexSettings = new SFire3FRSettingsPack();
+            CAN_SETTINGS HSCanSettings = new CAN_SETTINGS();
+            int iNumberOfBytes = 0;
+            int iResult;
+
+            if (m_bPortOpen == false)  //Check to see if the port is opened first
+            {
+                MessageBox.Show("Device is Not Opened!");
+                return;
+            }
+
+            switch (iOpenDeviceType)
+            {
+                case (int)eHardwareTypes.NEODEVICE_FIRE:             //FIRE
+                                                                     //Get the settings
+                    iNumberOfBytes = System.Runtime.InteropServices.Marshal.SizeOf(FireReadSettings);
+                    iResult = icsNeoDll.icsneoGetDeviceSettings(m_hObject, ref FireReadSettings, iNumberOfBytes, 0);
+                    if (iResult == 0)
+                    {
+                        MessageBox.Show("Problem reading FIRE configuration");
+                        return;
+                    }
+                    //Copy the HS CAN settings from the structure to sub struct
+                    HSCanSettings = FireReadSettings.FireSettings.can1;
+                    break;
+
+                case (int)eHardwareTypes.NEODEVICE_VCAN3:            //Vcan3
+                                                                     //Get the setting
+                    iNumberOfBytes = System.Runtime.InteropServices.Marshal.SizeOf(VcanReadSettings);
+                    iResult = icsNeoDll.icsneoGetDeviceSettings(m_hObject, ref VcanReadSettings, iNumberOfBytes, 0);
+                    if (iResult == 0)
+                    {
+                        MessageBox.Show("Problem reading VCAN3 configuration");
+                        return;
+                    }
+
+                    //Copy the HS CAN settings from the structure to sub struct
+                    HSCanSettings = VcanReadSettings.VCAN3Settings.Can1;
+                    break;
+
+                case (int)eHardwareTypes.NEODEVICE_FIRE2:            //FIRE2
+                                                                     //Get the setting
+                    iNumberOfBytes = System.Runtime.InteropServices.Marshal.SizeOf(Fire2ReadSettings);
+                    iResult = icsNeoDll.icsneoGetDeviceSettings(m_hObject, ref Fire2ReadSettings, iNumberOfBytes, 0);
+                    if (iResult == 0)
+                    {
+                        MessageBox.Show("Problem reading FIRE2 configuration");
+                        return;
+                    }
+                    //Copy the HS CAN settings from the structure to sub struct
+                    HSCanSettings = Fire2ReadSettings.Fire2Settings.can1;
+                    break;
+
+                case (int)eHardwareTypes.NEODEVICE_RADGALAXY:            //RadGalaxy
+                                                                         //Get the setting
+                    iNumberOfBytes = System.Runtime.InteropServices.Marshal.SizeOf(RadGalaxyReadSettings);
+                    iResult = icsNeoDll.icsneoGetDeviceSettings(m_hObject, ref RadGalaxyReadSettings, iNumberOfBytes, 0);
+                    if (iResult == 0)
+                    {
+                        MessageBox.Show("Problem reading RADGalaxy configuration");
+                        return;
+                    }
+                    //Copy the HS CAN settings from the structure to sub struct
+                    HSCanSettings = RadGalaxyReadSettings.RADGalaxySettings.can1;
+                    break;
+
+                case (int)eHardwareTypes.NEODEVICE_VCANRF:           //VcanRF
+                                                                     //Get the setting
+                    iNumberOfBytes = System.Runtime.InteropServices.Marshal.SizeOf(VcanRFReadSettings);
+                    iResult = icsNeoDll.icsneoGetDeviceSettings(m_hObject, ref VcanRFReadSettings, iNumberOfBytes, 0);
+                    if (iResult == 0)
+                    {
+                        MessageBox.Show("Problem reading VCANRF configuration");
+                        return;
+                    }
+                    //Copy the HS CAN settings from the structure to sub struct
+                    HSCanSettings = VcanRFReadSettings.VCANRFSettings.can1;
+                    break;
+
+                case (int)eHardwareTypes.NEODEVICE_VCAN42:           //Vcan4-2
+                case (int)eHardwareTypes.NEODEVICE_VCAN41:           //Vcan4-1 Both are the same
+                                                                     //Get the setting
+                    iNumberOfBytes = System.Runtime.InteropServices.Marshal.SizeOf(Vcan412ReadSettings);
+                    iResult = icsNeoDll.icsneoGetDeviceSettings(m_hObject, ref Vcan412ReadSettings, iNumberOfBytes, 0);
+                    if (iResult == 0)
+                    {
+                        MessageBox.Show("Problem reading VCAN412 configuration");
+                        return;
+                    }
+                    //Copy the HS CAN settings from the structure to sub struct
+                    HSCanSettings = Vcan412ReadSettings.VCAN412Settings.can1;
+                    break;
+                case (int)eHardwareTypes.NEODEVICE_RADPLUTO:             //RAD Pluto
+                                                                         //Get the setting
+                    RADPlutoSettings.uiDevice = (UInt32)EDeviceSettingsType.DeviceRADPlutoSettingsType;
+                    iNumberOfBytes = System.Runtime.InteropServices.Marshal.SizeOf(RADPlutoSettings);
+                    iResult = icsNeoDll.icsneoGetDeviceSettings(m_hObject, ref RADPlutoSettings, iNumberOfBytes, 0);
+                    if (iResult == 0)
+                    {
+                        MessageBox.Show("Problem reading RAD Pluto configuration");
+                        return;
+                    }
+                    //Copy the HS CAN settings from the structure to sub struct
+                    HSCanSettings = RADPlutoSettings.PlutoSettings.can1;
+                    break;
+                case (int)eHardwareTypes.NEODEVICE_VCAN4_IND:            //ValueCAN 4-Ind
+                                                                         //Get the setting
+                    VCAN4IndSettings.uiDevice = (UInt32)EDeviceSettingsType.DeviceVCAN4IndSettingsType;
+                    iNumberOfBytes = System.Runtime.InteropServices.Marshal.SizeOf(VCAN4IndSettings);
+                    iResult = icsNeoDll.icsneoGetDeviceSettings(m_hObject, ref VCAN4IndSettings, iNumberOfBytes, 0);
+                    if (iResult == 0)
+                    {
+                        MessageBox.Show("Problem reading ValueCAN4 Ind configuration");
+                        return;
+                    }
+                    //Copy the HS CAN settings from the structure to sub struct
+                    HSCanSettings = VCAN4IndSettings.VCAN4IndSettings.can1;
+                    break;
+                case (int)eHardwareTypes.NEODEVICE_RADJUPITER:           //RAD Jupiter
+                                                                         //Get the setting
+                    JupiterSettings.uiDevice = (UInt32)EDeviceSettingsType.DeviceRADJupiterSettingsType;
+                    iNumberOfBytes = System.Runtime.InteropServices.Marshal.SizeOf(JupiterSettings);
+                    iResult = icsNeoDll.icsneoGetDeviceSettings(m_hObject, ref JupiterSettings, iNumberOfBytes, 0);
+                    if (iResult == 0)
+                    {
+                        MessageBox.Show("Problem reading RAD Jupiter configuration");
+                        return;
+                    }
+                    //Copy the HS CAN settings from the structure to sub struct
+                    HSCanSettings = JupiterSettings.JupiterSettings.can1;
+                    break;
+                case (int)eHardwareTypes.NEODEVICE_RED2:             //neoVI RED 2
+                                                                     //Get the setting
+                    RED2Settings.uiDevice = (UInt32)EDeviceSettingsType.DeviceRed2SettingsType;
+                    iNumberOfBytes = System.Runtime.InteropServices.Marshal.SizeOf(RED2Settings);
+                    iResult = icsNeoDll.icsneoGetDeviceSettings(m_hObject, ref RED2Settings, iNumberOfBytes, 0);
+                    if (iResult == 0)
+                    {
+                        MessageBox.Show("Problem reading neoVI RED 2 configuration");
+                        return;
+                    }
+                    //Copy the HS CAN settings from the structure to sub struct
+                    HSCanSettings = RED2Settings.RED2Settings.can1;
+                    break;
+                case (int)eHardwareTypes.NEODEVICE_FIRE3:            //neoVI FIRE 3
+                                                                     //Get the setting
+                    FIRE3Settings.uiDevice = (UInt32)EDeviceSettingsType.DeviceFire3SettingsType;
+                    iNumberOfBytes = System.Runtime.InteropServices.Marshal.SizeOf(FIRE3Settings);
+                    iResult = icsNeoDll.icsneoGetDeviceSettings(m_hObject, ref FIRE3Settings, iNumberOfBytes, 0);
+                    if (iResult == 0)
+                    {
+                        MessageBox.Show("Problem reading neoVI FIRE 3 configuration");
+                        return;
+                    }
+                    //Copy the HS CAN settings from the structure to sub struct
+                    HSCanSettings = FIRE3Settings.Fire3Settings.can1;
+                    break;
+                case (int)eHardwareTypes.NEODEVICE_FIRE3_FLEXRAY:            //neoVI Fire 3 Flexray
+                                                                             //Get the setting
+                    FIRE3FlexSettings.uiDevice = (UInt32)EDeviceSettingsType.DeviceFire3FlexraySettingsType;
+                    iNumberOfBytes = System.Runtime.InteropServices.Marshal.SizeOf(FIRE3FlexSettings);
+                    iResult = icsNeoDll.icsneoGetDeviceSettings(m_hObject, ref FIRE3FlexSettings, iNumberOfBytes, 0);
+                    if (iResult == 0)
+                    {
+                        MessageBox.Show("Problem reading neoVI FIRE 3 Flexray configuration");
+                        return;
+                    }
+                    //Copy the HS CAN settings from the structure to sub struct
+                    HSCanSettings = FIRE3FlexSettings.Fire3FRSettings.can1;
+                    break;
+                default:
+                    //Connected hardware does not support this command
+                    MessageBox.Show("Problem reading configuration, unsupported device");
+                    return;
+            }
+
+            //fill text boxes with data from sub struct
+            HSCanSettings.TqSeg1 = Convert.ToByte(txt3GPSeg1.Text);
+            HSCanSettings.TqSeg2 = Convert.ToByte(txt3GPSeg2.Text);
+            HSCanSettings.TqProp = Convert.ToByte(txt3GPropDelay.Text);
+            HSCanSettings.TqSync = Convert.ToByte(txt3GSJumpW.Text);
+            HSCanSettings.BRP = Convert.ToByte(txt3GBRP.Text);
+            HSCanSettings.SetBaudrate = 1;
+
+            //Check device to make sure correct structure goes to correct device
+            switch (iOpenDeviceType)
+            {
+                case (int)eHardwareTypes.NEODEVICE_FIRE:          //FIRE
+                                                                  //copy sub struct to main struct
+                    FireReadSettings.uiDevice = (UInt32)EDeviceSettingsType.DeviceFireSettingsType;
+                    FireReadSettings.FireSettings.can1 = HSCanSettings;
+                    iResult = icsNeoDll.icsneoSetDeviceSettings(m_hObject, ref FireReadSettings, iNumberOfBytes, 1, 0);
+                    if (iResult == 0)
+                    {
+                        MessageBox.Show("Problem Sending FIRE configuration");
+                        return;
+                    }
+                    break;
+                case (int)eHardwareTypes.NEODEVICE_VCAN3:            //Vcan3
+                                                                     //copy sub struct to main struct
+                    VcanReadSettings.uiDevice = (UInt32)EDeviceSettingsType.DeviceVCAN3SettingsType;
+                    VcanReadSettings.VCAN3Settings.Can1 = HSCanSettings;
+                    iResult = icsNeoDll.icsneoSetDeviceSettings(m_hObject, ref VcanReadSettings, iNumberOfBytes, 1, 0);
+                    if (iResult == 0)
+                    {
+                        MessageBox.Show("Problem Sending Vcan3 configuration");
+                        return;
+                    }
+                    break;
+
+                case (int)eHardwareTypes.NEODEVICE_FIRE2://FIRE2
+                                                         //copy sub struct to main struct
+                    Fire2ReadSettings.uiDevice = (UInt32)EDeviceSettingsType.DeviceFire2SettingsType;
+                    Fire2ReadSettings.Fire2Settings.can1 = HSCanSettings;
+                    iResult = icsNeoDll.icsneoSetDeviceSettings(m_hObject, ref Fire2ReadSettings, iNumberOfBytes, 1, 0);
+                    if (iResult == 0)
+                    {
+                        MessageBox.Show("Problem Sending FIRE2 configuration");
+                        return;
+                    }
+                    break;
+
+                case (int)eHardwareTypes.NEODEVICE_RADGALAXY://RAD Galaxy
+                                                             //copy sub struct to main struct
+                    RadGalaxyReadSettings.uiDevice = (UInt32)EDeviceSettingsType.DeviceRADGalaxySettingsType;
+                    RadGalaxyReadSettings.RADGalaxySettings.can1 = HSCanSettings;
+                    iResult = icsNeoDll.icsneoSetDeviceSettings(m_hObject, ref RadGalaxyReadSettings, iNumberOfBytes, 1, 0);
+                    if (iResult == 0)
+                    {
+                        MessageBox.Show("Problem Sending RADGalaxy configuration");
+                        return;
+                    }
+                    break;
+
+                case (int)eHardwareTypes.NEODEVICE_VCANRF://Vcanrf
+                                                          //copy sub struct to main struct
+                    VcanRFReadSettings.uiDevice = (UInt32)EDeviceSettingsType.DeviceVCANRFSettingsType;
+                    VcanRFReadSettings.VCANRFSettings.can1 = HSCanSettings;
+                    iResult = icsNeoDll.icsneoSetDeviceSettings(m_hObject, ref VcanRFReadSettings, iNumberOfBytes, 1, 0);
+                    if (iResult == 0)
+                    {
+                        MessageBox.Show("Problem Sending Vcanrf configuration");
+                        return;
+                    }
+                    break;
+
+                case (int)eHardwareTypes.NEODEVICE_VCAN42: //VCAN 4-2
+                case (int)eHardwareTypes.NEODEVICE_VCAN41: //VCAN 4-1
+                                                           //copy sub struct to main struct
+                    Vcan412ReadSettings.uiDevice = (UInt32)EDeviceSettingsType.DeviceVCAN412SettingsType;
+                    Vcan412ReadSettings.VCAN412Settings.can1 = HSCanSettings;
+                    iResult = icsNeoDll.icsneoSetDeviceSettings(m_hObject, ref Vcan412ReadSettings, iNumberOfBytes, 1, 0);
+                    if (iResult == 0)
+                    {
+                        MessageBox.Show("Problem Sending VCAN 412 configuration");
+                        return;
+                    }
+                    break;
+                case (int)eHardwareTypes.NEODEVICE_RADPLUTO: //RAD Pluto
+                                                             //copy sub struct to main struct
+                    RADPlutoSettings.uiDevice = (UInt32)EDeviceSettingsType.DeviceRADPlutoSettingsType;
+                    RADPlutoSettings.PlutoSettings.can1 = HSCanSettings;
+                    iResult = icsNeoDll.icsneoSetDeviceSettings(m_hObject, ref RADPlutoSettings, iNumberOfBytes, 1, 0);
+                    if (iResult == 0)
+                    {
+                        MessageBox.Show("Problem Sending RAD Pluto configuration");
+                        return;
+                    }
+                    break;
+                case (int)eHardwareTypes.NEODEVICE_VCAN4_IND: //ValueCAN 4 Ind
+                                                              //copy sub struct to main struct
+                    VCAN4IndSettings.uiDevice = (UInt32)EDeviceSettingsType.DeviceVCAN4IndSettingsType;
+                    VCAN4IndSettings.VCAN4IndSettings.can1 = HSCanSettings;
+                    iResult = icsNeoDll.icsneoSetDeviceSettings(m_hObject, ref VCAN4IndSettings, iNumberOfBytes, 1, 0);
+                    if (iResult == 0)
+                    {
+                        MessageBox.Show("Problem Sending ValueCAN 4 Ind configuration");
+                        return;
+                    }
+                    break;
+                case (int)eHardwareTypes.NEODEVICE_RADJUPITER: //RAD Jupiter
+                                                               //copy sub struct to main struct
+                    JupiterSettings.uiDevice = (UInt32)EDeviceSettingsType.DeviceRADJupiterSettingsType;
+                    JupiterSettings.JupiterSettings.can1 = HSCanSettings;
+                    iResult = icsNeoDll.icsneoSetDeviceSettings(m_hObject, ref JupiterSettings, iNumberOfBytes, 1, 0);
+                    if (iResult == 0)
+                    {
+                        MessageBox.Show("Problem Sending RAD Jupiter configuration");
+                        return;
+                    }
+                    break;
+                case (int)eHardwareTypes.NEODEVICE_RED2:             //neoVI RED 2
+                                                                     //copy sub struct to main struct
+                    RED2Settings.uiDevice = (UInt32)EDeviceSettingsType.DeviceRed2SettingsType;
+                    RED2Settings.RED2Settings.can1 = HSCanSettings;
+                    iResult = icsNeoDll.icsneoSetDeviceSettings(m_hObject, ref RED2Settings, iNumberOfBytes, 1, 0);
+                    if (iResult == 0)
+                    {
+                        MessageBox.Show("Problem Sending neoVI RED 2 configuration");
+                        return;
+                    }
+                    break;
+                case (int)eHardwareTypes.NEODEVICE_FIRE3:            //neoVI FIRE 3
+                                                                     //copy sub struct to main struct
+                    FIRE3Settings.uiDevice = (UInt32)EDeviceSettingsType.DeviceFire3SettingsType;
+                    FIRE3Settings.Fire3Settings.can1 = HSCanSettings;
+                    iResult = icsNeoDll.icsneoSetDeviceSettings(m_hObject, ref FIRE3Settings, iNumberOfBytes, 1, 0);
+                    if (iResult == 0)
+                    {
+                        MessageBox.Show("Problem Sending neoVI FIRE 3 configuration");
+                        return;
+                    }
+                    break;
+                case (int)eHardwareTypes.NEODEVICE_FIRE3_FLEXRAY:            //neoVI Fire 3 Flexray
+                                                                             //copy sub struct to main struct
+                    FIRE3FlexSettings.uiDevice = (UInt32)EDeviceSettingsType.DeviceFire3FlexraySettingsType;
+                    FIRE3FlexSettings.Fire3FRSettings.can1 = HSCanSettings;
+                    iResult = icsNeoDll.icsneoSetDeviceSettings(m_hObject, ref FIRE3FlexSettings, iNumberOfBytes, 1, 0);
+                    if (iResult == 0)
+                    {
+                        MessageBox.Show("Problem Sending neoVI FIRE 3 configuration");
+                        return;
+                    }
+                    break;
+                default:
+                    MessageBox.Show("Problem sending configuration, unsupported device");
+                    return;
+            }
+            MessageBox.Show("Settings Changed");
         }
-    }
 
-    private void cmdConFigISO15765Rx_Click(object sender, EventArgs e)
-    {
-        int lResult;
-        String sTempNetwork;
-        int iNetwork;
-        stCM_ISO157652_RxMessage flow_cntrl_msg = new stCM_ISO157652_RxMessage();
-
-        sTempNetwork = lstISO15765Network.Text;
-        iNetwork = icsNeoDll.GetNetworkIDfromString(ref sTempNetwork);
-        lResult = icsNeoDll.icsneoISO15765_EnableNetworks(m_hObject, iNetwork);
-                    
-        //Build structure for message
-        string sNetIDString = lstISO15765Network.Text;
-        flow_cntrl_msg.vs_netid = Convert.ToUInt16(iNetwork);
-        flow_cntrl_msg.padding = 0xAA; //Set Padding Byte
-        flow_cntrl_msg.id = Convert.ToUInt32(txtISO15765ArbID.Text, 16);  //ArbID of the message
-        flow_cntrl_msg.id_mask = 0xFFF; //The flow control arb filter mask (response id from receiver)
-        flow_cntrl_msg.fc_id = Convert.ToUInt32(txtISO15765FlowControlArbID.Text, 16); //ArbID for the flow control Frame
-        flow_cntrl_msg.blockSize = 100;
-        flow_cntrl_msg.stMin = 100;
-        flow_cntrl_msg.cf_timeout = 1000;
-
-        //Set flags for Padding and ID information.
-        flow_cntrl_msg.flags = 0;
-        int iFlags = Convert.ToInt32(stCM_ISO157652_RxMessage_Flags.enableFlowControlTransmission);
-        if (chkIS015765PaddingEnable.Checked == true) iFlags = (iFlags | Convert.ToInt32(CSnet.stCM_ISO157652_TxMessage_Flags.paddingEnable));
-        if (chkISO15765ExtendedID.Checked == true) iFlags = (iFlags | Convert.ToInt32(CSnet.stCM_ISO157652_TxMessage_Flags.id_29_bit_enable));
-        if (chkISO15765FCExtendedID.Checked == true) iFlags = (iFlags | Convert.ToInt32(CSnet.stCM_ISO157652_TxMessage_Flags.fc_id_29_bit_enable));
-        if (chkISO15765CANFD.Checked == true) iFlags = (iFlags | Convert.ToInt32(CSnet.stCM_ISO157652_TxMessage_Flags.iscanFD));
-        if (chkISO15765CANFD.Checked == true) iFlags = (iFlags | Convert.ToInt32(CSnet.stCM_ISO157652_TxMessage_Flags.isBSREnabled));
-        flow_cntrl_msg.flags = Convert.ToUInt16(iFlags);
-
-        //ulIndex set to 0 for setting up the first filter.
-        lResult = icsNeoDll.icsneoISO15765_ReceiveMessage(m_hObject, 0, ref flow_cntrl_msg);
-        // Test the returned result
-        if (lResult != 1)
+        private void cmdLINTransmit_Click(object sender, EventArgs e)
         {
-            MessageBox.Show("Problem Setting up Message");
+            // Has the uset open neoVI yet?
+            if (m_bPortOpen == false)
+            {
+                MessageBox.Show("neoVI not opened");
+                return;   // do not read messages if we haven't opened neoVI yet
+            }
+
+            //0 = Commander  = ID and data section
+            //1 = Header(only) = ID 
+            //2 = Responder = Responder data
+            //Find out what type of messages to send
+
+            switch (cboLINMessageType.SelectedIndex)
+            {
+                case 0:
+                    // Commander Frame
+                    SendCommanderFrame();
+                    break;
+                case 1:
+                    //Header, no data bytes
+                    SendHeaderOnlyFrame();
+                    break;
+                case 2:
+                    //Responder Frame
+                    SendResponderFrame();
+                    break;
+                default:
+                    //Should never get here
+                    break;
+            }
         }
-    }
+
+        private void cmdCANFDTransmit_Click(object sender, EventArgs e)
+        {
+            //Hardware must have CAN FD support for this tor work. 
+            int lResult;
+            icsSpyMessage stMessagesTx = new icsSpyMessage();
+            int lNetworkID;
+            uint iNumberTxed = 0;
+
+            byte[] iDataBytes;
+            int iCounter;
+
+            //Read data from textbox to Byte arraylstNumberOfCANFDBytes
+            String[] sSplitString = txtFDByteList.Text.Split(',');
+            iDataBytes = new byte[sSplitString.GetUpperBound(0) + 1];
+
+
+            for (iCounter = 0; iCounter < sSplitString.GetUpperBound(0) + 1; iCounter++)
+            {
+                iDataBytes[iCounter] = Convert.ToByte(sSplitString[iCounter], 16);
+            }
+
+            //Get pointer to data (could also be done with Unsafe code)
+            System.Runtime.InteropServices.GCHandle gcHandle = System.Runtime.InteropServices.GCHandle.Alloc(iDataBytes, System.Runtime.InteropServices.GCHandleType.Pinned);
+            IntPtr CanFDptr = gcHandle.AddrOfPinnedObject();
+
+            //Send on HS CAN
+            string sNetIDToUse = lstCANFDNetwork.Text;
+            lNetworkID = icsNeoDll.GetNetworkIDfromString(ref sNetIDToUse);
+
+            //Set the ID
+            stMessagesTx.ArbIDOrHeader = Convert.ToInt32(txtCANFDArbID.Text, 16);
+
+            // The number of Data Bytes
+            stMessagesTx.NumberBytesData = Convert.ToByte(lstNumberOfCANFDBytes.Text);
+            stMessagesTx.NumberBytesHeader = 0;
+
+            stMessagesTx.iExtraDataPtr = CanFDptr;
+            stMessagesTx.Protocol = Convert.ToByte(CSnet.ePROTOCOL.SPY_PROTOCOL_CANFD);
+
+            if (chkCANFDExtended.Checked == true)
+            {
+                //Make id Extended
+                stMessagesTx.StatusBitField = Convert.ToInt16(eDATA_STATUS_BITFIELD_1.SPY_STATUS_XTD_FRAME);
+            }
+            else
+            {
+                //Use Normal ID
+                stMessagesTx.StatusBitField = 0;
+            }
+
+            stMessagesTx.StatusBitField2 = 0;
+            stMessagesTx.StatusBitField3 = 16; //Enable bitrate switch
+
+            if (Convert.ToInt32(lstNumberOfCANFDBytes.Text) > 8)
+            {
+                //CAN FD More than 8 bytes
+                //Enable Extra Data Pointer
+                stMessagesTx.ExtraDataPtrEnabled = 1;
+                lResult = icsNeoDll.icsneoTxMessagesEx(m_hObject, ref stMessagesTx, Convert.ToUInt32(lNetworkID), 1, ref iNumberTxed, 0);
+            }
+            else
+            {
+                //CAN FD 8 bytes or less
+                stMessagesTx.ExtraDataPtrEnabled = 0;
+                stMessagesTx.Data1 = Convert.ToByte(txtDataByte1.Text, 16);
+                stMessagesTx.Data2 = Convert.ToByte(txtDataByte2.Text, 16);
+                stMessagesTx.Data3 = Convert.ToByte(txtDataByte3.Text, 16);
+                stMessagesTx.Data4 = Convert.ToByte(txtDataByte4.Text, 16);
+                stMessagesTx.Data5 = Convert.ToByte(txtDataByte5.Text, 16);
+                stMessagesTx.Data6 = Convert.ToByte(txtDataByte6.Text, 16);
+                stMessagesTx.Data7 = Convert.ToByte(txtDataByte7.Text, 16);
+                stMessagesTx.Data8 = Convert.ToByte(txtDataByte8.Text, 16);
+
+                // Transmit the assembled message
+                lResult = icsNeoDll.icsneoTxMessages(m_hObject, ref stMessagesTx, Convert.ToInt32(lNetworkID), 1);
+            }
+
+
+            // Test the returned result
+            if (lResult != 1)
+            {
+                MessageBox.Show("Problem Transmitting Message");
+            }
+
+            gcHandle.Free();
+        }
+
+        private void cmdISO15765SendMessage_Click(object sender, EventArgs e)
+        {
+            int lResult;
+            int iCounter;
+            int iNetwork = 1;
+
+            // Has the uset open neoVI yet?
+            if (m_bPortOpen == false)  //Check to see if the port is opened first
+            {
+                MessageBox.Show("Device is Not Opened!");
+                return;
+            }
+
+            //Create Message and adjust array to proper size
+            stCM_ISO157652_TxMessage tx_msg = new stCM_ISO157652_TxMessage();
+            tx_msg.data = new byte[4096];
+
+
+            //enable ISO15765
+            string sNetIDString = lstISO15765Network.Text;
+            iNetwork = icsNeoDll.GetNetworkIDfromString(ref sNetIDString);
+            lResult = icsNeoDll.icsneoISO15765_EnableNetworks(m_hObject, iNetwork);
+
+            tx_msg.id = Convert.ToUInt32(txtISO15765ArbID.Text, 16);  //ArbID of the message
+            tx_msg.vs_netid = Convert.ToUInt16(iNetwork);  //Network to use
+            tx_msg.num_bytes = Convert.ToUInt32(nudISO15765NumberOfBytes.Value); //The number of data bytes to use
+            tx_msg.padding = 0xAA; //Set Padding Byte
+            tx_msg.flags = 0;
+
+
+
+            int iFlags = 0;
+            if (chkIS015765PaddingEnable.Checked == true) iFlags = (iFlags | Convert.ToInt32(CSnet.stCM_ISO157652_TxMessage_Flags.paddingEnable));
+            if (chkISO15765ExtendedID.Checked == true) iFlags = (iFlags | Convert.ToInt32(CSnet.stCM_ISO157652_TxMessage_Flags.id_29_bit_enable));
+            if (chkISO15765FCExtendedID.Checked == true) iFlags = (iFlags | Convert.ToInt32(CSnet.stCM_ISO157652_TxMessage_Flags.fc_id_29_bit_enable));
+            if (chkISO15765CANFD.Checked == true) iFlags = (iFlags | Convert.ToInt32(CSnet.stCM_ISO157652_TxMessage_Flags.iscanFD));
+            if (chkISO15765CANFD.Checked == true) iFlags = (iFlags | Convert.ToInt32(CSnet.stCM_ISO157652_TxMessage_Flags.isBSREnabled));
+            tx_msg.flags = Convert.ToUInt16(iFlags);
+
+            tx_msg.fc_id = Convert.ToUInt32(txtISO15765FlowControlArbID.Text, 16); //ArbID for the flow control Frame
+            tx_msg.fc_id_mask = 0xFFF; //The flow control arb filter mask (response id from receiver)
+            tx_msg.flowControlExtendedAddress = Convert.ToByte(chkISO15765ExtendedID.Checked); //Extended ID
+            tx_msg.fs_timeout = 0x100;  //Flow Control Time out in ms
+            tx_msg.fs_wait = 0x3000; //Flow Control FS=Wait Timeout ms
+            tx_msg.blockSize = 0;//Block size (for sending flow Control)
+            tx_msg.stMin = 0;
+
+            //Fill data
+            String[] SplitString = txtISO15765Data.Text.Split(',');
+            for (iCounter = 0; iCounter < SplitString.GetUpperBound(0) + 1; iCounter++)
+            {
+                tx_msg.data[iCounter] = Convert.ToByte(SplitString[iCounter], 16);
+            }
+
+            lResult = icsNeoDll.icsneoISO15765_TransmitMessage(m_hObject, iNetwork, ref tx_msg, 3000);
+
+            // Test the returned result
+            if (lResult != 1)
+            {
+                MessageBox.Show("Problem Transmitting Message");
+            }
+        }
+
+        private void cmdConFigISO15765Rx_Click(object sender, EventArgs e)
+        {
+            int lResult;
+            String sTempNetwork;
+            int iNetwork;
+            stCM_ISO157652_RxMessage flow_cntrl_msg = new stCM_ISO157652_RxMessage();
+
+            sTempNetwork = lstISO15765Network.Text;
+            iNetwork = icsNeoDll.GetNetworkIDfromString(ref sTempNetwork);
+            lResult = icsNeoDll.icsneoISO15765_EnableNetworks(m_hObject, iNetwork);
+
+            //Build structure for message
+            string sNetIDString = lstISO15765Network.Text;
+            flow_cntrl_msg.vs_netid = Convert.ToUInt16(iNetwork);
+            flow_cntrl_msg.padding = 0xAA; //Set Padding Byte
+            flow_cntrl_msg.id = Convert.ToUInt32(txtISO15765ArbID.Text, 16);  //ArbID of the message
+            flow_cntrl_msg.id_mask = 0xFFF; //The flow control arb filter mask (response id from receiver)
+            flow_cntrl_msg.fc_id = Convert.ToUInt32(txtISO15765FlowControlArbID.Text, 16); //ArbID for the flow control Frame
+            flow_cntrl_msg.blockSize = 100;
+            flow_cntrl_msg.stMin = 100;
+            flow_cntrl_msg.cf_timeout = 1000;
+
+            //Set flags for Padding and ID information.
+            flow_cntrl_msg.flags = 0;
+            int iFlags = Convert.ToInt32(stCM_ISO157652_RxMessage_Flags.enableFlowControlTransmission);
+            if (chkIS015765PaddingEnable.Checked == true) iFlags = (iFlags | Convert.ToInt32(CSnet.stCM_ISO157652_TxMessage_Flags.paddingEnable));
+            if (chkISO15765ExtendedID.Checked == true) iFlags = (iFlags | Convert.ToInt32(CSnet.stCM_ISO157652_TxMessage_Flags.id_29_bit_enable));
+            if (chkISO15765FCExtendedID.Checked == true) iFlags = (iFlags | Convert.ToInt32(CSnet.stCM_ISO157652_TxMessage_Flags.fc_id_29_bit_enable));
+            if (chkISO15765CANFD.Checked == true) iFlags = (iFlags | Convert.ToInt32(CSnet.stCM_ISO157652_TxMessage_Flags.iscanFD));
+            if (chkISO15765CANFD.Checked == true) iFlags = (iFlags | Convert.ToInt32(CSnet.stCM_ISO157652_TxMessage_Flags.isBSREnabled));
+            flow_cntrl_msg.flags = Convert.ToUInt16(iFlags);
+
+            //ulIndex set to 0 for setting up the first filter.
+            lResult = icsNeoDll.icsneoISO15765_ReceiveMessage(m_hObject, 0, ref flow_cntrl_msg);
+            // Test the returned result
+            if (lResult != 1)
+            {
+                MessageBox.Show("Problem Setting up Message");
+            }
+        }
 
         private void cmdISO15765Disable_Click(object sender, EventArgs e)
         {
@@ -2143,7 +2146,7 @@ namespace CSnet
             //Send on Ethernet
             string sNetIDToUse = cboEthernetNetworks.Text;
             lNetworkID = icsNeoDll.GetNetworkIDfromString(ref sNetIDToUse);
-            
+
             // The number of Data Bytes
             stMessagesTx.NumberBytesData = Convert.ToByte(Convert.ToInt32(nudEthernetNumberOfBytes.Value) & 0xFF);
             stMessagesTx.NumberBytesHeader = Convert.ToByte(Convert.ToInt32(nudEthernetNumberOfBytes.Value) / 0x100);
@@ -2174,24 +2177,24 @@ namespace CSnet
             Int32 iResult;
             PhyRegPkt_t PhyRegPkt;
             int iTempFlags = 0;
-        
+
             //Check for supported hardware
             if (iOpenDeviceType == (int)eHardwareTypes.NEODEVICE_RADSUPERMOON | iOpenDeviceType == (int)eHardwareTypes.NEODEVICE_RADMOON2 | iOpenDeviceType == (int)eHardwareTypes.NEODEVICE_RADPLUTO)
             {
                 //Copy data to the structure
-                
-                PhyRegPkt.ClausePkt.phyAddrOrPort  = Convert.ToByte(nudAddressOrPort.Value);
+
+                PhyRegPkt.ClausePkt.phyAddrOrPort = Convert.ToByte(nudAddressOrPort.Value);
                 PhyRegPkt.ClausePkt.pageOrDevice = Convert.ToByte(nudPhyPageOrDevice.Value);
                 PhyRegPkt.ClausePkt.regAddr = Convert.ToUInt16(nudReqAddress.Value);
                 PhyRegPkt.ClausePkt.regVal = Convert.ToUInt16(nudReqValue.Value);
 
-                 
+
                 //Set the needed flags from the checkbox
                 if (chkPhyEnabled.Checked == true) iTempFlags = iTempFlags | (int)PhyRegFlags.Enabled;     //Set Bitfield Enabled
                 if (chkPhyWrite.Checked == true) iTempFlags = iTempFlags | (int)PhyRegFlags.WriteEnable;     //Set Bitfield WriteEnable = F,Clause45Enable 
                 if (chkphyClause45Enable.Checked == true) iTempFlags = iTempFlags | (int)PhyRegFlags.Clause45Enable;     //Set Bitfield Clause45Enable 
                 PhyRegPkt.Flags = (ushort)iTempFlags;
-    
+
                 //Get and cast the size of the structrue.
                 iResult = icsNeoDll.icsneoReadWritePHYSettings(m_hObject, ref PhyRegPkt, (IntPtr)System.Runtime.InteropServices.Marshal.SizeOf(PhyRegPkt), (IntPtr)1);
                 //If this is a read, dispaly the data
@@ -2210,13 +2213,13 @@ namespace CSnet
         private void cmdSetDoIPState_Click(object sender, EventArgs e)
         {
             Int32 lResult;
-            
-			// Has the uset open neoVI yet?;
-			if (m_bPortOpen==false) 
-			{
-				MessageBox.Show("neoVI not opened");
-				return; // do not read messages if we haven't opened neoVI yet
-			}
+
+            // Has the uset open neoVI yet?;
+            if (m_bPortOpen == false)
+            {
+                MessageBox.Show("neoVI not opened");
+                return; // do not read messages if we haven't opened neoVI yet
+            }
 
             //Call function to change the IO Pin
             lResult = icsNeoDll.icsneoEnableDOIPLine(m_hObject, chkDoIPState.Checked);
@@ -2238,17 +2241,17 @@ namespace CSnet
             GPTPStatus sgGPTPStatus = new GPTPStatus();
             double dTimeStamp;
 
-			// Has the uset open neoVI yet?
-			if (m_bPortOpen==false) 
-			{
-				MessageBox.Show("neoVI not opened");
-				return; // do not read messages if we haven't opened neoVI yet
-			}
+            // Has the uset open neoVI yet?
+            if (m_bPortOpen == false)
+            {
+                MessageBox.Show("neoVI not opened");
+                return; // do not read messages if we haven't opened neoVI yet
+            }
 
             //Call function 
             iResult = icsNeoDll.icsneoGetGPTPStatus(m_hObject, ref sgGPTPStatus);
 
-            if (iResult==0)
+            if (iResult == 0)
             {
                 cmdGetGPTP.Text = "Call failed or not supported by hardware.";
             }
@@ -2256,7 +2259,7 @@ namespace CSnet
             {
                 //Calculate the time stamp
                 dTimeStamp = ((Convert.ToUInt64(sgGPTPStatus.current_time.seconds_msb) << 32) + sgGPTPStatus.current_time.seconds_lsb) + (Convert.ToDouble(sgGPTPStatus.current_time.nanoseconds) / 1000000000);
-    
+
                 //Output the timestamp
                 cmdGetGPTP.Text = Convert.ToString(dTimeStamp);
             }
@@ -2278,25 +2281,25 @@ namespace CSnet
 
             //Request DLL Firmware information.stAPIFirmwareInfo
             iResult = icsNeoDll.icsneoGetDLLFirmwareInfo(m_hObject, ref FirmwareInfo);
-            if(iResult == 0)
+            if (iResult == 0)
             {
                 MessageBox.Show("Problem getting the version of the firmware stored within the DLL API");
                 return;
             }
 
             sFWVerInfo = "DLL FW Version = " + Convert.ToString(FirmwareInfo.iAppMajor) + "." + Convert.ToString(FirmwareInfo.iAppMinor) + "\r\n";
-    
+
             //Request Hardware Firmware information.
             iResult = icsNeoDll.icsneoGetHWFirmwareInfo(m_hObject, ref FirmwareInfo);
-            if(iResult == 0)
+            if (iResult == 0)
             {
                 MessageBox.Show("Problem getting the neoVI's firmware information");
             }
             sFWVerInfo += "HW FW Version = " + Convert.ToString(FirmwareInfo.iAppMajor) + "." + Convert.ToString(FirmwareInfo.iAppMinor);
-    
+
             txtFirmwareCheck.Text = sFWVerInfo;
         }
-        
+
         private void cmdGetRTC_Click(object sender, EventArgs e)
         {
             Int32 lResult;
@@ -2342,7 +2345,7 @@ namespace CSnet
             icsTime.month = Convert.ToByte(dtDateTime.Month);
             icsTime.sec = Convert.ToByte(dtDateTime.Second);
             icsTime.year = Convert.ToByte(dtDateTime.Year - 2000);
-                        
+
             //Call tos set RTC
             lResult = icsNeoDll.icsneoSetRTC(m_hObject, ref icsTime);
 
@@ -2359,7 +2362,7 @@ namespace CSnet
 
         private const byte ADI_WIL_MAC_SIZE = 8;
         private const byte ADI_WIL_MAX_NODES = 62;
-                      
+
         private const byte ADI_WIL_API_INITIALIZE = 0;
         private const byte ADI_WIL_API_TERMINATE = 1;
         private const byte ADI_WIL_API_CONNECT = 2;
@@ -2397,7 +2400,7 @@ namespace CSnet
         private const byte ADI_WIL_API_APPLY_NETWORK_TOPOLOGY = 34;
         private const byte ADI_WIL_API_CONFIGURE_CELL_BALANCING = 35;
         private const byte ADI_WIL_API_GET_CELL_BALANCING_STATUS = 36;
-                      
+
         private const byte ADI_WIL_ERR_SUCCESS = 0;
         private const byte ADI_WIL_ERR_FAIL = 1;
         private const byte ADI_WIL_ERR_API_IN_PROGRESS = 2;
@@ -2413,7 +2416,7 @@ namespace CSnet
         private const byte ADI_WIL_ERR_CRC = 12;
         private const byte ADI_WIL_ERR_FILE_REJECTED = 13;
         private const byte ADI_WIL_ERR_PARTIAL_SUCCESS = 14;
-                      
+
         private const byte ADI_WIL_MODE_STANDBY = 1;
         private const byte ADI_WIL_MODE_COMMISSIONING = 2;
         private const byte ADI_WIL_MODE_ACTIVE = 3;
@@ -2421,8 +2424,12 @@ namespace CSnet
         private const byte ADI_WIL_MODE_OTAP = 5;
         private const byte ADI_WIL_MODE_SLEEP = 6;
 
+        
         private void setACL_Click(object sender, EventArgs e)
         {
+            //must set mode to standby before setting ACL
+            setMode(ADI_WIL_MODE_STANDBY);
+
             int iResult;
             int iTimeOutCounter = 0;
             byte uAPISelected, uInstanceSelected, uFunctionSelected, uFunctionError, uCallbackError = 1, uCurrentFunction, uFinishedProcessing;
@@ -2432,11 +2439,11 @@ namespace CSnet
             uInstanceSelected = 0;
             uFunctionSelected = ADI_WIL_API_SET_ACL;
             byte uNodeCount = 1;
-            byte[] pACLArray = { 0x64, 0xF9, 0xC0, 0x00, 0x00, 0x00, 0x00, 0x00};
+            byte[] pACLArray = { 0x64, 0xF9, 0xC0, 0x00, 0x00, 0x00, 0x00, 0x00 };
             pParameters[0] = uNodeCount;
             Buffer.BlockCopy(pACLArray, 0, pParameters, 1, pACLArray.Length);
             uTotalLength = (uint)(1 + pACLArray.Length);
-            
+
             iResult = icsNeoDll.icsneoGenericAPISendCommand(m_hObject, uAPISelected, uInstanceSelected, uFunctionSelected, Marshal.UnsafeAddrOfPinnedArrayElement(pParameters, 0), uTotalLength, out uFunctionError);
 
             if (iResult != 1 && uFunctionError != ADI_WIL_ERR_SUCCESS)
@@ -2498,7 +2505,7 @@ namespace CSnet
             */
 
             int iResult;
-            
+
             byte uAPISelected, uInstanceSelected, uFunctionSelected, uFunctionError, uCurrentFunction, uNodeCount;
             byte[] pReturnedData = new byte[513];
             byte[] pACL = new byte[ADI_WIL_MAC_SIZE * ADI_WIL_MAX_NODES];
@@ -2523,7 +2530,10 @@ namespace CSnet
                 return;
             }
 
-            checkStatus(uAPISelected, uInstanceSelected, uFunctionSelected);
+            if (!checkStatus(uAPISelected, uInstanceSelected, uFunctionSelected))
+            {
+                MessageBox.Show("Error");
+            }
 
             iResult = icsNeoDll.icsneoGenericAPIReadData(m_hObject, uAPISelected, uInstanceSelected, out uCurrentFunction, Marshal.UnsafeAddrOfPinnedArrayElement(pReturnedData, 0), out uReturnedDataLength);
 
@@ -2532,7 +2542,7 @@ namespace CSnet
                 // Handle Error Here
                 MessageBox.Show($"Read error {iResult}");
                 return;
-            }            
+            }
 
             if (uReturnedDataLength > 0)
             {
@@ -2580,6 +2590,24 @@ namespace CSnet
             } else
             {
                 return true;
+            }
+        }
+
+        private void setMode(byte mode)
+        {
+            //set mode to active
+            //adi_wil_SetMode(m_hObject, 3);
+            byte functionError = 0;
+            byte function = ADI_WIL_API_SET_MODE; // adi_wil_SetMode ADI_WIL_API_SET_MODE = 4;
+            byte[] parameters = new byte[512];
+
+            parameters[0] = mode; //3 = active mode
+
+            icsNeoDll.icsneoGenericAPISendCommand(m_hObject, 1, 0, function, Marshal.UnsafeAddrOfPinnedArrayElement(parameters, 0), 1, out functionError);
+
+            if (!checkStatus(1, 0, function))
+            {
+                MessageBox.Show("Error");
             }
         }
     }
