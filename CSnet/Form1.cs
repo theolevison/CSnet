@@ -2535,7 +2535,7 @@ namespace CSnet
 
             if (uReturnedDataLength > 0)
             {
-                uNodeCount = pReturnedData[512];
+                uNodeCount = pReturnedData[ADI_WIL_MAC_SIZE * ADI_WIL_MAX_NODES + 1]; //497
                 MessageBox.Show($"node count{uNodeCount}");
 
                 if (ADI_WIL_MAX_NODES >= uNodeCount && uNodeCount >= 0)
