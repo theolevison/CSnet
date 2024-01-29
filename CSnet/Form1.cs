@@ -2536,12 +2536,13 @@ namespace CSnet
             if (uReturnedDataLength > 0)
             {
                 uNodeCount = pReturnedData[512];
+                MessageBox.Show($"node count{uNodeCount}");
 
                 if (ADI_WIL_MAX_NODES >= uNodeCount && uNodeCount >= 0)
                 {
                     Buffer.BlockCopy(pReturnedData, 0, pACL, 0, uNodeCount * ADI_WIL_MAC_SIZE);
                 }
-                //MessageBox.Show(BitConverter.ToString(pReturnedData));
+                MessageBox.Show(BitConverter.ToString(pReturnedData));
                 MessageBox.Show(BitConverter.ToString(pACL));
             }
         }
