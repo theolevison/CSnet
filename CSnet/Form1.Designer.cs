@@ -48,7 +48,7 @@
             this.Label5.Name = "Label5";
             this.Label5.Size = new System.Drawing.Size(171, 20);
             this.Label5.TabIndex = 44;
-            this.Label5.Text = "ICSNeo40.dll version";
+            this.Label5.Text = "version";
             // 
             // cmdVersion
             // 

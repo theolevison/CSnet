@@ -2632,7 +2632,7 @@ namespace CSnet
         [DllImport("icsneo40.dll")]
         public static extern Int32 icsneoOpenNeoDevice(ref NeoDevice pNeoDevice, ref IntPtr hObject, ref byte bNetworkIDs, Int32 bConfigRead, Int32 bSyncToPC);
         [DllImport("icsneo40.dll")]
-        public static extern Int32 icsneoOpenDevice(ref NeoDeviceEx pNeoDeviceEx, ref IntPtr hObject, ref byte bNetworkIDs, Int32 bConfigRead, Int32 iOptions,ref OptionsOpenNeoEx stOptionsOpenNeoEx, UInt32 uiReserved);
+        public static extern Int32 icsneoOpenDevice(ref NeoDeviceEx pNeoDeviceEx, ref IntPtr hObject, ref byte bNetworkIDs, Int32 bConfigRead, Int32 iOptions, ref OptionsOpenNeoEx stOptionsOpenNeoEx, UInt32 uiReserved);
         [DllImport("icsneo40.dll")]
         public static extern Int32 icsneoClosePort(IntPtr hObject, ref Int32 pNumberOfErrors);
         [DllImport("icsneo40.dll")]
@@ -2673,7 +2673,7 @@ namespace CSnet
         [DllImport("icsneo40.dll")]
         public static extern Int32 icsneoSetDeviceSettings(IntPtr hObject, ref SVCAN3SettingsPack pSettings, Int32 iNumBytes, Int32 bSaveToEEPROM, Int32 VnetChan);
         [DllImport("icsneo40.dll")]
-        public static extern Int32 icsneoGetDeviceSettings(IntPtr hObject, ref SVCAN3SettingsPack pSettings, Int32 iNumBytes, Int32 VnetChan);   
+        public static extern Int32 icsneoGetDeviceSettings(IntPtr hObject, ref SVCAN3SettingsPack pSettings, Int32 iNumBytes, Int32 VnetChan);
         [DllImport("icsneo40.dll")]
         public static extern Int32 icsneoSetDeviceSettings(IntPtr hObject, ref SVCAN412SettingsPack pSettings, Int32 iNumBytes, Int32 bSaveToEEPROM, Int32 VnetChan);
         [DllImport("icsneo40.dll")]
@@ -2695,9 +2695,9 @@ namespace CSnet
         [DllImport("icsneo40.dll")]
         public static extern Int32 icsneoGetDeviceSettings(IntPtr hObject, ref SVCANRFSettingsPack pSettings, Int32 iNumBytes, Int32 VnetChan);
         [DllImport("icsneo40.dll")]
-        public static extern Int32 icsneoSetDeviceSettings(IntPtr hObject, ref SRADPlutoSettingsPack pSettings, Int32 iNumBytes,Int32 bSaveToEEPROM , Int32 VnetChan);
+        public static extern Int32 icsneoSetDeviceSettings(IntPtr hObject, ref SRADPlutoSettingsPack pSettings, Int32 iNumBytes, Int32 bSaveToEEPROM, Int32 VnetChan);
         [DllImport("icsneo40.dll")]
-        public static extern Int32 icsneoGetDeviceSettings(IntPtr hObject,ref SRADPlutoSettingsPack pSettings,Int32 iNumBytes, Int32 VnetChan);
+        public static extern Int32 icsneoGetDeviceSettings(IntPtr hObject, ref SRADPlutoSettingsPack pSettings, Int32 iNumBytes, Int32 VnetChan);
         [DllImport("icsneo40.dll")]
         public static extern Int32 icsneoSetDeviceSettings(IntPtr hObject, ref SVCAN4IndSettingsPack pSettings, Int32 iNumBytes, Int32 bSaveToEEPROM, Int32 VnetChan);
         [DllImport("icsneo40.dll")]
@@ -2772,25 +2772,54 @@ namespace CSnet
         [DllImport("icsneo40.dll")]
         public static extern Int32 icsneoISO15765_DisableNetworks(IntPtr hObject);
         [DllImport("icsneo40.dll")]
-        public static extern Int32 icsneoISO15765_EnableNetworks (IntPtr hObject, Int32 Network);
+        public static extern Int32 icsneoISO15765_EnableNetworks(IntPtr hObject, Int32 Network);
         [DllImport("icsneo40.dll")]
         public static extern Int32 icsneoFindAllCOMDevices(Int32 lDriverType, Int32 lGetSerialNumbers, Int32 lStopAtFirst, Int32 lUSBCommOnly, ref Int32 p_lDeviceTypes, ref Int32 p_lComPorts, ref Int32 p_lSerialNumbers, ref Int32 lNumDevices);
         [DllImport("icsneo40.dll")]
-        public static extern Int32 icsneoISO15765_TransmitMessage(IntPtr hObject,Int32 ulNetworkID,ref stCM_ISO157652_TxMessage pMsg,Int32 ulBlockingTimeout);
+        public static extern Int32 icsneoISO15765_TransmitMessage(IntPtr hObject, Int32 ulNetworkID, ref stCM_ISO157652_TxMessage pMsg, Int32 ulBlockingTimeout);
         [DllImport("icsneo40.dll")]
         public static extern Int32 icsneoISO15765_ReceiveMessage(IntPtr hObject, Int32 ulIndex, ref stCM_ISO157652_RxMessage pMsg);
         [DllImport("icsneo40.dll")]
-        public static extern Int32 icsneoSerialNumberToString(UInt32 Serial,ref byte Data, ref UInt32 DataSize);
+        public static extern Int32 icsneoSerialNumberToString(UInt32 Serial, ref byte Data, ref UInt32 DataSize);
         [DllImport("icsneo40.dll")]
         public static extern Int32 icsneoReadWritePHYSettings(IntPtr hObject, ref PhyRegPkt_t PHYSettings, IntPtr size, IntPtr NumEntries);
         [DllImport("icsneo40.dll")]
-        public static extern Int32 icsneoEnableDOIPLine(IntPtr hObject,bool bActivate);
+        public static extern Int32 icsneoEnableDOIPLine(IntPtr hObject, bool bActivate);
         [DllImport("icsneo40.dll")]
         public static extern Int32 icsneoGetRTC(IntPtr hObject, ref icsSpyTime pTime);
         [DllImport("icsneo40.dll")]
         public static extern Int32 icsneoSetRTC(IntPtr hObject, ref icsSpyTime pTime);
         [DllImport("icsneo40.dll")]
-        public static extern Int32 icsneoGetGPTPStatus(IntPtr hObject,ref GPTPStatus StatusGPTP);
+        public static extern Int32 icsneoGetGPTPStatus(IntPtr hObject, ref GPTPStatus StatusGPTP);
+        [DllImport("icsneo40.dll")]
+        public static extern int icsneoGenericAPISendCommand(
+        IntPtr hObject,
+        byte apiIndex,
+        byte instanceIndex,
+        byte functionIndex,
+        IntPtr bData,
+        uint length,
+        out byte functionError
+        );
+        [DllImport("icsneo40.dll")]
+        public static extern int icsneoGenericAPIReadData(
+        IntPtr hObject,
+        byte apiIndex,
+        byte instanceIndex,
+        out byte functionIndex,
+        IntPtr bData,
+        out uint length
+        );
+        [DllImport("icsneo40.dll")]
+        public static extern int icsneoGenericAPIGetStatus(
+            IntPtr hObject,
+            byte apiIndex,
+            byte instanceIndex,
+            out byte functionIndex,
+            out byte callbackError,
+            out byte finishedProcessing
+        );
+        
 
         [DllImport("icsneo40.dll")]
         public static extern int icsneoGenericAPISendCommand(
