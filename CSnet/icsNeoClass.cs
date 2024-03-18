@@ -641,7 +641,25 @@ namespace CSnet
         public byte iBootLoaderVersionMinor;
     }
 
-    
+    [StructLayout(LayoutKind.Sequential)]
+    public struct adi_wil_dev_version_t
+    {
+        public adi_wil_version_t MainProcSWVersion;
+        public ushort iMainProcSiVersion;
+        public adi_wil_version_t CoProcSWVersion;
+        public ushort iCoProcSiVersion;
+        public uint iLifeCycleInfo;
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    public struct adi_wil_version_t
+    {
+        public ushort iVersionMajor;
+        public ushort iVersionMinor;
+        public ushort iVersionPatch;
+        public ushort iVersionBuild;
+    }
+
     [StructLayout(LayoutKind.Sequential)]
     public struct icsSpyMessageJ1850
     {
@@ -1603,6 +1621,105 @@ namespace CSnet
         public SNeoMostGatewaySettings neoMostGateway;
         public UInt16 vnetBits;  //First bit enables Android Messages
     }
+    /*
+
+    [StructLayout(LayoutKind.Sequential, Pack = 2)]
+    public struct SRADBMSSettings
+    {
+        
+        public ushort perf_en;
+
+        public ulong termination_enables;
+
+        public CAN_SETTINGS can1;
+        public CANFD_SETTINGS canfd1;
+
+        public CAN_SETTINGS can2;
+        public CANFD_SETTINGS canfd2;
+
+        public ushort network_enables;
+        public ushort network_enables_2;
+        public ushort network_enables_3;
+
+       
+        public short iso15765_separation_time_offset;
+
+        [StructLayout(LayoutKind.Explicit)]
+        public struct FlagsUnion
+        {
+            [FieldOffset(0)]
+            public uint flagsValue;
+
+            [FieldOffset(0)]
+            public FlagsStruct flagsStruct;
+        }
+
+        public struct FlagsStruct
+        {
+            public uint disableUsbCheckOnBoot : 1;
+            public uint enableLatencyTest : 1;
+            public uint enablePcEthernetComm : 1;
+            public uint reserved : 29;
+        }
+
+        public FlagsUnion flags;
+
+        public ETHERNET_SETTINGS ethernet;
+        public ETHERNET_SETTINGS2 ethernet2;
+
+        public uint pwr_man_timeout;
+        public ushort pwr_man_enable;
+        public ushort network_enabled_on_boot;
+
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 10)]
+        public byte[] rsvd;
+
+        public sSPI_PORT_SETTINGS spi_config;
+
+        public sWIL_CONNECTION_SETTINGS wbms_wil_1;
+        public sWIL_CONNECTION_SETTINGS wbms_wil_2;
+
+        public ushort wil1_nwk_metadata_buff_count;
+        public ushort wil2_nwk_metadata_buff_count;
+
+        public WBMSGatewaySettings gateway;
+
+        public ushort network_enables_4;
+        public ulong network_enables_5;
+    }
+
+    [StructLayout(LayoutKind.Explicit)]
+    public struct sSPI_PORT_SETTING
+    {
+        [FieldOffset(0)]
+        public byte byteValue;
+
+        [FieldOffset(0)]
+        public ConfigStruct config;
+    }
+
+    public struct ConfigStruct
+    {
+        public byte onboard_external : 1;
+        public byte type : 1;
+        public byte mode : 3;
+        public byte reserved : 3;
+    }
+
+    public struct sSPI_PORT_SETTINGS
+    {
+        public sSPI_PORT_SETTING port_a;
+        public sSPI_PORT_SETTING port_b;
+    }
+
+    [StructLayout(LayoutKind.Sequential, Pack = 2)]
+    public struct SRADBMSSettingsPack
+    {
+        public UInt32 uiDevice;
+        public SRADBMSSettings Settings;  //HardwareSettingsToUse with correct Struct
+    }
+
+    */
 
     [StructLayout(LayoutKind.Sequential, Pack = 2)]
     public struct SFireSettingsPack
@@ -2486,6 +2603,26 @@ namespace CSnet
         public const Int16 SPY_PROTOCOL_BEAN = 11;
         public const Int16 SPY_PROTOCOL_LIN = 12;
 
+        //写一些MAC变量
+        public static string macAddress1 = "";//mac地址1
+        public static string macAddress2 = "";//mac地址2
+        public static string macAddress3 = "";//mac地址3
+        public static string macAddress4 = "";//mac地址4
+        public static string macAddress5 = "";//mac地址5
+        public static string macAddress6 = "";//mac地址6
+        public static string macAddress7 = "";//mac地址7
+        public static string macAddress8 = "";//mac地址8
+        public static string macAddress9 = "";//mac地址9
+        public static string macAddress10 = "";//mac地址10
+        public static string macAddress11 = "";//mac地址11
+        public static string macAddress12 = "";//mac地址12
+        public static string macAddress13 = "";//mac地址13
+        public static string macAddress14 = "";//mac地址14
+        public static string macAddress15 = "";//mac地址15
+        public static string macAddress16 = "";//mac地址16
+      
+
+
 
 
         [DllImport("icsneo40.dll")]
@@ -2655,6 +2792,34 @@ namespace CSnet
         [DllImport("icsneo40.dll")]
         public static extern Int32 icsneoGetGPTPStatus(IntPtr hObject,ref GPTPStatus StatusGPTP);
 
+        [DllImport("icsneo40.dll")]
+        public static extern int icsneoGenericAPISendCommand(
+      IntPtr hObject,
+      byte apiIndex,
+      byte instanceIndex,
+      byte functionIndex,
+      IntPtr bData,
+      uint length,
+      out byte functionError
+      );
+        [DllImport("icsneo40.dll")]
+        public static extern int icsneoGenericAPIReadData(
+        IntPtr hObject,
+        byte apiIndex,
+        byte instanceIndex,
+        out byte functionIndex,
+        IntPtr bData,
+        out uint length
+        );
+        [DllImport("icsneo40.dll")]
+        public static extern int icsneoGenericAPIGetStatus(
+            IntPtr hObject,
+            byte apiIndex,
+            byte instanceIndex,
+            out byte functionIndex,
+            out byte callbackError,
+            out byte finishedProcessing
+        );
         public static double icsneoGetTimeStamp(long TimeHardware, long TimeHardware2)
         {
             return NEOVI_TIMEHARDWARE2_SCALING * TimeHardware2 + NEOVI_TIMEHARDWARE_SCALING * TimeHardware;
