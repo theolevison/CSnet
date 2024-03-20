@@ -2820,35 +2820,6 @@ namespace CSnet
             out byte finishedProcessing
         );
         
-
-        [DllImport("icsneo40.dll")]
-        public static extern int icsneoGenericAPISendCommand(
-      IntPtr hObject,
-      byte apiIndex,
-      byte instanceIndex,
-      byte functionIndex,
-      IntPtr bData,
-      uint length,
-      out byte functionError
-      );
-        [DllImport("icsneo40.dll")]
-        public static extern int icsneoGenericAPIReadData(
-        IntPtr hObject,
-        byte apiIndex,
-        byte instanceIndex,
-        out byte functionIndex,
-        IntPtr bData,
-        out uint length
-        );
-        [DllImport("icsneo40.dll")]
-        public static extern int icsneoGenericAPIGetStatus(
-            IntPtr hObject,
-            byte apiIndex,
-            byte instanceIndex,
-            out byte functionIndex,
-            out byte callbackError,
-            out byte finishedProcessing
-        );
         public static double icsneoGetTimeStamp(long TimeHardware, long TimeHardware2)
         {
             return NEOVI_TIMEHARDWARE2_SCALING * TimeHardware2 + NEOVI_TIMEHARDWARE_SCALING * TimeHardware;

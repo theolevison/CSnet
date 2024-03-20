@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using System.Runtime.InteropServices.WindowsRuntime;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -9,6 +11,7 @@ namespace CSnet
     public class ManagerData
     {
         public string MacAddress { get; set; }
+        public int Version { get; set; }
         public byte[] PMSPacket0 { get; set; } = new byte[0];
         public byte[] EMSPacket0 { get; set; } = new byte[0];
         public UInt16 I1 { get; set; }
@@ -17,7 +20,7 @@ namespace CSnet
         public UInt16 AUX1 { get; set; } //BEV: FC+ Chassis, BETA: HVDC- Chassis, BETB: HVDC- Chassis
         public UInt16 AUX2 { get; set; } //BEV: FC- Chassis, BETA: Isolation switch monitoring, BETB:DCFC+ Chassis
         public UInt16 AUX3 { get; set; } //BEV: Shunt Thermistor, BETA: Shunt A temperature, BETB: DCFC differential
-        public UInt16 AUX4 { get; set; } //BEV: DCFC relay Thermistor, BETA: SA1 tepmerature, BETB: DCFC- Chassis
+        public UInt16 AUX4 { get; set; } //BEV: DCFC relay Thermistor, BETA: SA1 temperature, BETB: DCFC- Chassis
         public UInt16 AUX5 { get; set; } //BEV: Main relay Thermistor, BETA: SA4 temperature, BETB: Isolation switch monitoring
         public UInt16 AUX6 { get; set; } //BEV: Vref external, BETA: SA3 temperature, BETB:Shunt B temperature
         public UInt16 AUX7 { get; set; } //BEV: 5V reference, BETA: input 12V sensing, BETB: SB1 temperature
@@ -35,22 +38,22 @@ namespace CSnet
 
         public UInt16 CD1V { get; set; }
 
-        public double Thermistor1 { get; set; }
-        public double Thermistor2 { get; set; }
         public string Timestamp { get; set; }
         public string PacketTimestamp { get; set; }
 
         //BEV measurements
         private double BEVTemp(double a)
         {
-            double b = a * 0.0001;//convert to correct decimal places
+            double b = a * 0.001;//convert to correct decimal places
 
             //put voltage against graph to find thermistor temperature
-            return (Math.Pow(b, 6) * 0.0000000000006) - (Math.Pow(b, 5) * 0.0000000004) + (Math.Pow(b, 4) * 0.00000007) - (Math.Pow(b, 3) * 0.000001) - (Math.Pow(b, 2) * 0.0004) - b * 0.0169 + 4.6655;
+            return (Math.Pow(b, 3) * -4.0721) + (Math.Pow(b, 2) * 32.822) - b * 104.43 + 179.58;
         }
         public double GetBEVDCFCPlus()
         {
+            Debug.WriteLine($"aux1 {AUX1}, aux2 {AUX2}, aux3 {AUX3}, aux4 {AUX4}, aux5 {AUX5}, aux6 {AUX6}, aux7 {AUX7}");
             return AUX1 * 284.006; //TODO: confirm this is AUX 1, not AUX 0. Check VREF (AUX6) which should always be 3V
+
         }
         public double GetBEVDCFCMinus()
         {
@@ -74,844 +77,130 @@ namespace CSnet
         }
 
         //BET A
-        public double BETAHVDCMinus { get; set; }
-        public double BETBHVDCMinus { get; set; }
-        private double _DCHCMinus;
-        public double DCHCMinus { get => _DCHCMinus; set => _DCHCMinus = -(value * 701 + 3); }
-        private double _DCHCPlus;
-        public double DCHCPlus { get => _DCHCPlus; set => _DCHCPlus = value; }
-        public double Input12VSensing { get; set; }
-
-        public double ShuntA { get; set; }
-        public double SA1Temp { get; set; }
-        public double SA4Temp { get; set; }
-        public double SA3Temp { get; set; }
-        public double ShuntB { get; set; }
-        public double SB1Temp { get; set; }
-
-        public void FillPMS()
+        public double GetBETAHVCDMinus()
         {
-            BETAHVDCMinus = PMSVoltages(AUX1, "BETA", "AUX"); //TODO: check these are correct
-            BETBHVDCMinus = PMSVoltages(AUX1, "BETB", "AUX");
-            DCHCMinus = PMSVoltages(AUX3, "BETB", "AUX_3");
-            DCHCPlus = PMSVoltages(AUX1, "BETB", "AUX_1");
-            Input12VSensing = PMSVoltages(AUX6, "BETA", "AUX_6");
-            ShuntA = PMSVoltages(AUX2, "BETA", "AUX_2");
-            SA1Temp = PMSVoltages(AUX3, "BETA", "AUX_3");
-            SA4Temp = PMSVoltages(AUX4, "BETA", "AUX_4");
-            SA3Temp = PMSVoltages(AUX5, "BETA", "AUX_5");
-            ShuntB = PMSVoltages(AUX5, "BETB", "AUX_5");
-            SB1Temp = PMSVoltages(AUX6, "BETB", "AUX_6");
+            return -((double)AUX1 * 701 + 3);
         }
-
-        private double PMSVoltages(ushort a, string pack, string type)
+        public double GetBETAIsolationSwitch()//not used in test
         {
-            double[,] NTC_LittleFuse =
+            if (AUX2 < 25.51)
             {
-                {150,0.049125},
-{149,0.050625},
-{148,0.052125},
-{147,0.053625},
-{146,0.05475},
-{145,0.05625},
-{144,0.05775},
-{143,0.05925},
-{142,0.06075},
-{141,0.061875},
-{140,0.063375},
-{139,0.06525},
-{138,0.0675},
-{137,0.069375},
-{136,0.07125},
-{135,0.073125},
-{134,0.075},
-{133,0.076875},
-{132,0.07875},
-{131,0.080625},
-{130,0.0825},
-{129,0.085125},
-{128,0.08775},
-{127,0.090375},
-{126,0.093},
-{125,0.095625},
-{124,0.09825},
-{123,0.100875},
-{122,0.1035},
-{121,0.106125},
-{120,0.10875},
-{119,0.1125},
-{118,0.115875},
-{117,0.119625},
-{116,0.123},
-{115,0.12675},
-{114,0.1305},
-{113,0.133875},
-{112,0.13725},
-{111,0.141},
-{110,0.144375},
-{109,0.149625},
-{108,0.1545},
-{107,0.159375},
-{106,0.16425},
-{105,0.1695},
-{104,0.174375},
-{103,0.17925},
-{102,0.184125},
-{101,0.189},
-{100,0.193875},
-{99,0.199875},
-{98,0.20625},
-{97,0.212625},
-{96,0.218625},
-{95,0.225},
-{94,0.2325},
-{93,0.239625},
-{92,0.247125},
-{91,0.25425},
-{90,0.26175},
-{89,0.270375},
-{88,0.279},
-{87,0.287625},
-{86,0.29625},
-{85,0.304875},
-{84,0.315},
-{83,0.325125},
-{82,0.33525},
-{81,0.345375},
-{80,0.3555},
-{79,0.3675},
-{78,0.3795},
-{77,0.391125},
-{76,0.403125},
-{75,0.41475},
-{74,0.429},
-{73,0.442875},
-{72,0.45675},
-{71,0.47025},
-{70,0.48375},
-{69,0.50025},
-{68,0.51675},
-{67,0.532875},
-{66,0.548625},
-{65,0.564375},
-{64,0.5835},
-{63,0.60225},
-{62,0.620625},
-{61,0.639},
-{60,0.657},
-{59,0.679125},
-{58,0.7005},
-{57,0.721875},
-{56,0.7425},
-{55,0.763125},
-{54,0.787875},
-{53,0.812625},
-{52,0.836625},
-{51,0.859875},
-{50,0.88275},
-{49,0.910875},
-{48,0.938625},
-{47,0.96525},
-{46,0.9915},
-{45,1.016625},
-{44,1.048125},
-{43,1.078125},
-{42,1.10775},
-{41,1.13625},
-{40,1.163625},
-{39,1.19775},
-{38,1.23075},
-{37,1.26225},
-{36,1.292625},
-{35,1.32225},
-{34,1.358625},
-{33,1.3935},
-{32,1.4265},
-{31,1.45875},
-{30,1.4895},
-{29,1.527},
-{28,1.563},
-{27,1.5975},
-{26,1.630125},
-{25,1.66125},
-{24,1.699875},
-{23,1.73625},
-{22,1.77075},
-{21,1.803375},
-{20,1.834125},
-{19,1.872},
-{18,1.907625},
-{17,1.941},
-{16,1.9725},
-{15,2.002125},
-{14,2.0385},
-{13,2.072625},
-{12,2.104125},
-{11,2.13375},
-{10,2.1615},
-{9,2.195625},
-{8,2.227125},
-{7,2.256},
-{6,2.283},
-{5,2.308125},
-{4,2.33925},
-{3,2.367375},
-{2,2.393625},
-{1,2.41725},
-{0,2.439375},
-{-1,2.47125},
-{-2,2.49975},
-{-3,2.525625},
-{-4,2.5485},
-{-5,2.5695},
-{-6,2.588625},
-{-7,2.60625},
-{-8,2.622},
-{-9,2.637},
-{-10,2.6505},
-{-11,2.67375},
-{-12,2.694},
-{-13,2.712},
-{-14,2.72775},
-{-15,2.742},
-{-16,2.755125},
-{-17,2.76675},
-{-18,2.77725},
-{-19,2.787},
-{-20,2.795625},
-{-21,2.811},
-{-22,2.8245},
-{-23,2.83575},
-{-24,2.845875},
-{-25,2.854875},
-{-26,2.86275},
-{-27,2.869875},
-{-28,2.87625},
-{-29,2.88225},
-{-30,2.8875},
-{-31,2.896875},
-{-32,2.90475},
-{-33,2.9115},
-{-34,2.9175},
-{-35,2.92275},
-{-36,2.92725},
-{-37,2.931375},
-{-38,2.935125},
-{-39,2.938125},
-{-40,2.941125}
-            };
-            double[,] NTC_TDK =
+                //Switch open
+            } else if (AUX2 > 46.52)
             {
-                {156,0.052125},
-{155,0.053625},
-{154,0.05475},
-{153,0.05625},
-{152,0.05775},
-{151,0.058875},
-{150,0.060357498},
-{149,0.061712598},
-{148,0.063216346},
-{147,0.064763343},
-{146,0.066354991},
-{145,0.067992739},
-{144,0.069698521},
-{143,0.071391789},
-{142,0.073133617},
-{141,0.074925568},
-{140,0.076769262},
-{139,0.078591063},
-{138,0.080571081},
-{137,0.082609586},
-{136,0.084708504},
-{135,0.086869831},
-{134,0.089172976},
-{133,0.091410775},
-{132,0.093714376},
-{131,0.09608593},
-{130,0.098527665},
-{129,0.101029131},
-{128,0.103651613},
-{127,0.106353273},
-{126,0.109136749},
-{125,0.112004768},
-{124,0.115168593},
-{123,0.118142477},
-{122,0.121205542},
-{121,0.12436072},
-{120,0.127611047},
-{119,0.131094681},
-{118,0.134586072},
-{117,0.138184552},
-{116,0.141893686},
-{115,0.145717159},
-{114,0.14956686},
-{113,0.153666057},
-{112,0.157893497},
-{111,0.16225348},
-{110,0.166750446},
-{109,0.171664315},
-{108,0.176330544},
-{107,0.181140981},
-{106,0.186100355},
-{105,0.19121354},
-{104,0.196710655},
-{103,0.202192756},
-{102,0.207846675},
-{101,0.213678023},
-{100,0.219692579},
-{99,0.22586954},
-{98,0.232305606},
-{97,0.238945413},
-{96,0.245795538},
-{95,0.252862737},
-{94,0.259834677},
-{93,0.267382275},
-{92,0.27517007},
-{91,0.283205647},
-{90,0.291496778},
-{89,0.300449294},
-{88,0.309041278},
-{87,0.317899567},
-{86,0.327032119},
-{85,0.336447054},
-{84,0.346644584},
-{83,0.356688548},
-{82,0.367041974},
-{81,0.37771365},
-{80,0.388712499},
-{79,0.400329251},
-{78,0.412032411},
-{77,0.424091208},
-{76,0.436515015},
-{75,0.449313277},
-{74,0.462569062},
-{73,0.476147275},
-{72,0.490128574},
-{71,0.504522484},
-{70,0.51933849},
-{69,0.534460236},
-{68,0.550126938},
-{67,0.566242673},
-{66,0.582816448},
-{65,0.599857063},
-{64,0.61711933},
-{63,0.635070108},
-{62,0.653510381},
-{61,0.672447691},
-{60,0.691889157},
-{59,0.711499551},
-{58,0.731888303},
-{57,0.752796231},
-{56,0.774228217},
-{55,0.796188445},
-{54,0.818376669},
-{53,0.84128798},
-{52,0.864731009},
-{51,0.888706594},
-{50,0.913214582},
-{49,0.938148066},
-{48,0.963563897},
-{47,0.989500006},
-{46,1.015951807},
-{45,1.042913453},
-{44,1.070645843},
-{43,1.098411524},
-{42,1.126655877},
-{41,1.155367805},
-{40,1.184534759},
-{39,1.215000858},
-{38,1.244797685},
-{37,1.274997495},
-{36,1.305582217},
-{35,1.33653231},
-{34,1.369494464},
-{33,1.400826655},
-{32,1.432452163},
-{31,1.464346455},
-{30,1.496483712},
-{29,1.5285374},
-{28,1.561477828},
-{27,1.594577795},
-{26,1.62780584},
-{25,1.661129568},
-{24,1.694679402},
-{23,1.727700893},
-{22,1.760719417},
-{21,1.793701239},
-{20,1.826612316},
-{19,1.860905793},
-{18,1.89313941},
-{17,1.925205948},
-{16,1.957072784},
-{15,1.988707654},
-{14,2.020339486},
-{13,2.051617323},
-{12,2.082563704},
-{11,2.113148601},
-{10,2.143343017},
-{9,2.174301122},
-{8,2.203162076},
-{7,2.231569867},
-{6,2.259501653},
-{5,2.286936007},
-{4,2.314354075},
-{3,2.340798074},
-{2,2.366685467},
-{1,2.392000979},
-{0,2.416730992},
-{-1,2.440392391},
-{-2,2.463521898},
-{-3,2.486059668},
-{-4,2.5079988},
-{-5,2.529333904},
-{-6,2.550923843},
-{-7,2.570638465},
-{-8,2.589767344},
-{-9,2.608310544},
-{-10,2.62626934},
-{-11,2.644271922},
-{-12,2.661011816},
-{-13,2.677180919},
-{-14,2.69278478},
-{-15,2.70782987},
-{-16,2.722624178},
-{-17,2.736506143},
-{-18,2.749858643},
-{-19,2.762691033},
-{-20,2.775013259},
-{-21,2.787003098},
-{-22,2.798262641},
-{-23,2.809051193},
-{-24,2.819380199},
-{-25,2.829261404},
-{-26,2.838865799},
-{-27,2.84780995},
-{-28,2.856350015},
-{-29,2.864498066},
-{-30,2.872266244},
-{-31,2.879859922},
-{-32,2.886827293},
-{-33,2.893458764},
-{-34,2.899765953},
-{-35,2.905760387},
-{-36,2.911709712},
-{-37,2.917036931},
-{-38,2.922092682},
-{-39,2.926887436},
-{-40,2.931431488},
-{-41,2.935793236},
-{-42,2.93986668},
-{-43,2.943718781},
-{-44,2.947359023},
-{-45,2.950796655},
-{-46,2.954153323},
-{-47,2.957159017},
-{-48,2.959994467},
-{-49,2.962667471},
-{-50,2.96518559},
-{-51,2.967615874},
-{-52,2.969833454},
-{-53,2.97191874},
-{-54,2.973878246},
-{-55,2.97571826},
-{-56,2.9775},
-{-57,2.978625},
-{-58,2.980125},
-{-59,2.980875},
-{-60,2.982}
-            };
-            double[,] Shunt =
-            {
-                {150,0.046959211},
-{149,0.048159678},
-{148,0.049398775},
-{147,0.050672808},
-{146,0.051981683},
-{145,0.053332488},
-{144,0.054728695},
-{143,0.056163004},
-{142,0.057638883},
-{141,0.059163358},
-{140,0.060729129},
-{139,0.062346769},
-{138,0.064016105},
-{137,0.065733397},
-{136,0.067505585},
-{135,0.069328915},
-{134,0.071210288},
-{133,0.073149475},
-{132,0.075149781},
-{131,0.077214481},
-{130,0.079339771},
-{129,0.081535947},
-{128,0.083799166},
-{127,0.086132618},
-{126,0.088539465},
-{125,0.091022834},
-{124,0.093603283},
-{123,0.096262849},
-{122,0.099008048},
-{121,0.101838379},
-{120,0.104760263},
-{119,0.10776275},
-{118,0.110855679},
-{117,0.114052226},
-{116,0.117351683},
-{115,0.120756748},
-{114,0.124290587},
-{113,0.127941989},
-{112,0.131710025},
-{111,0.135600529},
-{110,0.139619231},
-{109,0.143768383},
-{108,0.148056893},
-{107,0.152483451},
-{106,0.157056742},
-{105,0.161778619},
-{104,0.166657488},
-{103,0.171698268},
-{102,0.176905735},
-{101,0.182287801},
-{100,0.187845632},
-{99,0.193612858},
-{98,0.199570554},
-{97,0.205725835},
-{96,0.212088789},
-{95,0.218659596},
-{94,0.225422383},
-{93,0.232412139},
-{92,0.239634645},
-{91,0.247092255},
-{90,0.254802676},
-{89,0.262795413},
-{88,0.271049766},
-{87,0.279582014},
-{86,0.288392571},
-{85,0.297496664},
-{84,0.306896817},
-{83,0.316607073},
-{82,0.326637766},
-{81,0.336992674},
-{80,0.347686685},
-{79,0.358727995},
-{78,0.370126904},
-{77,0.381889998},
-{76,0.3940343},
-{75,0.406564459},
-{74,0.41952559},
-{73,0.432897556},
-{72,0.446689884},
-{71,0.460910838},
-{70,0.475572668},
-{69,0.490649608},
-{68,0.506188119},
-{67,0.522195716},
-{66,0.538683287},
-{65,0.555662261},
-{64,0.573176068},
-{63,0.59120161},
-{62,0.609743705},
-{61,0.628814319},
-{60,0.648415793},
-{59,0.668561643},
-{58,0.689255516},
-{57,0.710502619},
-{56,0.732311467},
-{55,0.754684936},
-{54,0.777626638},
-{53,0.801138534},
-{52,0.825224695},
-{51,0.84988498},
-{50,0.875118854},
-{49,0.900956029},
-{48,0.927361655},
-{47,0.954332028},
-{46,0.981858426},
-{45,1.00993387},
-{44,1.038523782},
-{43,1.067648293},
-{42,1.097291513},
-{41,1.12744379},
-{40,1.15808758},
-{39,1.189229284},
-{38,1.220823866},
-{37,1.252851039},
-{36,1.285288799},
-{35,1.318113115},
-{34,1.351297688},
-{33,1.384814855},
-{32,1.418636286},
-{31,1.452729544},
-{30,1.487063075},
-{29,1.521608182},
-{28,1.556323102},
-{27,1.591173451},
-{26,1.626121532},
-{25,1.661129568},
-{24,1.696159278},
-{23,1.731171567},
-{22,1.7661276},
-{21,1.800986583},
-{20,1.835709904},
-{19,1.870263446},
-{18,1.904603564},
-{17,1.938692133},
-{16,1.972490974},
-{15,2.005963397},
-{14,2.039055747},
-{13,2.07174797},
-{12,2.104006735},
-{11,2.135799557},
-{10,2.167096667},
-{9,2.197869212},
-{8,2.22809036},
-{7,2.257735301},
-{6,2.286781206},
-{5,2.315207187},
-{4,2.342994592},
-{3,2.37012649},
-{2,2.396588554},
-{1,2.422368252},
-{0,2.447455358},
-{-1,2.471813334},
-{-2,2.49546387},
-{-3,2.518403058},
-{-4,2.540628712},
-{-5,2.562140629},
-{-6,2.58296856},
-{-7,2.603087057},
-{-8,2.622500648},
-{-9,2.641215469},
-{-10,2.659238978},
-{-11,2.676553024},
-{-12,2.69319537},
-{-13,2.709177192},
-{-14,2.724510687},
-{-15,2.739208878},
-{-16,2.753285597},
-{-17,2.766755322},
-{-18,2.779633165},
-{-19,2.79193469},
-{-20,2.803675873},
-{-21,2.814873044},
-{-22,2.825542737},
-{-23,2.835701684},
-{-24,2.845366709},
-{-25,2.854554685},
-{-26,2.863264149},
-{-27,2.871531483},
-{-28,2.879373316},
-{-29,2.88680611},
-{-30,2.893846103},
-{-31,2.900509287},
-{-32,2.906811365},
-{-33,2.912767718},
-{-34,2.918393404},
-{-35,2.923703116},
-{-36,2.928711172},
-{-37,2.933431498},
-{-38,2.937877619},
-{-39,2.942062652},
-{-40,2.945999295}
-            };
-            double voltage;
-            double temperature;
-            string brand = "LittleFuse";
-            //If it's for the BETA pack
-            if (pack == "BETA")
-            {
-                switch (type)
-                {
-                    case "AUX": //HVDC-
-                        //Do transfer function Vbatt_minus = -(Vadc*701+3V)
-                        voltage = -(a * 701 + 3);
-                        return voltage;
-                    case "AUX_2":
-                        for (int i = 0; i < Shunt.Length; i++)
-                        {
-                            if (a >= Shunt[i, 1] && a < Shunt[i + 1, 1])
-                            {
-                                temperature = Shunt[i, 0];
-                                return temperature;
-                            }
-                        }
-                        return 0;
-                    case "AUX_3":
-                        if (brand == "LitteFuse")
-                        {
-                            for (int i = 0; i < NTC_LittleFuse.Length; i++)
-                            {
-                                if (a >= NTC_LittleFuse[i, 1] && a < NTC_LittleFuse[i + 1, 1])
-                                {
-                                    temperature = NTC_LittleFuse[i, 0];
-                                    return temperature;
-                                }
-                            }
-                        }
-                        else
-                        {
-                            for (int i = 0; i < NTC_TDK.Length; i++)
-                            {
-                                if (a >= NTC_TDK[i, 1] && a < NTC_TDK[i + 1, 1])
-                                {
-                                    temperature = NTC_TDK[i, 0];
-                                    return temperature;
-                                }
-                            }
-                        }
-                        return 0;
-                    case "AUX_4":
-                        if (brand == "LitteFuse")
-                        {
-                            for (int i = 0; i < NTC_LittleFuse.Length; i++)
-                            {
-                                if (a >= NTC_LittleFuse[i, 1] && a < NTC_LittleFuse[i + 1, 1])
-                                {
-                                    temperature = NTC_LittleFuse[i, 0];
-                                    return temperature;
-                                }
-                            }
-                        }
-                        else
-                        {
-                            for (int i = 0; i < NTC_TDK.Length; i++)
-                            {
-                                if (a >= NTC_TDK[i, 1] && a < NTC_TDK[i + 1, 1])
-                                {
-                                    temperature = NTC_TDK[i, 0];
-                                    return temperature;
-                                }
-                            }
-                        }
-                        return 0;
-                    case "AUX_5":
-                        if (brand == "LitteFuse")
-                        {
-                            for (int i = 0; i < NTC_LittleFuse.Length; i++)
-                            {
-                                if (a >= NTC_LittleFuse[i, 1] && a < NTC_LittleFuse[i + 1, 1])
-                                {
-                                    temperature = NTC_LittleFuse[i, 0];
-                                    return temperature;
-                                }
-                            }
-                        }
-                        else
-                        {
-                            for (int i = 0; i < NTC_TDK.Length; i++)
-                            {
-                                if (a >= NTC_TDK[i, 1] && a < NTC_TDK[i + 1, 1])
-                                {
-                                    temperature = NTC_TDK[i, 0];
-                                    return temperature;
-                                }
-                            }
-                        }
-                        return 0;
-
-                    case "AUX_6": //Input 12V Sensing
-                        //Do transfer function KL30 =Vadc *5.83+0.5V
-                        voltage = a * 5.83 + 0.5;
-                        return voltage;
-                }
-            }
-            //If it's for the BETB pack
-            else if (pack == "BETB")
-            {
-                switch (type)
-                {
-                    case "AUX": //HVDC-
-                        //Do transfer function Vbatt_minus = -(Vadc*701+3V)
-                        voltage = -(a * 701 + 3);
-                        return voltage;
-
-                    case "AUX_1": //DCHC+
-                        //Do transfer funcion DCFC_plus = Vadc*584.489+1.2V
-                        voltage = a * 584.489 + 1.2;
-                        return voltage;
-
-                    case "AUX_3": //DCFC-
-                        //Do transfer function DCFC_minus = -(Vadc*584.489+1.2V)
-                        voltage = -(a * 584.489 + 1.2);
-                        return voltage;
-                    case "AUX_5":
-                        for (int i = 0; i < Shunt.Length; i++)
-                        {
-                            if (a >= Shunt[i, 1] && a < Shunt[i + 1, 1])
-                            {
-                                temperature = Shunt[i, 0];
-                                return temperature;
-                            }
-                        }
-                        return 0;
-                    case "AUX_6":
-                        if (brand == "LitteFuse")
-                        {
-                            for (int i = 0; i < NTC_LittleFuse.Length; i++)
-                            {
-                                if (a >= NTC_LittleFuse[i, 1] && a < NTC_LittleFuse[i + 1, 1])
-                                {
-                                    temperature = NTC_LittleFuse[i, 0];
-                                    return temperature;
-                                }
-                            }
-                        }
-                        else
-                        {
-                            for (int i = 0; i < NTC_TDK.Length; i++)
-                            {
-                                if (a >= NTC_TDK[i, 1] && a < NTC_TDK[i + 1, 1])
-                                {
-                                    temperature = NTC_TDK[i, 0];
-                                    return temperature;
-                                }
-                            }
-                        }
-                        return 0;
-                }
+                //Switch closed
             }
             return 0;
         }
+        public double GetBETAShuntTemperature()
+        {
+            double b = AUX3 * 0.0001;//convert to correct decimal places
 
+            //put voltage against graph to find thermistor temperature
+            return (Math.Pow(b, 5) * -15.38) + (Math.Pow(b, 4) * 122.63) - (Math.Pow(b, 3) * 368.35) + (Math.Pow(b, 2) * 514.63) - b * 362.57 + 156.2;
+        }
+        public double GetBETASA1Temp()
+        {
+            return AUX4;
+        }
+        public double GetBETASA4Temp()
+        {
+            return AUX5;
+        }
+        public double GetBETASA3Temp()
+        {
+            return AUX6;
+        }
+
+        //BET B
+        public double GetBETBHVDCMinus()
+        {
+            return -(AUX1 * 701 +3);
+        }
+        public double GetBETBDCFCPlus()
+        {
+            return AUX2 * 584.489 + 1.2;
+        }
+        public double GetBETBDCFCMinus()
+        {
+            return -(AUX4 * 584.489 + 1.2);
+        }
+        public double GetBETBDCFCDifferential()
+        {
+            return AUX3;//TODO: add transfer function
+        }
+        public double GetBETBIsolationSwitch()
+        {
+            if (AUX5 < 25.51)
+            {
+                //Switch is open
+            } else if (AUX5 > 46.52)
+            {
+                //Switch is closed
+            }
+            return 0;//TODO: make this actually work
+        }
+        public double GetBETBShuntTemp()
+        {
+            return AUX6; //TODO: transfer function
+        }
+        public double GetBETBSB1Temp()
+        {
+            return AUX7; //TODO: transfer function
+        }
+    
         //EMS measurements
         private double NTC_COEF_A = 0.0026859917508292143;
         private double NTC_COEF_B = 0.0002879825290119797;
-        private double NTC_COEF_C = 5.413360154836909e-07;
+        private double NTC_COEF_C = 0.0000005413360154836909;
         public double EMSBDSBVoltage()
         {
-            return CD1V; //TODO: get this value from base or auxilary loop
+            return CD1V * 0.001;
         }
         public double EMSPressure1()
         {
-            return 10.0 + 250.0 * (G1V / C1V);
+            Debug.WriteLine($"G1 {G1V}, G2 {G2V}, G3 {G3V}, G4 {G4V}, G5 {G5V}, G6 {G6V}, G7 {G7V}");
+            return 10.0 + 250.0 * (G1V/ (double)C1V);
         }
         public double EMSPressure2()
         {
-            return 10.0 + 250.0 * (G3V / G7V); //TODO: do we need to * 0.0001? To convert Voltage?
+            return 10.0 + 250.0 * (G3V/ (double)G7V); //TODO: do we need to * 0.0001? To convert Voltage?
         }
         public double EMSTemperature1()
         {
-            double NTCResistance = ((10.0) / (C1V / G2V - 1.0));
-            return (1.0 / (NTC_COEF_A + (NTC_COEF_B * Math.Log(NTCResistance)) + (NTC_COEF_C * Math.Pow(Math.Log(NTCResistance), 3)))) - 273.0;
+            if (C1V != 0)
+            {
+                double NTCResistance = ((10.0) / (C1V / (double)G2V - 1.0));
+                return (1.0 / (NTC_COEF_A + (NTC_COEF_B * Math.Log(NTCResistance)) + (NTC_COEF_C * Math.Pow(Math.Log(NTCResistance), 3)))) - 273.0;
+            } else
+            {
+                return 0;
+            }
         }
         public double EMSTemperature2()
         {
-            double NTCResistance = ((10.0) / (G7V / G4V - 1.0));
-            return (1.0 / (NTC_COEF_A + (NTC_COEF_B * Math.Log(NTCResistance)) + (NTC_COEF_C * Math.Pow(Math.Log(NTCResistance), 3)))) - 273.0;
+            if (G7V != 0)
+            {
+                double NTCResistance = ((10.0) / (G7V / (double)G4V - 1.0));
+                return (1.0 / (NTC_COEF_A + (NTC_COEF_B * Math.Log(NTCResistance)) + (NTC_COEF_C * Math.Pow(Math.Log(NTCResistance), 3)))) - 273.0;
+            } else
+            {
+                return 0;
+            }
         }
         public double EMSGas1() 
         { 
-            return (G5V / C1V - 0.1) / 0.05;
+            return (G5V / (double)C1V - 0.1) / 0.05;
         }
         public double EMSGas2()
         {
-            return (G6V / G7V - 0.1) / 0.05;
+            return (G6V / (double)G7V - 0.1) / 0.05;
         }
-        public double EMSReferenceVoltage1(double a)
+        public double EMSReferenceVoltage1()
         {
             return C1V;
         }
-        public double EMSReferenceVoltage2(double a)
+        public double EMSReferenceVoltage2()
         {
             return G7V;
         }

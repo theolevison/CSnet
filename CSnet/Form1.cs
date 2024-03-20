@@ -16,14 +16,8 @@ namespace CSnet
 {
     public partial class Form1 : Form
     {
-
-        IntPtr m_hObject;		 //handle for device
-        IntPtr[] objects = new IntPtr[] { IntPtr.Zero, IntPtr.Zero, IntPtr.Zero, IntPtr.Zero };
-
-        bool m_bPortOpen;	 //tells the port status of the device
-        icsSpyMessage[] stMessages = new icsSpyMessage[20000];   //TempSpace for messages
-        byte[] NetworkIDConvert = new byte[15]; // Storage to convert listbox index to Network ID's 
-        int iOpenDeviceType; //Storage for the device type that is open
+       
+        IntPtr[] objects = new IntPtr[] { IntPtr.Zero, IntPtr.Zero, IntPtr.Zero, IntPtr.Zero }; //TODO: this is limiting us to 4 ADI boxes, must make IntPtr anonymous
         OptionsNeoEx neoDeviceOption = new OptionsNeoEx();
         Socket udpClient = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
         Func<double, double> f;
@@ -31,7 +25,6 @@ namespace CSnet
         public Form1()
         {
             InitializeComponent();
-
         }
 
         private const byte ADI_WIL_MAC_SIZE = 8;
@@ -114,7 +107,7 @@ namespace CSnet
         private const int MANAGER_1_ID = 241;
         private const int byte_number = 0;
 
-        private HashSet<Int32> openedDevicesSerials = new HashSet<Int32>();
+        private HashSet<String> openedDevicesSerials = new HashSet<String>();
         private void CmdOpenDevices_Click(object sender, EventArgs e)
         {
             int iResult;
@@ -133,7 +126,7 @@ namespace CSnet
                 bNetwork[iCount] = Convert.ToByte(iCount);
             }
 
-            //Set the number of devices to find, for this example look for 16.  This example will only work with the first.
+            //Set the number of devices to find, for this example look for 16
             iNumberOfDevices = 15;
 
             //Search for connected hardware
@@ -154,10 +147,15 @@ namespace CSnet
 
             for (int i = 0; i < iNumberOfDevices; i++)
             {
+                //Convert the Serial number to a String
+                icsNeoDll.icsneoSerialNumberToString(Convert.ToUInt32(ndNeoToOpenex[i].neoDevice.SerialNumber), ref bSN[0], ref StringSize);
+                sConvertedSN = Encoding.ASCII.GetString(bSN);
+
                 //keep track of devices that have already been opened
-                if (openedDevicesSerials.Add(ndNeoToOpenex[i].neoDevice.SerialNumber))
+                if (openedDevicesSerials.Add(sConvertedSN))
                 {
-                    iResult = icsNeoDll.icsneoOpenDevice(ref ndNeoToOpenex[i], ref objects[i], ref bNetwork[0], 1, 0, ref OptionOpenNeoEX, 0);
+                    IntPtr anonymousPointer = IntPtr.Zero;
+                    iResult = icsNeoDll.icsneoOpenDevice(ref ndNeoToOpenex[i], ref anonymousPointer, ref bNetwork[0], 1, 0, ref OptionOpenNeoEX, 0);
                     if (iResult == 1)
                     {
                         MessageBox.Show("Port Opened OK!");
@@ -169,13 +167,9 @@ namespace CSnet
                         return;
                     }
 
-                    //Convert the Serial number to a String
-                    icsNeoDll.icsneoSerialNumberToString(Convert.ToUInt32(ndNeoToOpenex[i].neoDevice.SerialNumber), ref bSN[0], ref StringSize);
-                    sConvertedSN = System.Text.ASCIIEncoding.ASCII.GetString(bSN);
-
                     //create new tab per device
                     TabPage tabPage = new TabPage($"Device {sConvertedSN}");
-                    tabPage.Controls.Add(new OpenDeviceTab(ref objects[i]) { Name = $"{sConvertedSN}" });
+                    tabPage.Controls.Add(new OpenDeviceTab(ref anonymousPointer) { Name = $"{sConvertedSN}" });
                     this.TabControl1.TabPages.Add(tabPage);
                 }
             }
@@ -192,15 +186,23 @@ namespace CSnet
                 //chkAutoRead.Checked = false;
             }
 
-            //close the port
-            iResult = icsNeoDll.icsneoClosePort(m_hObject, ref iNumberOfErrors);
-            if (iResult == 1)
+            foreach (TabPage tabPage in TabControl1.TabPages)
             {
-                MessageBox.Show("Port Closed OK!");
-            }
-            else
-            {
-                MessageBox.Show("Problem ClosingPort");
+                OpenDeviceTab uc1 = (OpenDeviceTab)tabPage.Controls[0];
+                
+                //close the port
+                iResult = icsNeoDll.icsneoClosePort(uc1.m_hObject, ref iNumberOfErrors);
+                
+                if (iResult == 1)
+                {
+                    openedDevicesSerials.Remove(uc1.Name);
+                    TabControl1.TabPages.Remove(tabPage);
+                    MessageBox.Show("Port Closed OK!");
+                }
+                else
+                {
+                    MessageBox.Show("Problem ClosingPort");
+                }
             }
         }
 
@@ -208,21 +210,6 @@ namespace CSnet
         {
             //get version information and send to hardware.
             cmdVersion.Text = Convert.ToString(icsNeoDll.icsneoGetDLLVersion());
-        }
-
-        private uint GetPacketTypeFromArbId(uint arbId)
-        {
-            return (arbId >> 16) & 0xFF;
-        }
-
-        private uint GetPacketIdFromArbId(uint arbId)
-        {
-            return (arbId >> 8) & 0xFF;
-        }
-
-        private uint GetSourceFromArbId(uint arbId)
-        {
-            return arbId & 0xFF;
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -331,7 +318,9 @@ namespace CSnet
                                 server.SendTo(tempPacket, remoteEnd);
                             } else if (data[1] == PMSPACKET)
                             {
-                               
+                                //for example:
+                                uc1.managers[0].GetBEVDCFCContactorTemp();
+
                                 byte[] tempPacket = BitConverter.GetBytes(uc1.managers[0].I1)
                                     .Concat(BitConverter.GetBytes(uc1.managers[0].I2))
                                     .Concat(BitConverter.GetBytes(uc1.managers[0].VBAT))
@@ -341,18 +330,19 @@ namespace CSnet
                                     .Concat(BitConverter.GetBytes(uc1.managers[0].AUX4))
                                     .Concat(BitConverter.GetBytes(uc1.managers[0].AUX5))
                                     .Concat(BitConverter.GetBytes(uc1.managers[0].AUX6))
-                                    .ToArray();                              
+                                    .ToArray();
                                
                                 server.SendTo(tempPacket, remoteEnd);
                             } else if (data[1] == EMSPACKET)
                             {
-                                byte[] tempPacket = BitConverter.GetBytes(uc1.managers[0].G1V)
+                                    byte[] tempPacket = BitConverter.GetBytes(uc1.managers[0].G1V)
                                     .Concat(BitConverter.GetBytes(uc1.managers[0].G2V))
                                     .Concat(BitConverter.GetBytes(uc1.managers[0].G3V))
                                     .Concat(BitConverter.GetBytes(uc1.managers[0].G4V))
                                     .Concat(BitConverter.GetBytes(uc1.managers[0].G5V))
                                     .Concat(BitConverter.GetBytes(uc1.managers[0].G6V))
                                     .Concat(BitConverter.GetBytes(uc1.managers[0].G7V))
+                                    //.Concat(BitConverter.GetBytes(uc1.managers[0].GetBEVDCFCMinus()))
                                     .ToArray();
 
                                 server.SendTo(tempPacket, remoteEnd);
@@ -392,247 +382,6 @@ namespace CSnet
 
                     uc1.chkHexFormat = false;
                 }
-            }
-        }
-
-        private const byte ADI_WIL_MAC_SIZE = 8;
-        private const byte ADI_WIL_MAX_NODES = 62;
-
-        private const byte ADI_WIL_API_INITIALIZE = 0;
-        private const byte ADI_WIL_API_TERMINATE = 1;
-        private const byte ADI_WIL_API_CONNECT = 2;
-        private const byte ADI_WIL_API_DISCONNECT = 3;
-        private const byte ADI_WIL_API_SET_MODE = 4;
-        private const byte ADI_WIL_API_GET_MODE = 5;
-        private const byte ADI_WIL_API_SET_ACL = 6;
-        private const byte ADI_WIL_API_GET_ACL = 7;
-        private const byte ADI_WIL_API_QUERY_DEVICE = 8;
-        private const byte ADI_WIL_API_GET_NETWORK_STATUS = 9;
-        private const byte ADI_WIL_API_LOAD_FILE = 10;
-        private const byte ADI_WIL_API_ERASE_FILE = 11;
-        private const byte ADI_WIL_API_GET_DEVICE_VERSION = 12;
-        private const byte ADI_WIL_API_GET_FILE_CRC = 13;
-        private const byte ADI_WIL_API_SET_GPIO = 14;
-        private const byte ADI_WIL_API_GET_GPIO = 15;
-        private const byte ADI_WIL_API_SELECT_SCRIPT = 16;
-        private const byte ADI_WIL_API_MODIFY_SCRIPT = 17;
-        private const byte ADI_WIL_API_ENTER_INVENTORY_STATE = 18;
-        private const byte ADI_WIL_API_GET_FILE = 19;
-        private const byte ADI_WIL_API_GET_WIL_SOFTWARE_VERSION = 20;
-        private const byte ADI_WIL_API_PROCESS_TASK = 21;
-        private const byte ADI_WIL_API_SET_CONTEXTUAL_DATA = 22;
-        private const byte ADI_WIL_API_GET_CONTEXTUAL_DATA = 23;
-        private const byte ADI_WIL_API_RESET_DEVICE = 24;
-        private const byte ADI_WIL_API_SET_STATE_OF_HEALTH = 25;
-        private const byte ADI_WIL_API_GET_STATE_OF_HEALTH = 26;
-        private const byte ADI_WIL_API_ENABLE_FAULT_SERVICING = 27;
-        private const byte ADI_WIL_API_ROTATE_KEY = 28;
-        private const byte ADI_WIL_API_SET_CUSTOMER_IDENTIFIER_DATA = 29;
-        private const byte ADI_WIL_API_ENABLE_NETWORK_DATA_CAPTURE = 30;
-        private const byte ADI_WIL_API_UPDATE_MONITOR_PARAMETERS = 31;
-        private const byte ADI_WIL_API_GET_MONITOR_PARAMETERS_CRC = 32;
-        private const byte ADI_WIL_API_ASSESS_NETWORK_TOPOLOGY = 33;
-        private const byte ADI_WIL_API_APPLY_NETWORK_TOPOLOGY = 34;
-        private const byte ADI_WIL_API_CONFIGURE_CELL_BALANCING = 35;
-        private const byte ADI_WIL_API_GET_CELL_BALANCING_STATUS = 36;
-
-        private const byte ADI_WIL_ERR_SUCCESS = 0;
-        private const byte ADI_WIL_ERR_FAIL = 1;
-        private const byte ADI_WIL_ERR_API_IN_PROGRESS = 2;
-        private const byte ADI_WIL_ERR_TIMEOUT = 3;
-        private const byte ADI_WIL_ERR_NOT_CONNECTED = 4;
-        private const byte ADI_WIL_ERR_INVALID_PARAMETER = 5;
-        private const byte ADI_WIL_ERR_INVALID_STATE = 6;
-        private const byte ADI_WIL_ERR_NOT_SUPPORTED = 7;
-        private const byte ADI_WIL_ERR_EXTERNAL = 8;
-        private const byte ADI_WIL_ERR_INVALID_MODE = 9;
-        private const byte ADI_WIL_ERR_IN_PROGRESS = 10;
-        private const byte ADI_WIL_ERR_CONFIGURATION_MISMATCH = 11;
-        private const byte ADI_WIL_ERR_CRC = 12;
-        private const byte ADI_WIL_ERR_FILE_REJECTED = 13;
-        private const byte ADI_WIL_ERR_PARTIAL_SUCCESS = 14;
-
-        private const byte ADI_WIL_MODE_STANDBY = 1;
-        private const byte ADI_WIL_MODE_COMMISSIONING = 2;
-        private const byte ADI_WIL_MODE_ACTIVE = 3;
-        private const byte ADI_WIL_MODE_MONITORING = 4;
-        private const byte ADI_WIL_MODE_OTAP = 5;
-        private const byte ADI_WIL_MODE_SLEEP = 6;
-
-        
-        private void setACL_Click(object sender, EventArgs e)
-        {
-            //must set mode to standby before setting ACL
-            setMode(ADI_WIL_MODE_STANDBY);
-
-            int iResult;
-            int iTimeOutCounter = 0;
-            byte uAPISelected, uInstanceSelected, uFunctionSelected, uFunctionError, uCallbackError = 1, uCurrentFunction, uFinishedProcessing;
-            byte[] pParameters = new byte[512];
-            uint uTotalLength;
-            uAPISelected = 1;
-            uInstanceSelected = 0;
-            uFunctionSelected = ADI_WIL_API_SET_ACL;
-            byte uNodeCount = 1;
-            byte[] pACLArray = { 0x64, 0xF9, 0xC0, 0x00, 0x00, 0x00, 0x00, 0x00 };
-            pParameters[0] = uNodeCount;
-            Buffer.BlockCopy(pACLArray, 0, pParameters, 1, pACLArray.Length);
-            uTotalLength = (uint)(1 + pACLArray.Length);
-
-            iResult = icsNeoDll.icsneoGenericAPISendCommand(m_hObject, uAPISelected, uInstanceSelected, uFunctionSelected, Marshal.UnsafeAddrOfPinnedArrayElement(pParameters, 0), uTotalLength, out uFunctionError);
-
-            if (iResult != 1 && uFunctionError != ADI_WIL_ERR_SUCCESS)
-            {
-                // Handle Error Here
-                MessageBox.Show($"Command error {uFunctionError}");
-                return;
-            }
-
-            while (iTimeOutCounter < 10)
-            {
-                iResult = icsNeoDll.icsneoGenericAPIGetStatus(m_hObject, uAPISelected, uInstanceSelected, out uCurrentFunction, out uCallbackError, out uFinishedProcessing);
-
-                if (uCurrentFunction != uFunctionSelected || iResult != 1)
-                {
-                    // Handle Error Here
-                    MessageBox.Show($"Status error {uFunctionError}");
-                    return;
-                }
-
-                if (uFinishedProcessing == 1)
-                {
-                    break;
-                }
-
-                Thread.Sleep(100);
-                iTimeOutCounter++;
-            }
-
-            if (uCallbackError != ADI_WIL_ERR_SUCCESS || iTimeOutCounter > 10)
-            {
-                // Handle Error Here
-                MessageBox.Show($"Timeout/callback error {uCallbackError}");
-                return;
-            }
-
-            MessageBox.Show("Apparently finished succesfully");
-        }
-
-        private void getACL_Click(object sender, EventArgs e)
-        {
-            if (m_bPortOpen == false)
-            {
-                MessageBox.Show("neoVI not opened");
-                return;  // do not read messages if we haven't opened neoVI yet
-            }
-
-            //get ACL is available in all system modes
-
-            int iResult;
-
-            byte uAPISelected, uInstanceSelected, uFunctionSelected, uFunctionError, uCurrentFunction, uNodeCount;
-            byte[] pReturnedData = new byte[513];
-            byte[] pACL = new byte[ADI_WIL_MAC_SIZE * ADI_WIL_MAX_NODES];
-            uint uParametersLength, uReturnedDataLength;
-
-            //test value to see if the acl gets changed
-            //pReturnedData[0] = 1;
-
-            //MessageBox.Show(BitConverter.ToString(pReturnedData));
-            MessageBox.Show(BitConverter.ToString(pACL));
-
-            uAPISelected = 1;
-            uInstanceSelected = 0;
-            uFunctionSelected = ADI_WIL_API_GET_ACL;
-
-            iResult = icsNeoDll.icsneoGenericAPISendCommand(m_hObject, uAPISelected, uInstanceSelected, uFunctionSelected, IntPtr.Zero, 0, out uFunctionError);
-
-            if (iResult != 1 && uFunctionError != ADI_WIL_ERR_SUCCESS)
-            {
-                // Handle Error Here
-                MessageBox.Show($"Send error {iResult} {uFunctionError}");
-                return;
-            }
-
-            if (!checkStatus(uAPISelected, uInstanceSelected, uFunctionSelected))
-            {
-                MessageBox.Show("Error");
-            }
-
-            iResult = icsNeoDll.icsneoGenericAPIReadData(m_hObject, uAPISelected, uInstanceSelected, out uCurrentFunction, Marshal.UnsafeAddrOfPinnedArrayElement(pReturnedData, 0), out uReturnedDataLength);
-
-            if (uCurrentFunction != uFunctionSelected || iResult != 1) //1 is success
-            {
-                // Handle Error Here
-                MessageBox.Show($"Read error {iResult}");
-                return;
-            }
-
-            if (uReturnedDataLength > 0)
-            {
-                uNodeCount = pReturnedData[ADI_WIL_MAC_SIZE * ADI_WIL_MAX_NODES + 1]; //497
-                MessageBox.Show($"node count{uNodeCount}");
-
-                if (ADI_WIL_MAX_NODES >= uNodeCount && uNodeCount >= 0)
-                {
-                    Buffer.BlockCopy(pReturnedData, 0, pACL, 0, uNodeCount * ADI_WIL_MAC_SIZE);
-                }
-                MessageBox.Show(BitConverter.ToString(pReturnedData));
-                MessageBox.Show(BitConverter.ToString(pACL));
-            }
-        }
-
-        private bool checkStatus(byte uAPISelected, byte uInstanceSelected, byte uFunctionSelected)
-        {
-            int iTimeOutCounter = 0;
-
-            byte uCallbackError = 1, uFinishedProcessing, uCurrentFunction;
-
-            while (iTimeOutCounter < 10)
-            {
-                int iResult = icsNeoDll.icsneoGenericAPIGetStatus(m_hObject, uAPISelected, uInstanceSelected, out uCurrentFunction, out uCallbackError, out uFinishedProcessing);
-
-                if (uCurrentFunction != uFunctionSelected || iResult != 1) //1 is success
-                {
-                    // Handle Error Here
-                    MessageBox.Show($"Error {iResult}");
-                    return false;
-                }
-
-                if (uFinishedProcessing == 1)
-                {
-                    break;
-                }
-
-                System.Threading.Thread.Sleep(10);
-                iTimeOutCounter++;
-            }
-
-            if (uCallbackError != ADI_WIL_ERR_SUCCESS || iTimeOutCounter > 10)
-            {
-                // Handle Error Here
-                return false;
-            } else
-            {
-                return true;
-            }
-        }
-
-        private void setMode(byte mode)
-        {
-            //set mode to active
-            //adi_wil_SetMode(m_hObject, 3);
-            byte functionError = 0;
-            byte function = ADI_WIL_API_SET_MODE; // adi_wil_SetMode ADI_WIL_API_SET_MODE = 4;
-            byte[] parameters = new byte[512];
-
-            parameters[0] = mode; //3 = active mode
-
-            icsNeoDll.icsneoGenericAPISendCommand(m_hObject, 1, 0, function, Marshal.UnsafeAddrOfPinnedArrayElement(parameters, 0), 1, out functionError);
-
-            if (!checkStatus(1, 0, function))
-            {
-                MessageBox.Show("Error");
             }
         }
     }

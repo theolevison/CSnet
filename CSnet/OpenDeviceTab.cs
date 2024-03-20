@@ -167,7 +167,7 @@ namespace CSnet
         public const ulong ADI_WIL_DEV_NODE_61 = 0x2000000000000000u;
 
         public const ulong ADI_WIL_DEV_ALL_NODES = 0x3FFFFFFFFFFFFFFFu;
-
+        
         public const ulong ADI_WIL_DEV_MANAGER_0 = 0x4000000000000000UL;
         public const ulong ADI_WIL_DEV_MANAGER_1 = 0x8000000000000000UL;
         public const ulong ADI_WIL_DEV_ALL_MANAGERS = 0xC000000000000000u;
@@ -177,7 +177,7 @@ namespace CSnet
         private byte[] sListStringV1 = new byte[128]; //Node1 00数据
         private byte[] sListStringV2 = new byte[128]; //Node2 00数据
 
-        IntPtr m_hObject;		 //handle for device
+        public IntPtr m_hObject;		 //handle for device
         bool m_bPortOpen;	 //tells the port status of the device
         icsSpyMessage[] stMessages = new icsSpyMessage[20000];   //TempSpace for messages
         private byte currentMode = ADI_WIL_MODE_STANDBY;
@@ -209,6 +209,9 @@ namespace CSnet
 
             managers[0] = new ManagerData();
             managers[1] = new ManagerData();
+
+            managers[0].Version = DeviceFirmwareVersion(62);
+            managers[1].Version = DeviceFirmwareVersion(63); //this should throw an error if the pack is BEV & only has one manager
 
             getAclButton_Click(null, null);
             modules = new ModuleData[nodeMacAddresses.Count];
@@ -371,7 +374,6 @@ namespace CSnet
             }
         }
 
-
         private void PMSGPIO(ulong manager, byte highLow)
         {
             byte functionError = 0;
@@ -392,6 +394,8 @@ namespace CSnet
                 MessageBox.Show("GPIO error");
             }
 
+            /*
+            //read GPIO to check it was done successfully 
             function = ADI_WIL_API_GET_GPIO;
 
             BitConverter.GetBytes(ADI_WIL_DEV_MANAGER_0).CopyTo(parameters, 0);
@@ -428,6 +432,14 @@ namespace CSnet
 
             
             Debug.WriteLine($"GPIO pin output: {BitConverter.ToUInt64(pReturnedData, 0)}");
+
+            
+                The GPIO pin on the target device is set to be an output pin before its value is set. 
+                Note that the GPIO pin is set to output mode only, therefore it cannot be set to a value 
+                then re-read back by using adi_wil_GetGPIO since adi_wil_GetGPIO will reconfigure the pin 
+                to input mode in order to be read 
+             */
+
         }
 
         private int DeviceFirmwareVersion(int deviceID)
@@ -438,7 +450,8 @@ namespace CSnet
             byte functionError = 0;
             byte function = ADI_WIL_API_GET_DEVICE_VERSION; // adi_wil_SetMode ADI_WIL_API_SET_MODE = 4;
             byte[] parameters = new byte[8];
-            
+
+
             //node id's are converted to powers of 2, for some reason
             BitConverter.GetBytes(Convert.ToUInt64(Math.Pow(2, deviceID))).CopyTo(parameters, 0);
 
@@ -515,7 +528,7 @@ namespace CSnet
                 return;
             }
 
-            Debug.WriteLine($"verison object {version}");
+            Debug.WriteLine($"version object {version}");
 
             firmwareLabel.Text = $"Firmware version: {version.MainProcSWVersion.iVersionMajor}";
         }
@@ -1355,7 +1368,7 @@ namespace CSnet
 
                                             // Copy each packet into the object arrays
 
-                                            if (uiPacketID == 0)
+                                            if (uiPacketID == 0 && uiPayloadLength > 0)
                                             {
                                                 byte[] managedArray = new byte[uiPayloadLength];
                                                 Marshal.Copy(ptr, managedArray, 0, uiPayloadLength);
@@ -1386,7 +1399,7 @@ namespace CSnet
 
                                                 modules[uiDeviceSource].CGDV = CGDV;
                                             }
-                                            else if (uiPacketID == 1)
+                                            else if (uiPacketID == 1 && uiPayloadLength > 0)
                                             {
 
                                                 byte[] managedArray = new byte[uiPayloadLength];
@@ -1413,7 +1426,7 @@ namespace CSnet
                                     {
                                         sListString += "PMS ";
 
-                                        if (uiPayloadLength <= 514)
+                                        if (uiPayloadLength <= 514 && uiPayloadLength > 0)
                                         {
                                             // wBMS Packet Payload is located in the ExtraDataPtr
                                             IntPtr ptr = stMessages[lCount - 1].iExtraDataPtr;
@@ -1422,24 +1435,25 @@ namespace CSnet
                                             byte[] managedArray = new byte[uiPayloadLength];
                                             Marshal.Copy(ptr, managedArray, 0, uiPayloadLength);
 
-                                            managers[uiPacketID].PMSPacket0 = managedArray;
+                                            managers[0].PMSPacket0 = managedArray;
 
                                             if (uiPacketID == 0)
                                             {                                                
-                                                managers[uiPacketID].I1 = BitConverter.ToUInt16(managedArray, 12);
-                                                managers[uiPacketID].I2 = BitConverter.ToUInt16(managedArray, 14);
-                                                managers[uiPacketID].VBAT = BitConverter.ToUInt16(managedArray, 16);
-                                                managers[uiPacketID].AUX1 = BitConverter.ToUInt16(managedArray, 20);
-                                                managers[uiPacketID].AUX2 = BitConverter.ToUInt16(managedArray, 28);
-                                                managers[uiPacketID].AUX3 = BitConverter.ToUInt16(managedArray, 41);
-                                                managers[uiPacketID].AUX4 = BitConverter.ToUInt16(managedArray, 49);
-                                                managers[uiPacketID].AUX5 = BitConverter.ToUInt16(managedArray, 62);
-                                                managers[uiPacketID].AUX6 = BitConverter.ToUInt16(managedArray, 70);
+                                                managers[0].I1 = BitConverter.ToUInt16(managedArray, 11);
+                                                managers[0].I2 = BitConverter.ToUInt16(managedArray, 13);
+                                                managers[0].VBAT = BitConverter.ToUInt16(managedArray, 15);
+                                                Debug.WriteLine($"{BitConverter.ToUInt16(managedArray, 19)} {managedArray[19]} {managedArray[20]}");
+                                                Debug.WriteLine(BitConverter.ToUInt16(new byte[] {255,255}, 0));
+                                                managers[0].AUX1 = BitConverter.ToUInt16(managedArray, 19);
+                                                managers[0].AUX2 = BitConverter.ToUInt16(managedArray, 27);
+                                                managers[0].AUX3 = BitConverter.ToUInt16(managedArray, 40);
+                                                managers[0].AUX4 = BitConverter.ToUInt16(managedArray, 48);
+                                                managers[0].AUX5 = BitConverter.ToUInt16(managedArray, 61);
+                                                managers[0].AUX6 = BitConverter.ToUInt16(managedArray, 69);
                                             } else if (uiPacketID == 2)
                                             {
-                                                managers[uiPacketID].AUX7 = BitConverter.ToUInt16(managedArray, 69);
+                                                managers[0].AUX7 = BitConverter.ToUInt16(managedArray, 69); //TODO: check if we can look in a different packet for AUX values? They are different sometimes
                                             }
-
                                         }
                                         else
                                         {
@@ -1461,23 +1475,25 @@ namespace CSnet
 
                                         // Copy each packet into the object arrays
 
-                                        if (uiPacketID == 0)
+                                        if (uiPacketID == 0 && uiPayloadLength > 0)
                                         {
                                             byte[] managedArray = new byte[uiPayloadLength];
                                             Marshal.Copy(ptr, managedArray, 0, uiPayloadLength);
 
                                             //Debug.WriteLine($"EMS {managedArray[5]}");
 
-                                            managers[uiPacketID].C1V = BitConverter.ToUInt16(managedArray, 6);
-                                            managers[uiPacketID].G1V = BitConverter.ToUInt16(managedArray, 24); //TODO: check this is the correct offset, should it be 16?
-                                            managers[uiPacketID].G2V = BitConverter.ToUInt16(managedArray, 26);
-                                            managers[uiPacketID].G3V = BitConverter.ToUInt16(managedArray, 30);
-                                            managers[uiPacketID].G4V = BitConverter.ToUInt16(managedArray, 32);
-                                            managers[uiPacketID].G5V = BitConverter.ToUInt16(managedArray, 34);
-                                            managers[uiPacketID].G6V = BitConverter.ToUInt16(managedArray, 38);
-                                            managers[uiPacketID].G7V = BitConverter.ToUInt16(managedArray, 40);
+                                            managers[0].C1V = BitConverter.ToUInt16(managedArray, 6);
+                                            managers[0].G1V = BitConverter.ToUInt16(managedArray, 24); //TODO: check this is the correct offset, should it be 16?
+                                            managers[0].G2V = BitConverter.ToUInt16(managedArray, 26);
+                                            managers[0].G3V = BitConverter.ToUInt16(managedArray, 30);
+                                            managers[0].G4V = BitConverter.ToUInt16(managedArray, 32);
+                                            managers[0].G5V = BitConverter.ToUInt16(managedArray, 34);
+                                            managers[0].G6V = BitConverter.ToUInt16(managedArray, 38);
+                                            managers[0].G7V = BitConverter.ToUInt16(managedArray, 40);
+                                                     
+                                            managers[0].EMSPacket0 = managedArray;
 
-                                            managers[uiPacketID].EMSPacket0 = managedArray;
+                                            managers[0].CD1V = BitConverter.ToUInt16(managedArray,14);
                                         }
                                     }
                                     else
@@ -1620,14 +1636,19 @@ namespace CSnet
                 else
                 {
                     //PMS data
-                    temp = $"Manager 0 {managers[0].I1:0.00}A {managers[0].I2:0.00}A {managers[0].AUX1:0.00} {managers[0].AUX2:0.00} {managers[0].AUX3:0.00} {managers[0].AUX4:0.00} {managers[0].AUX5:0.00} {managers[0].AUX6:0.00}";
-
+                    temp = $"Manager 0 BEV {managers[0].I1:0.00}A {managers[0].I2:0.00}A {managers[0].GetBEVDCFCPlus():0.00} {managers[0].GetBEVDCFCMinus():0.00} {managers[0].GetBEVShuntTemp():0.00} {managers[0].GetBEVDCFCContactorTemp():0.00} {managers[0].GetBEVMainContactorTemp():0.00} {managers[0].GetBEVVREF():0.00}";
                     PMSBox.Items.Add(temp);
-
+                    temp = $"Manager 0 BETA {managers[0].GetBETAHVCDMinus()} {managers[0].GetBETASA1Temp()} {managers[0].GetBETASA4Temp()} {managers[0].GetBETASA3Temp()} {managers[0].GetBETAShuntTemperature()}";
+                    PMSBox.Items.Add(temp);
+                    temp = $"Manager 0 BETB {managers[0].GetBETBDCFCDifferential()} {managers[0].GetBETBDCFCMinus()} {managers[0].GetBETBDCFCPlus()} {managers[0].GetBETBSB1Temp()} {managers[0].GetBETBShuntTemp()} {managers[0].GetBETBHVDCMinus()}";
+                    PMSBox.Items.Add(temp);
+                    Debug.WriteLine(managers[0].PMSPacket0);
+                    Debug.WriteLine(managers[0].AUX1);
+                    Debug.WriteLine(managers[0].AUX2);
 
                     //EMS data
-                    temp = $"Manager 0 {managers[0].G1V:0.00} {managers[0].G2V:0.00} {managers[0].G3V:0.00} {managers[0].G4V:0.00} {managers[0].G5V:0.00} {managers[0].G6V:0.00} {managers[0].G7V:0.00}";
-
+                    temp = $"Manager 0 {managers[0].CD1V:0.00V} {managers[0].EMSReferenceVoltage1():0.00} {managers[0].EMSReferenceVoltage2():0.00} {managers[0].EMSTemperature1():0.00} {managers[0].EMSTemperature2():0.00} {managers[0].EMSPressure1():0.00} {managers[0].EMSPressure2():0.00} {managers[0].EMSGas1():0.00} {managers[0].EMSGas2():0.00}";
+                    
                     EMSBox.Items.Add(temp);
                 }
             }
@@ -1713,11 +1734,10 @@ namespace CSnet
 
         private void button5_Click(object sender, EventArgs e)
         {
-            WilFirmwareVersion();
+            //WilFirmwareVersion(); //don't need to check this
             PMSGPIO(ADI_WIL_DEV_MANAGER_0, 1);
             PMSGPIO(ADI_WIL_DEV_MANAGER_1, 1);
         }
-
         private void button1_Click(object sender, EventArgs e)
         {
             for (int i = 0; i < modules.Length; i++)
