@@ -5,6 +5,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Net;
 using System.Net.Sockets;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Text;
@@ -192,6 +193,8 @@ namespace CSnet
                 
                 //close the port
                 iResult = icsNeoDll.icsneoClosePort(uc1.m_hObject, ref iNumberOfErrors);
+                //release resources used by the object
+                icsNeoDll.icsneoFreeObject(uc1.m_hObject);
                 
                 if (iResult == 1)
                 {
@@ -237,6 +240,9 @@ namespace CSnet
         private const byte BMSTEMPPACKET = 1;
         private const byte PMSPACKET = 2;
         private const byte EMSPACKET = 3;
+        private const byte ModuleVersion = 4;
+        private const byte PackVersion = 5;
+        private const byte DiagnosticVoltage = 6;
 
         private void UDPListener()
         {
@@ -316,7 +322,8 @@ namespace CSnet
                                 tempPacket[7] = bbb[1];
 
                                 server.SendTo(tempPacket, remoteEnd);
-                            } else if (data[1] == PMSPACKET)
+                            }
+                            else if (data[1] == PMSPACKET)
                             {
                                 //for example:
                                 uc1.managers[0].GetBEVDCFCContactorTemp();
@@ -331,11 +338,14 @@ namespace CSnet
                                     .Concat(BitConverter.GetBytes(uc1.managers[0].AUX5))
                                     .Concat(BitConverter.GetBytes(uc1.managers[0].AUX6))
                                     .ToArray();
-                               
+
                                 server.SendTo(tempPacket, remoteEnd);
-                            } else if (data[1] == EMSPACKET)
+                            }
+                            else if (data[1] == EMSPACKET)
                             {
-                                    byte[] tempPacket = BitConverter.GetBytes(uc1.managers[0].G1V)
+
+
+                                byte[] tempPacket = BitConverter.GetBytes(uc1.managers[0].G1V)
                                     .Concat(BitConverter.GetBytes(uc1.managers[0].G2V))
                                     .Concat(BitConverter.GetBytes(uc1.managers[0].G3V))
                                     .Concat(BitConverter.GetBytes(uc1.managers[0].G4V))
@@ -346,10 +356,35 @@ namespace CSnet
                                     .ToArray();
 
                                 server.SendTo(tempPacket, remoteEnd);
-                            } else
+                            }
+                            else if (data[1] == ModuleVersion)
+                            {
+                                //send raw BMS packet to UDP client
+                                byte[] modulesVersion = new byte[1];
+                                modulesVersion[0] = (byte)uc1.modules[data[2]].version;
+
+
+                                server.SendTo(modulesVersion, remoteEnd);
+                            }
+                            else if (data[1] == PackVersion)
+                            {
+                                byte[] packVersion = new byte[1];
+                                //firmwareLabel.Text
+                                // string Addr1 = MyINI.GetIniKeyValueForStr("PACK", "version", Application.StartupPath + "\\config.ini");
+
+                                packVersion[0] = byte.Parse(uconst.packVersion);
+                                server.SendTo(packVersion, remoteEnd);
+                            }
+                            else if (data[1] == DiagnosticVoltage)
+                            {
+                                int[] data1 = uconst.DoubleArrayToIntArray(uc1.modules[data[2]].CGDV);
+                                byte[] CGDV1 = uconst.IntArrayToByteArray(data1);
+                                server.SendTo(CGDV1, remoteEnd);
+                            }
+                            else
                             {
                                 //request not recongised, send back FF
-                                server.SendTo(new byte[] {255,255,255,255,255,255,255,255,255,255,255}, remoteEnd);
+                                server.SendTo(new byte[] { 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255 }, remoteEnd);
                             }
                         }
                     }

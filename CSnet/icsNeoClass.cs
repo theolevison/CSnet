@@ -573,6 +573,13 @@ namespace CSnet
         public byte Reserved3;
     }
 
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    public struct adi_wil_contextual_data_t
+    {
+        public byte iLength; // number of valid bytes in the buffer Data
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 75)]
+        public byte[] Data; // array to hold contextual data
+    }
 
     [StructLayout(LayoutKind.Sequential)]
     public struct VSBSpyMessage   //reff
@@ -1820,6 +1827,15 @@ namespace CSnet
         public byte reserved2;
         public byte reserved3;
         public byte reserved4;
+    }
+
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    public struct adi_wil_file_t
+    {
+        public ushort iRemainingBytes;
+        public byte iByteCount;
+        public ushort iOffset;
+        public IntPtr pData;
     }
 
     [StructLayout(LayoutKind.Sequential, Pack = 2)]

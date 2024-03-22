@@ -30,6 +30,7 @@
         {
             this.components = new System.ComponentModel.Container();
             this.GroupBox4 = new System.Windows.Forms.GroupBox();
+            this.button1 = new System.Windows.Forms.Button();
             this.label2 = new System.Windows.Forms.Label();
             this.EMSBox = new System.Windows.Forms.ListBox();
             this.label1 = new System.Windows.Forms.Label();
@@ -49,12 +50,13 @@
             this.lstErrorHolder = new System.Windows.Forms.ListBox();
             this.cmdGetErrors = new System.Windows.Forms.Button();
             this.Timer1 = new System.Windows.Forms.Timer(this.components);
-            this.button1 = new System.Windows.Forms.Button();
+            this.button6 = new System.Windows.Forms.Button();
             this.GroupBox4.SuspendLayout();
             this.SuspendLayout();
             // 
             // GroupBox4
             // 
+            this.GroupBox4.Controls.Add(this.button6);
             this.GroupBox4.Controls.Add(this.button1);
             this.GroupBox4.Controls.Add(this.label2);
             this.GroupBox4.Controls.Add(this.EMSBox);
@@ -82,6 +84,17 @@
             this.GroupBox4.TabIndex = 48;
             this.GroupBox4.TabStop = false;
             this.GroupBox4.Text = "Receive Message";
+            // 
+            // button1
+            // 
+            this.button1.Location = new System.Drawing.Point(1015, 43);
+            this.button1.Margin = new System.Windows.Forms.Padding(4);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(100, 32);
+            this.button1.TabIndex = 40;
+            this.button1.Text = "VERSIONS";
+            this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
             // label2
             // 
@@ -275,16 +288,16 @@
             this.Timer1.Interval = 1000;
             this.Timer1.Tick += new System.EventHandler(this.Timer1_Tick);
             // 
-            // button1
+            // button6
             // 
-            this.button1.Location = new System.Drawing.Point(1015, 43);
-            this.button1.Margin = new System.Windows.Forms.Padding(4);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(100, 32);
-            this.button1.TabIndex = 40;
-            this.button1.Text = "VERSIONS";
-            this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
+            this.button6.Location = new System.Drawing.Point(688, 41);
+            this.button6.Margin = new System.Windows.Forms.Padding(4);
+            this.button6.Name = "button6";
+            this.button6.Size = new System.Drawing.Size(100, 31);
+            this.button6.TabIndex = 41;
+            this.button6.Text = "GET CONFIG";
+            this.button6.UseVisualStyleBackColor = true;
+            this.button6.Click += new System.EventHandler(this.button6_Click);
             // 
             // OpenDeviceTab
             // 
@@ -321,5 +334,6 @@
         internal System.Windows.Forms.Label label1;
         internal System.Windows.Forms.Label label2;
         private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Button button6;
     }
 }

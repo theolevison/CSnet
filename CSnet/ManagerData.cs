@@ -51,7 +51,7 @@ namespace CSnet
         }
         public double GetBEVDCFCPlus()
         {
-            Debug.WriteLine($"aux1 {AUX1}, aux2 {AUX2}, aux3 {AUX3}, aux4 {AUX4}, aux5 {AUX5}, aux6 {AUX6}, aux7 {AUX7}");
+            //Debug.WriteLine($"aux1 {AUX1}, aux2 {AUX2}, aux3 {AUX3}, aux4 {AUX4}, aux5 {AUX5}, aux6 {AUX6}, aux7 {AUX7}");
             return AUX1 * 284.006; //TODO: confirm this is AUX 1, not AUX 0. Check VREF (AUX6) which should always be 3V
 
         }
@@ -159,7 +159,7 @@ namespace CSnet
         }
         public double EMSPressure1()
         {
-            Debug.WriteLine($"G1 {G1V}, G2 {G2V}, G3 {G3V}, G4 {G4V}, G5 {G5V}, G6 {G6V}, G7 {G7V}");
+            //Debug.WriteLine($"G1 {G1V}, G2 {G2V}, G3 {G3V}, G4 {G4V}, G5 {G5V}, G6 {G6V}, G7 {G7V}");
             return 10.0 + 250.0 * (G1V/ (double)C1V);
         }
         public double EMSPressure2()

@@ -16,8 +16,17 @@ namespace CSnet
         public byte[] Thermistor1Raw { get; set; } = new byte[2];
         public double Thermistor2 { get; set; }
         public byte[] Thermistor2Raw { get; set; } = new byte[2];
-        public string Timestamp { get; set; }
-        public string PacketTimestamp { get; set; }
+        public double BMSMessageTimestamp { get; set; }
+        
+
+        //CMU Performance
+        public int Latency { get; set; }
+        public int TotalPECErrors { get; set; }
+        public double AverageUpdateRate { get; set; }
+        public double PeakUpdateRate { get; set; }
+        public int AverageRSSI { get; set; }
+        public int PeakRSSI { get; set; }
+        public int UpdateRateCount { get; set; } = 0;
 
         public void FillThermistorValues(byte[] rawTemps)
         {         

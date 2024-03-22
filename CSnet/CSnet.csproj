@@ -123,6 +123,7 @@
     <Compile Include="OpenDeviceTab.Designer.cs">
       <DependentUpon>OpenDeviceTab.cs</DependentUpon>
     </Compile>
+    <Compile Include="uconst.cs" />
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
     </EmbeddedResource>

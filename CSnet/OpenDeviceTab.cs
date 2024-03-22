@@ -291,7 +291,7 @@ namespace CSnet
             }
         }
 
-        private bool OTAPCheckStatus(byte uAPISelected, byte uInstanceSelected, byte uFunctionSelected)
+        private int OTAPCheckStatus(byte uAPISelected, byte uInstanceSelected, byte uFunctionSelected)
         {
             int timeout = 0, result = 0;
 
@@ -304,7 +304,7 @@ namespace CSnet
                 if (timeout == 1000)
                 {
                     Debug.WriteLine("OTAP timeout");
-                    return false;                    
+                    return 0;                    
                 }
                 timeout++;
                 //only breaks if command has been successfully sent, or timesout
@@ -313,22 +313,21 @@ namespace CSnet
             if (uCallbackError == ADI_WIL_ERR_IN_PROGRESS) //uFinishedProcessing == 1 && 
             {
                 //still writing file
-                return true;
+                Debug.WriteLine("file thing in progress");
+                return 1;
             } else if (uCallbackError == ADI_WIL_ERR_SUCCESS)
             {
                 //written entire file
-                return true;
+                return 2;
             } else
             {
                 Debug.WriteLine($"OTAP bad response from get status, Callback: {uCallbackError} finishedProcessing: {uFinishedProcessing} result: {result}");
-                return false;
+                return 0;
             }
         }
 
         private int SendOTAPFileChunk(int offset, byte[] buffer)
         {
-            int iResult;
-
             byte[] parameters = new byte[67];
             byte[] pReturnedData = new byte[4];
 
@@ -341,7 +340,7 @@ namespace CSnet
             parameters[2] = 64;//file size, always send in 64 byte chunks
             Buffer.BlockCopy(buffer, offset, parameters, 3, 64); //copy chunk of file into parameters at position 3
 
-            iResult = icsNeoDll.icsneoGenericAPISendCommand(m_hObject, uAPISelected, uInstanceSelected, uFunctionSelected, Marshal.UnsafeAddrOfPinnedArrayElement(parameters, 0), (uint)parameters.Length, out uFunctionError);
+            int iResult = icsNeoDll.icsneoGenericAPISendCommand(m_hObject, uAPISelected, uInstanceSelected, uFunctionSelected, Marshal.UnsafeAddrOfPinnedArrayElement(parameters, 0), (uint)parameters.Length, out uFunctionError);
 
             if (iResult != 1 && uFunctionError != ADI_WIL_ERR_SUCCESS)
             {
@@ -350,10 +349,11 @@ namespace CSnet
                 return -1;
             }
 
-            if(OTAPCheckStatus(uAPISelected, uInstanceSelected, uFunctionSelected))
+            if(OTAPCheckStatus(uAPISelected, uInstanceSelected, uFunctionSelected) != 0)
             {
                 //finished or in progress, either way read the latest offset
                 uint uReturnedDataLength;
+                
 
                 iResult = icsNeoDll.icsneoGenericAPIReadData(m_hObject, uAPISelected, uInstanceSelected, out uCurrentFunction, Marshal.UnsafeAddrOfPinnedArrayElement(pReturnedData, 0), out uReturnedDataLength);
 
@@ -371,6 +371,97 @@ namespace CSnet
             {
                 MessageBox.Show("OTAP status error");
                 return -1;
+            }
+        }
+
+        private void GetConfigFile()
+        {
+            setMode(ADI_WIL_MODE_STANDBY);
+
+            //open file writer stream
+            string filename = @"c:\Users\Public\Documents\configFile.txt";
+
+            using (FileStream SourceStream = File.Open(filename, FileMode.OpenOrCreate))
+            {
+                SourceStream.Seek(0, SeekOrigin.Begin);//go to the start of the file. I don't think this is necessary, unless we are writing over the top
+                
+                while (GetConfigurationFileChunk(SourceStream))
+                {
+                    //method appends to file
+                }
+                //close & save the file
+
+            }
+
+            //find version
+        }
+
+        private bool GetConfigurationFileChunk(FileStream SourceStream)
+        {
+            byte[] parameters = new byte[9];
+
+            byte uAPISelected = 1, uInstanceSelected = 0, uFunctionSelected = ADI_WIL_API_GET_FILE, uFunctionError, uCurrentFunction;
+
+            //typedef uint64_t adi_wil_device_t;
+            //4 bytes enum for file type
+            int deviceID = 62; //Manager 0
+            BitConverter.GetBytes(Convert.ToUInt64(Math.Pow(2, deviceID))).CopyTo(parameters, 0); //add address to parameters
+            
+            parameters[8] = 2;//file type, ADI_WIL_FILE_TYPE_CONFIGURATION = 2
+
+            int iResult = icsNeoDll.icsneoGenericAPISendCommand(m_hObject, uAPISelected, uInstanceSelected, uFunctionSelected, Marshal.UnsafeAddrOfPinnedArrayElement(parameters, 0), (uint)parameters.Length, out uFunctionError);
+
+            if (iResult != 1 && uFunctionError != ADI_WIL_ERR_SUCCESS)
+            {
+                // Handle Error Here
+                MessageBox.Show($"Get file error {iResult} {uFunctionError}");
+                return false;
+            }
+
+            if (OTAPCheckStatus(uAPISelected, uInstanceSelected, uFunctionSelected) == 1)
+            {
+                //in progress, read the latest offset
+                uint uReturnedDataLength;
+                byte[] pReturnedData = new byte[512];
+
+                IntPtr returnedDataPtr = IntPtr.Zero;
+
+                iResult = icsNeoDll.icsneoGenericAPIReadData(m_hObject, uAPISelected, uInstanceSelected, out uCurrentFunction, returnedDataPtr, out uReturnedDataLength);
+                adi_wil_file_t fileChunk = (adi_wil_file_t)Marshal.PtrToStructure(returnedDataPtr, typeof(adi_wil_file_t));
+
+
+                //iResult = icsNeoDll.icsneoGenericAPIReadData(m_hObject, uAPISelected, uInstanceSelected, out uCurrentFunction, Marshal.UnsafeAddrOfPinnedArrayElement(pReturnedData, 0), out uReturnedDataLength);
+                //adi_wil_file_t fileChunk = (adi_wil_file_t)Marshal.PtrToStructure(Marshal.UnsafeAddrOfPinnedArrayElement(pReturnedData, 0), typeof(adi_wil_file_t));
+
+                if (uCurrentFunction != uFunctionSelected || iResult != 1) //1 is success
+                {
+                    // Handle Error Here
+                    MessageBox.Show($"Read error {iResult}");        
+                    return false;
+                }
+
+
+                // wBMS Packet Payload is located in the ExtraDataPtr
+                IntPtr ptr = fileChunk.pData;
+                Debug.WriteLine(fileChunk.pData);
+                Debug.WriteLine(Marshal.UnsafeAddrOfPinnedArrayElement(pReturnedData,5));
+                
+                byte[] managedArray = new byte[fileChunk.iByteCount];
+                Buffer.BlockCopy(pReturnedData, 5, managedArray, 0, fileChunk.iByteCount);
+
+                Debug.WriteLine(managedArray[0]);
+                
+                //Marshal.Copy(ptr, managedArray, 0, managedArray.Length); for some reason, this results in an access violation exception
+
+                //append file chunk
+                SourceStream.Write(managedArray, 0, managedArray.Length);
+
+                return true;
+            }
+            else
+            {
+                MessageBox.Show("Failed or succeeded"); //Either way close the filestream
+                return false;
             }
         }
 
@@ -516,9 +607,10 @@ namespace CSnet
 
             uAPISelected = 1;
             uInstanceSelected = 0;
+            IntPtr test = IntPtr.Zero;
 
-            iResult = icsNeoDll.icsneoGenericAPIReadData(m_hObject, uAPISelected, uInstanceSelected, out uCurrentFunction, Marshal.UnsafeAddrOfPinnedArrayElement(pReturnedData, 0), out uReturnedDataLength);
-            adi_wil_dev_version_t version = (adi_wil_dev_version_t)Marshal.PtrToStructure(Marshal.UnsafeAddrOfPinnedArrayElement(pReturnedData, 0), typeof(adi_wil_dev_version_t));
+            iResult = icsNeoDll.icsneoGenericAPIReadData(m_hObject, uAPISelected, uInstanceSelected, out uCurrentFunction, test, out uReturnedDataLength);
+            adi_wil_dev_version_t version = (adi_wil_dev_version_t)Marshal.PtrToStructure(test, typeof(adi_wil_dev_version_t));
 
 
             if (uCurrentFunction != function || iResult != 1) //1 is success
@@ -533,7 +625,58 @@ namespace CSnet
             firmwareLabel.Text = $"Firmware version: {version.MainProcSWVersion.iVersionMajor}";
         }
 
+        public enum adi_wil_contextual_id_t
+        {
+            ADI_WIL_CONTEXTUAL_ID_0,             // Contextual data ID 0
+            ADI_WIL_CONTEXTUAL_ID_1,             // Contextual data ID 1
+            ADI_WIL_CONTEXTUAL_ID_WRITE_ONCE     // Write once contextual data
+        }
 
+        public void GetContextualData(int deviceID)
+        {
+            setMode(ADI_WIL_MODE_STANDBY);
+
+            //Get Device version
+            byte functionError = 0;
+            byte function = 23;  //ADI_WIL_API_GET_CONTEXTUAL_DATA = 23
+            byte[] parameters = new byte[9];
+           
+            //node id's are converted to powers of 2, for some reason
+            BitConverter.GetBytes(Convert.ToUInt64(Math.Pow(2, deviceID))).CopyTo(parameters, 0);
+            
+            parameters[8] = Convert.ToByte(adi_wil_contextual_id_t.ADI_WIL_CONTEXTUAL_ID_0);
+
+            int iResult = icsNeoDll.icsneoGenericAPISendCommand(m_hObject, 1, 0, function, Marshal.UnsafeAddrOfPinnedArrayElement(parameters, 0), (uint)parameters.Length, out functionError);
+
+            if (!checkStatus(1, 0, function) || iResult != 1)
+            {
+                MessageBox.Show("Find version error");
+                return;
+            }
+
+            byte uAPISelected, uInstanceSelected, uFunctionError, uCurrentFunction, uNodeCount;
+            byte[] pReturnedData = new byte[512];
+
+            uint uParametersLength, uReturnedDataLength;
+            //adi_wil_dev_version_t version = new adi_wil_dev_version_t();
+
+            uAPISelected = 1;
+            uInstanceSelected = 0;
+            
+            iResult = icsNeoDll.icsneoGenericAPIReadData(m_hObject, uAPISelected, uInstanceSelected, out uCurrentFunction, Marshal.UnsafeAddrOfPinnedArrayElement(pReturnedData, 0), out uReturnedDataLength);
+            adi_wil_contextual_data_t contextualData = (adi_wil_contextual_data_t)Marshal.PtrToStructure(Marshal.UnsafeAddrOfPinnedArrayElement(pReturnedData, 0), typeof(adi_wil_contextual_data_t));
+
+            if (uCurrentFunction != function || iResult != 1) //1 is success
+            {
+                //Handle Error Here
+                MessageBox.Show($"Read error {iResult}");
+                return;
+            }
+
+            Debug.WriteLine(contextualData.iLength);
+            
+            //adi_wil_contextual_data_t
+        }
         private void Timer1_Tick(object sender, EventArgs e)
         {
             CmdReceive_Click(cmdReceive, null);
@@ -1070,28 +1213,23 @@ namespace CSnet
 
         private bool checkStatus(byte uAPISelected, byte uInstanceSelected, byte uFunctionSelected)
         {
-            int iTimeOutCounter = 0;
+            int timeOutCounter = 0;
 
             byte uCallbackError = 1, uFinishedProcessing, uCurrentFunction;
 
-            while (iTimeOutCounter < 1000)
+            do
             {
                 int iResult = icsNeoDll.icsneoGenericAPIGetStatus(m_hObject, uAPISelected, uInstanceSelected, out uCurrentFunction, out uCallbackError, out uFinishedProcessing);
-
-                if (uCurrentFunction != uFunctionSelected || iResult != 1) //1 is success
+  
+                if (timeOutCounter == 1000)
                 {
-                    // function mismatch, or command not sent to the device
+                    Debug.WriteLine("check status timeout");
                     return false;
                 }
-
-                if (uFinishedProcessing == 1)
-                {
-                    break;
-                }
-
+                timeOutCounter++;
                 Thread.Sleep(1);
-                iTimeOutCounter++;
-            }
+                //only breaks if command has been successfully sent, or timesout
+            } while (uFinishedProcessing == 0);            
 
             if (uCallbackError != ADI_WIL_ERR_SUCCESS)
             {
@@ -1266,10 +1404,10 @@ namespace CSnet
                 // for each message we read
                 for (lCount = 1; lCount <= lNumberOfMessages; lCount++)
                 {
-                    // Calculate the messages timestamp
+                    // Calculate the messages timestamp in seconds
                     lResult = icsNeoDll.icsneoGetTimeStampForMsg(m_hObject, ref stMessages[lCount - 1], ref dTime);
 
-                    sListString = "Time : " + Convert.ToString(dTime);  //Build String
+                    
                     //sListString1 = "Time : " + Convert.ToString(dTime);  //Build String
                     //TODO: unpack raw data into correct format
 
@@ -1360,20 +1498,42 @@ namespace CSnet
                                     {
                                         sListString += "BMS ";
 
-                                        if (uiPayloadLength <= 514)
+                                        if (uiPayloadLength <= 514 && uiPayloadLength > 0)
                                         {
-
                                             // wBMS Packet Payload is located in the ExtraDataPtr
                                             IntPtr ptr = stMessages[lCount - 1].iExtraDataPtr;
 
                                             // Copy each packet into the object arrays
 
-                                            if (uiPacketID == 0 && uiPayloadLength > 0)
+                                            if (uiPacketID == 0)
                                             {
+                                                
+
                                                 byte[] managedArray = new byte[uiPayloadLength];
                                                 Marshal.Copy(ptr, managedArray, 0, uiPayloadLength);
 
                                                 modules[uiDeviceSource].Packet0 = managedArray;
+
+                                                //ignore the initial value of 0
+                                                if (modules[uiDeviceSource].BMSMessageTimestamp == 0)
+                                                {
+                                                    modules[uiDeviceSource].BMSMessageTimestamp = dTime;
+                                                }
+
+                                                double difference = Math.Abs(dTime - modules[uiDeviceSource].BMSMessageTimestamp);
+                                                if (difference > modules[uiDeviceSource].PeakUpdateRate)
+                                                {
+                                                    modules[uiDeviceSource].PeakUpdateRate = difference;
+                                                }
+
+                                                modules[uiDeviceSource].BMSMessageTimestamp = dTime; //time measured in seconds since device turned on
+
+                                                //calculate cumulative average for time between packets
+                                                modules[uiDeviceSource].AverageUpdateRate = (difference + modules[uiDeviceSource].UpdateRateCount * modules[uiDeviceSource].AverageUpdateRate) / (modules[uiDeviceSource].UpdateRateCount + 1);
+                                                modules[uiDeviceSource].UpdateRateCount++;
+                                                
+                                                //modules[uiDeviceSource].AverageUpdateRate;
+                                                //modules[uiDeviceSource].PeakUpdateRate;
 
                                                 double[] CGV = new double[8];
                                                 CGV[0] = BitConverter.ToUInt16(managedArray, 6) * 0.0001;
@@ -1399,7 +1559,7 @@ namespace CSnet
 
                                                 modules[uiDeviceSource].CGDV = CGDV;
                                             }
-                                            else if (uiPacketID == 1 && uiPayloadLength > 0)
+                                            else if (uiPacketID == 1)
                                             {
 
                                                 byte[] managedArray = new byte[uiPayloadLength];
@@ -1424,7 +1584,7 @@ namespace CSnet
                                     break;
                                 case PMS_PACKET_TYPE:
                                     {
-                                        sListString += "PMS ";
+                                        //PMS
 
                                         if (uiPayloadLength <= 514 && uiPayloadLength > 0)
                                         {
@@ -1442,8 +1602,6 @@ namespace CSnet
                                                 managers[0].I1 = BitConverter.ToUInt16(managedArray, 11);
                                                 managers[0].I2 = BitConverter.ToUInt16(managedArray, 13);
                                                 managers[0].VBAT = BitConverter.ToUInt16(managedArray, 15);
-                                                Debug.WriteLine($"{BitConverter.ToUInt16(managedArray, 19)} {managedArray[19]} {managedArray[20]}");
-                                                Debug.WriteLine(BitConverter.ToUInt16(new byte[] {255,255}, 0));
                                                 managers[0].AUX1 = BitConverter.ToUInt16(managedArray, 19);
                                                 managers[0].AUX2 = BitConverter.ToUInt16(managedArray, 27);
                                                 managers[0].AUX3 = BitConverter.ToUInt16(managedArray, 40);
@@ -1464,18 +1622,16 @@ namespace CSnet
                                     //TODO: look in ICS WIL DLL Deliverables\wbmsapitester\wbmsapitester\containers for information on decoding pms payload
                                     break;
                                 case EMS_PACKET_TYPE:
-                                    sListString += "EMS ";
+                                    //EMS
 
-                                    if (uiPayloadLength <= 514)
+                                    if (uiPayloadLength <= 514 && uiPayloadLength > 0)
                                     {
-                                        // Print out the payload
-
                                         // wBMS Packet Payload is located in the ExtraDataPtr
                                         IntPtr ptr = stMessages[lCount - 1].iExtraDataPtr;
 
                                         // Copy each packet into the object arrays
 
-                                        if (uiPacketID == 0 && uiPayloadLength > 0)
+                                        if (uiPacketID == 0)
                                         {
                                             byte[] managedArray = new byte[uiPayloadLength];
                                             Marshal.Copy(ptr, managedArray, 0, uiPayloadLength);
@@ -1503,27 +1659,67 @@ namespace CSnet
 
                                     break;
                                 case NETWORK_STATUS_PACKET_TYPE:
-                                    sListString += "Network Metadata ";
+                                    //Network Metadata
 
-                                    //TODO: decode payload
+                                    if (uiPayloadLength <= 514 && uiPayloadLength > 0)
+                                    {
+                                        // wBMS Packet Payload is located in the ExtraDataPtr
+                                        IntPtr ptr = stMessages[lCount - 1].iExtraDataPtr;
+
+                                        // Copy each packet into the object arrays
+
+                                        if (uiPacketID == 0)
+                                        {
+                                            byte[] managedArray = new byte[uiPayloadLength];
+                                            Marshal.Copy(ptr, managedArray, 0, uiPayloadLength);
+                                                                                        
+                                            modules[uiDeviceSource].Latency = BitConverter.ToUInt16(managedArray, 24);
+
+                                            byte RSSI = managedArray[31];
+                                            if (RSSI > modules[uiDeviceSource].PeakRSSI)
+                                            {
+                                                modules[uiDeviceSource].PeakRSSI = RSSI;
+                                            }
+                                            //TODO: also calculate average RSSI here & compare to health report packet ave RSSI, as seen below
+           
+                                            break;
+                                        }
+                                    }
+
                                     break;
                                 case HEALTH_REPORTS_PACKET_TYPE:
-                                    sListString += "Health Report ";
+                                    //Health Report
 
-                                    //TODO: decode payload
+                                    if (uiPayloadLength <= 514 && uiPayloadLength > 0)
+                                    {
+                                        // wBMS Packet Payload is located in the ExtraDataPtr
+                                        IntPtr ptr = stMessages[lCount - 1].iExtraDataPtr;
+
+                                        // Copy each packet into the object arrays
+
+                                        if (uiPacketID == 1)
+                                        {
+                                            byte[] managedArray = new byte[uiPayloadLength];
+                                            Marshal.Copy(ptr, managedArray, 0, uiPayloadLength);
+
+                                            //Get average RSSI to manager 0
+                                            modules[uiDeviceSource].AverageRSSI = managedArray[1]; //TODO: make sure I'm checking the correct average RSSI
+                                        }
+                                    }
+
                                     break;
                                 case SPI_STATS_PACKET_TYPE:
-                                    sListString += "SPI Port Statistics ";
+                                    //SPI Port Statistics
 
                                     //TODO: decode payload
                                     break;
                                 case WIL_STATS_PACKET_TYPE:
-                                    sListString += "WIL Statistics ";
+                                    //WIL Statistics
 
                                     //TODO: decode payload
                                     break;
                                 case EVENT_PACKET_TYPE:
-                                    sListString += "Event Notification ";
+                                    //Event Notification
 
                                     //TODO: decode payload
                                     break;
@@ -1594,12 +1790,16 @@ namespace CSnet
                 {
                     if (chkHexFormat)
                     {
+                        
                         module.Packet0.ToList().ForEach(x => temp += $"{x:X2} ");
                         lstMessage.Items.Add(temp);
                         temp = "";
                     }
                     else
                     {
+                        Debug.WriteLine($"Peak update : {module.PeakUpdateRate}");
+                        Debug.WriteLine($"Average update : {module.AverageUpdateRate}");
+                        Debug.WriteLine($"Timestamp : {module.BMSMessageTimestamp}");
                         temp = $"Module {module.MacAddress} Version {module.version}";
                         foreach (double cgv in module.CGV)
                         {
@@ -1642,9 +1842,9 @@ namespace CSnet
                     PMSBox.Items.Add(temp);
                     temp = $"Manager 0 BETB {managers[0].GetBETBDCFCDifferential()} {managers[0].GetBETBDCFCMinus()} {managers[0].GetBETBDCFCPlus()} {managers[0].GetBETBSB1Temp()} {managers[0].GetBETBShuntTemp()} {managers[0].GetBETBHVDCMinus()}";
                     PMSBox.Items.Add(temp);
-                    Debug.WriteLine(managers[0].PMSPacket0);
-                    Debug.WriteLine(managers[0].AUX1);
-                    Debug.WriteLine(managers[0].AUX2);
+                    //Debug.WriteLine(managers[0].PMSPacket0);
+                    //Debug.WriteLine(managers[0].AUX1);
+                    //Debug.WriteLine(managers[0].AUX2);
 
                     //EMS data
                     temp = $"Manager 0 {managers[0].CD1V:0.00V} {managers[0].EMSReferenceVoltage1():0.00} {managers[0].EMSReferenceVoltage2():0.00} {managers[0].EMSTemperature1():0.00} {managers[0].EMSTemperature2():0.00} {managers[0].EMSPressure1():0.00} {managers[0].EMSPressure2():0.00} {managers[0].EMSGas1():0.00} {managers[0].EMSGas2():0.00}";
@@ -1742,9 +1942,14 @@ namespace CSnet
         {
             for (int i = 0; i < modules.Length; i++)
             {
-                
                 modules[i].version = DeviceFirmwareVersion(i);
             }
+        }
+
+        private void button6_Click(object sender, EventArgs e)
+        {
+            //GetConfigFile();
+            GetContextualData(0);
         }
     }
 }
