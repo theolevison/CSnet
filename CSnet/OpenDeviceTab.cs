@@ -13,7 +13,6 @@ namespace CSnet
 {
     public partial class OpenDeviceTab : UserControl
     {
-
         private const byte ADI_WIL_MAC_SIZE = 8;
         private const byte ADI_WIL_MAX_NODES = 62;
 
@@ -194,7 +193,7 @@ namespace CSnet
             managers[0] = new ManagerData();
             managers[1] = new ManagerData();
 
-            //TODO: at some point check firmware versions. Must 
+            //TODO: at some point check firmware versions
             //managers[0].Version = DeviceFirmwareVersion(62); //afaik, manager 0 is always the primary manager, responsible for EMS & PMS
             //managers[1].Version = DeviceFirmwareVersion(63); //this should throw an error if the pack is BEV & only has one manager
 
@@ -591,7 +590,7 @@ namespace CSnet
         }
         private void Timer1_Tick(object sender, EventArgs e)
         {
-            CmdReceive_Click(ButtonGetMessages, null);
+            GetMessages_Click(ButtonGetMessages, null);
         }
 
         private void SendGenericCommand(byte function, byte[] parameters)
@@ -599,38 +598,24 @@ namespace CSnet
             byte functionError = 0;
 
             int iResult = icsNeoDll.icsneoGenericAPISendCommand(m_hObject, 1, 0, function, Marshal.UnsafeAddrOfPinnedArrayElement(parameters, 0), (uint)parameters.Length, out functionError);
-
-            if (!CheckStatus(1, 0, function) || iResult != 1)
+            
+            if(iResult != 1)
             {
-
+                Debug.WriteLine("Couldn't send command");
             }
+
+            CheckStatus(1, 0, function);
         }
 
         private void SetACL_Click(object sender, EventArgs e)
         {
-
-            List<string> macAddresses = new List<string>();
-
-            for (int i = 0; i < 16; i++)
-            {
-                //read mac addresses from user input (Form 2)
-                string address = MyINI.GetIniKeyValueForStr("macAddress", $"{i + 1}", Application.StartupPath + "\\config.ini");
-                if (address != "000000") // TODO: do some more input validation
-                {
-                    macAddresses.Add(address);
-                }
-
-            }
-
-            byte function = ADI_WIL_API_SET_ACL;
-            byte nodeCount = (byte)macAddresses.Count;
-
+            List<string> macAddresses = Form2.GetStoredMacAddresses();
+                
             List<byte> ACLList = new List<byte>
             {
-                nodeCount
+                (byte)macAddresses.Count
             };
 
-            //construct the list of mac addresses
             for (int i = 0; i < macAddresses.Count; i++)
             {
                 ACLList.AddRange(new byte[] { 0x64, 0xF9, 0xC0, 0x00, 0x00, Convert.ToByte(macAddresses[i].Substring(0, 2), 16), Convert.ToByte(macAddresses[i].Substring(2, 2), 16), Convert.ToByte(macAddresses[i].Substring(4, 2), 16) });
@@ -638,19 +623,14 @@ namespace CSnet
 
             SetMode(ADI_WIL_MODE_STANDBY);
 
-            SendGenericCommand(function, ACLList.ToArray());
+            SendGenericCommand(ADI_WIL_API_SET_ACL, ACLList.ToArray());
         }
 
         private void ACLPage_Click(object sender, EventArgs e)
         {
-            //must set mode to standby before setting ACL
-
             Form2 fw = new Form2();
             fw.WindowState = FormWindowState.Normal;
             fw.StartPosition = FormStartPosition.CenterScreen;
-            //fw.MdiParent = this;
-            //fw.WindowState.
-            //fw.Owner = this;
             fw.ShowDialog();
         }
 
@@ -700,12 +680,11 @@ namespace CSnet
         {
             if (mode != currentMode)
             {
-                byte function = ADI_WIL_API_SET_MODE; // adi_wil_SetMode ADI_WIL_API_SET_MODE = 4;
                 byte[] parameters = new byte[1];
 
                 parameters[0] = mode; //3 = active mode
 
-                SendGenericCommand(function, parameters);
+                SendGenericCommand(ADI_WIL_API_SET_MODE, parameters);
 
                 currentMode = mode;
             }
@@ -720,7 +699,7 @@ namespace CSnet
 
             SendGenericCommand(function, new byte[0]);
 
-            byte uAPISelected, uInstanceSelected, uFunctionError, uCurrentFunction, uNodeCount;
+            byte uAPISelected, uInstanceSelected, uFunctionError, uCurrentFunction;
             byte[] pReturnedData = new byte[ADI_WIL_MAC_SIZE * ADI_WIL_MAX_NODES + 1];
 
             uint uReturnedDataLength;
@@ -732,14 +711,13 @@ namespace CSnet
 
             if (uCurrentFunction != function || iResult != 1) //1 is success
             {
-                // Handle Error Here
                 MessageBox.Show($"Read error {iResult}");
                 return;
             }
 
             if (uReturnedDataLength > 0)
             {
-                uNodeCount = pReturnedData[ADI_WIL_MAC_SIZE * ADI_WIL_MAX_NODES];
+                byte uNodeCount = pReturnedData[ADI_WIL_MAC_SIZE * ADI_WIL_MAX_NODES];
 
                 for (int i = 0; i < uNodeCount; i++)
                 {
@@ -779,11 +757,9 @@ namespace CSnet
                     }
                 }
             }
-
-
         }
 
-        private void CmdReceive_Click(object sender, EventArgs e)
+        private void GetMessages_Click(object sender, EventArgs e)
         {
             SetMode(ADI_WIL_MODE_ACTIVE);
 

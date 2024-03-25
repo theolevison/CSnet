@@ -24,6 +24,8 @@ namespace CSnet
 
         private void Form2_Load(object sender, EventArgs e)
         {
+            //TODO: use XML (better support in C#) instead of INI, if we actually want to save data.
+
             //默认地址  64F9C0 0000 000000
 
             //配置文件
@@ -46,17 +48,21 @@ namespace CSnet
             textBox16.Text = MyINI.GetIniKeyValueForStr("macAddress", "16", Application.StartupPath + "\\config.ini");
         }
 
-        private static byte[] ConvertUInt32ArrayToByteArray(uint[] value)
+        public static List<string> GetStoredMacAddresses()
         {
-            const int bytesPerUInt32 = 4;
-            byte[] result = new byte[value.Length * bytesPerUInt32];
-            for (int index = 0; index < value.Length; index++)
+            List<string> macAddresses = new List<string>();
+
+            for (int i = 0; i < 16; i++)
             {
-                byte[] partialResult = System.BitConverter.GetBytes(value[index]);
-                for (int indexTwo = 0; indexTwo < partialResult.Length; indexTwo++)
-                    result[index * bytesPerUInt32 + indexTwo] = partialResult[indexTwo];
+                //read mac addresses from user input (Form 2)
+                string address = MyINI.GetIniKeyValueForStr("macAddress", $"{i + 1}", Application.StartupPath + "\\config.ini");
+                if (address != "000000") // TODO: do some more input validation
+                {
+                    macAddresses.Add(address);
+                }
             }
-            return result;
+
+            return macAddresses;
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -78,7 +84,7 @@ namespace CSnet
             MyINI.WritePrivateProfileString("macAddress", "15 ", textBox15.Text, Application.StartupPath + "\\config.ini");
             MyINI.WritePrivateProfileString("macAddress", "16 ", textBox16.Text, Application.StartupPath + "\\config.ini");
 
-            MessageBox.Show("Data have been save successful!");
+            MessageBox.Show("Data has been saved successfully!");
             // Form2 fw = new Form2();
             // fw.Close();
             // Process.GetCurrentProcess().Kill();

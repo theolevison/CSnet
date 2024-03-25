@@ -270,7 +270,7 @@
             this.ButtonGetMessages.Size = new System.Drawing.Size(139, 49);
             this.ButtonGetMessages.TabIndex = 20;
             this.ButtonGetMessages.Text = "Get Messages";
-            this.ButtonGetMessages.Click += new System.EventHandler(this.CmdReceive_Click);
+            this.ButtonGetMessages.Click += new System.EventHandler(this.GetMessages_Click);
             // 
             // lstErrorHolder
             // 
