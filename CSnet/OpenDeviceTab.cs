@@ -516,7 +516,7 @@ namespace CSnet
             SetMode(ADI_WIL_MODE_STANDBY);
 
             byte function = ADI_WIL_API_GET_WIL_SOFTWARE_VERSION; // adi_wil_SetMode ADI_WIL_API_SET_MODE = 4;
- 
+
             SendGenericCommand(function, new byte[0]);
 
             byte uAPISelected, uInstanceSelected, uCurrentFunction;
@@ -599,8 +599,8 @@ namespace CSnet
             byte functionError = 0;
 
             int iResult = icsNeoDll.icsneoGenericAPISendCommand(m_hObject, 1, 0, function, Marshal.UnsafeAddrOfPinnedArrayElement(parameters, 0), (uint)parameters.Length, out functionError);
-            
-            if(iResult != 1)
+
+            if (iResult != 1)
             {
                 Debug.WriteLine("Couldn't send command");
             }
@@ -611,7 +611,7 @@ namespace CSnet
         private void SetACL_Click(object sender, EventArgs e)
         {
             List<string> macAddresses = Form2.GetStoredMacAddresses();
-                
+
             List<byte> ACLList = new List<byte>
             {
                 (byte)macAddresses.Count
@@ -768,9 +768,9 @@ namespace CSnet
             int lNumberOfMessages = 0;
             int lNumberOfErrors = 0;
             long lCount;
-           
+
             double dTime = 0;
-   
+
             // read the messages from the driver
             lResult = icsNeoDll.icsneoGetMessages(m_hObject, ref stMessages[0], ref lNumberOfMessages, ref lNumberOfErrors);
 
@@ -788,7 +788,6 @@ namespace CSnet
                 {
                     // Calculate the messages timestamp in seconds
                     lResult = icsNeoDll.icsneoGetTimeStampForMsg(m_hObject, ref stMessages[lCount - 1], ref dTime);
-
 
                     //Decode based on the protocol
                     switch (stMessages[lCount - 1].Protocol)
@@ -838,116 +837,60 @@ namespace CSnet
                             // Combine the wBMS message together
                             int uiPayloadLength = (stMessages[lCount - 1].NumberBytesHeader << 8) | stMessages[lCount - 1].NumberBytesData;
 
-
-                            switch (uiPacketType)
+                            if (uiPayloadLength <= 514 && uiPayloadLength > 0)
                             {
-                                case API_PACKET_TYPE:
-                                    //ignore
-                                    break;
-                                case BMS_PACKET_TYPE:
-                                    {
-                                        if (uiPayloadLength <= 514 && uiPayloadLength > 0)
-                                        {
-                                            // wBMS Packet Payload is located in the ExtraDataPtr
-                                            IntPtr ptr = stMessages[lCount - 1].iExtraDataPtr;
+                                byte[] packet = ConvertPacketToManaged(stMessages[lCount - 1], uiPayloadLength);
 
-                                            byte[] managedArray = new byte[uiPayloadLength];
-                                            Marshal.Copy(ptr, managedArray, 0, uiPayloadLength);
+                                switch (uiPacketType)
+                                {
+                                    case API_PACKET_TYPE:
+                                        //ignore
+                                        break;
+                                    case BMS_PACKET_TYPE:                                        
+                                            modules[uiDeviceSource].UpdateData(packet, uiPacketID, dTime);
 
-                                            modules[uiDeviceSource].UpdateData(managedArray, uiPacketID, dTime);
-                                        }
-                                        else
-                                        {
-                                            Debug.WriteLine("Payload Length exceeds the Maximum size of 514!");
-                                        }
-                                    }
-
-                                    break;
-                                case PMS_PACKET_TYPE:
-                                    {
-                                        //PMS
-
-                                        if (uiPayloadLength <= 514 && uiPayloadLength > 0)
-                                        {
-                                            // wBMS Packet Payload is located in the ExtraDataPtr
-                                            IntPtr ptr = stMessages[lCount - 1].iExtraDataPtr;
-                                            byte[] managedArray = new byte[uiPayloadLength];
-                                            Marshal.Copy(ptr, managedArray, 0, uiPayloadLength);
-
+                                        break;
+                                    case PMS_PACKET_TYPE:
                                             //TODO: check that manager 0 is the primary manager
-                                            managers[0].UpdatePMSData(managedArray, uiPacketID);
-                                        }
-                                        else
-                                        {
-                                            Debug.WriteLine("Payload Length exceeds the Maximum size of 514!");
-                                        }
-                                    }
-
-                                    break;
-                                case EMS_PACKET_TYPE:
-                                    //EMS
-
-                                    if (uiPayloadLength <= 514 && uiPayloadLength > 0)
-                                    {
-                                        // wBMS Packet Payload is located in the ExtraDataPtr
-                                        IntPtr ptr = stMessages[lCount - 1].iExtraDataPtr;
-                                        byte[] managedArray = new byte[uiPayloadLength];
-                                        Marshal.Copy(ptr, managedArray, 0, uiPayloadLength);
-
-                                        managers[0].UpdateEMSData(managedArray, uiPacketID);
-                                    }
-                                    else
-                                    {
-                                        Debug.WriteLine("Payload Length exceeds the Maximum size of 514!");
-                                    }
-
-                                    break;
-                                case NETWORK_STATUS_PACKET_TYPE:
-                                    //Network Metadata
-
-                                    if (uiPayloadLength <= 514 && uiPayloadLength > 0)
-                                    {
-                                        // wBMS Packet Payload is located in the ExtraDataPtr
-                                        IntPtr ptr = stMessages[lCount - 1].iExtraDataPtr;
-                                        byte[] managedArray = new byte[uiPayloadLength];
-                                        Marshal.Copy(ptr, managedArray, 0, uiPayloadLength);
+                                            managers[0].UpdatePMSData(packet, uiPacketID);
                                         
-                                        modules[uiDeviceSource].UpdateMetadata(managedArray, uiPacketID);
-                                    }
+                                        break;
+                                    case EMS_PACKET_TYPE:
+                                        managers[0].UpdateEMSData(packet, uiPacketID);
 
-                                    break;
-                                case HEALTH_REPORTS_PACKET_TYPE:
-                                    //Health Report
+                                        break;
+                                    case NETWORK_STATUS_PACKET_TYPE:
+                                        //Network Metadata
+                                        modules[uiDeviceSource].UpdateMetadata(packet, uiPacketID);
 
-                                    if (uiPayloadLength <= 514 && uiPayloadLength > 0 && uiDeviceSource < 64)
-                                    {
-                                        // wBMS Packet Payload is located in the ExtraDataPtr
-                                        IntPtr ptr = stMessages[lCount - 1].iExtraDataPtr;
-                                        byte[] managedArray = new byte[uiPayloadLength];
-                                        Marshal.Copy(ptr, managedArray, 0, uiPayloadLength);
+                                        break;
+                                    case HEALTH_REPORTS_PACKET_TYPE:
+                                        //Health Report
+                                        if (uiDeviceSource < 64)
+                                        {
+                                            modules[uiDeviceSource].UpdateHealthdata(packet, uiPacketID);
+                                        }
 
-                                        modules[uiDeviceSource].UpdateHealthdata(managedArray, uiPacketID);
-                                    }
+                                        break;
+                                    case SPI_STATS_PACKET_TYPE:
+                                        //SPI Port Statistics
 
-                                    break;
-                                case SPI_STATS_PACKET_TYPE:
-                                    //SPI Port Statistics
+                                        //TODO: decode payload
+                                        break;
+                                    case WIL_STATS_PACKET_TYPE:
+                                        //WIL Statistics
 
-                                    //TODO: decode payload
-                                    break;
-                                case WIL_STATS_PACKET_TYPE:
-                                    //WIL Statistics
+                                        //TODO: decode payload
+                                        break;
+                                    case EVENT_PACKET_TYPE:
+                                        //Event Notification
 
-                                    //TODO: decode payload
-                                    break;
-                                case EVENT_PACKET_TYPE:
-                                    //Event Notification
-
-                                    //TODO: decode payload
-                                    break;
-                                default:
-                                    //Unknown
-                                    break;
+                                        //TODO: decode payload
+                                        break;
+                                    default:
+                                        //Unknown
+                                        break;
+                                }
                             }
 
                             break;
@@ -968,6 +911,16 @@ namespace CSnet
             {
                 MessageBox.Show("Problem Reading Messages");
             }
+        }
+
+        private byte[] ConvertPacketToManaged(icsSpyMessage message, int payloadLength)
+        {
+            // wBMS Packet Payload is located in the ExtraDataPtr
+            IntPtr ptr = message.iExtraDataPtr;
+            byte[] managedArray = new byte[payloadLength];
+            Marshal.Copy(ptr, managedArray, 0, payloadLength);
+
+            return managedArray;
         }
 
         private void OutputData()
