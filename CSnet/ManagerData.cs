@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Deployment.Application;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
@@ -40,6 +41,48 @@ namespace CSnet
 
         public string Timestamp { get; set; }
         public string PacketTimestamp { get; set; }
+
+        public void UpdatePMSData(byte[] packet, uint packetID)
+        {
+            
+            if (packetID == 0)
+            {
+                PMSPacket0 = packet;
+
+                I1 = BitConverter.ToUInt16(packet, 11);
+                I2 = BitConverter.ToUInt16(packet, 13);
+                VBAT = BitConverter.ToUInt16(packet, 15);
+                AUX1 = BitConverter.ToUInt16(packet, 19);
+                AUX2 = BitConverter.ToUInt16(packet, 27);
+                AUX3 = BitConverter.ToUInt16(packet, 40);
+                AUX4 = BitConverter.ToUInt16(packet, 48);
+                AUX5 = BitConverter.ToUInt16(packet, 61);
+                AUX6 = BitConverter.ToUInt16(packet, 69);
+            }
+            else if (packetID == 2)
+            {
+                AUX7 = BitConverter.ToUInt16(packet, 69); //TODO: check if we can look in a different packet for AUX values? They are different sometimes
+            }
+        }
+
+        public void UpdateEMSData(byte[] packet, uint packetID)
+        {
+            if (packetID == 0)
+            {
+                C1V = BitConverter.ToUInt16(packet, 6);
+                G1V = BitConverter.ToUInt16(packet, 24);
+                G2V = BitConverter.ToUInt16(packet, 26);
+                G3V = BitConverter.ToUInt16(packet, 30);
+                G4V = BitConverter.ToUInt16(packet, 32);
+                G5V = BitConverter.ToUInt16(packet, 34);
+                G6V = BitConverter.ToUInt16(packet, 38);
+                G7V = BitConverter.ToUInt16(packet, 40);
+
+                EMSPacket0 = packet;
+
+                CD1V = BitConverter.ToUInt16(packet, 14);
+            }
+        }
 
         //BEV measurements
         private double BEVTemp(double a)

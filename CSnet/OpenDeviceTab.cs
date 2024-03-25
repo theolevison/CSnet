@@ -470,7 +470,6 @@ namespace CSnet
                 then re-read back by using adi_wil_GetGPIO since adi_wil_GetGPIO will reconfigure the pin 
                 to input mode in order to be read 
              */
-
         }
 
         private int DeviceFirmwareVersion(int deviceID)
@@ -493,6 +492,8 @@ namespace CSnet
 
             uAPISelected = 1;
             uInstanceSelected = 0;
+
+            //TODO: Template Method pattern
 
             int iResult = icsNeoDll.icsneoGenericAPIReadData(m_hObject, uAPISelected, uInstanceSelected, out uCurrentFunction, Marshal.UnsafeAddrOfPinnedArrayElement(pReturnedData, 0), out uReturnedDataLength);
             adi_wil_dev_version_t version = (adi_wil_dev_version_t)Marshal.PtrToStructure(Marshal.UnsafeAddrOfPinnedArrayElement(pReturnedData, 0), typeof(adi_wil_dev_version_t));
@@ -845,81 +846,15 @@ namespace CSnet
                                     break;
                                 case BMS_PACKET_TYPE:
                                     {
-
                                         if (uiPayloadLength <= 514 && uiPayloadLength > 0)
                                         {
                                             // wBMS Packet Payload is located in the ExtraDataPtr
                                             IntPtr ptr = stMessages[lCount - 1].iExtraDataPtr;
 
-                                            // Copy each packet into the object arrays
+                                            byte[] managedArray = new byte[uiPayloadLength];
+                                            Marshal.Copy(ptr, managedArray, 0, uiPayloadLength);
 
-                                            if (uiPacketID == 0)
-                                            {
-                                                byte[] managedArray = new byte[uiPayloadLength];
-                                                Marshal.Copy(ptr, managedArray, 0, uiPayloadLength);
-
-                                                modules[uiDeviceSource].Packet0 = managedArray;
-
-                                                //ignore the initial value of 0
-                                                if (modules[uiDeviceSource].BMSMessageTimestamp == 0)
-                                                {
-                                                    modules[uiDeviceSource].BMSMessageTimestamp = dTime;
-                                                }
-
-                                                double difference = Math.Abs(dTime - modules[uiDeviceSource].BMSMessageTimestamp);
-                                                if (difference > modules[uiDeviceSource].PeakUpdateRate)
-                                                {
-                                                    modules[uiDeviceSource].PeakUpdateRate = difference;
-                                                }
-
-                                                modules[uiDeviceSource].BMSMessageTimestamp = dTime; //time measured in seconds since device turned on
-
-                                                //calculate cumulative average for time between packets
-                                                modules[uiDeviceSource].AverageUpdateRate = (difference + modules[uiDeviceSource].UpdateRateCount * modules[uiDeviceSource].AverageUpdateRate) / (modules[uiDeviceSource].UpdateRateCount + 1);
-                                                modules[uiDeviceSource].UpdateRateCount++;
-
-                                                //modules[uiDeviceSource].AverageUpdateRate;
-                                                //modules[uiDeviceSource].PeakUpdateRate;
-
-                                                double[] CGV = new double[8];
-                                                CGV[0] = BitConverter.ToUInt16(managedArray, 6) * 0.0001;
-                                                CGV[1] = BitConverter.ToUInt16(managedArray, 8) * 0.0001;
-                                                CGV[2] = BitConverter.ToUInt16(managedArray, 10) * 0.0001;
-                                                CGV[3] = BitConverter.ToUInt16(managedArray, 14) * 0.0001;
-                                                CGV[4] = BitConverter.ToUInt16(managedArray, 16) * 0.0001;
-                                                CGV[5] = BitConverter.ToUInt16(managedArray, 18) * 0.0001;
-                                                CGV[6] = BitConverter.ToUInt16(managedArray, 22) * 0.0001;
-                                                CGV[7] = BitConverter.ToUInt16(managedArray, 24) * 0.0001;
-
-                                                modules[uiDeviceSource].CGV = CGV;
-
-                                                double[] CGDV = new double[8];
-                                                CGDV[0] = BitConverter.ToUInt16(managedArray, 46) * 0.0001;
-                                                CGDV[1] = BitConverter.ToUInt16(managedArray, 48) * 0.0001;
-                                                CGDV[2] = BitConverter.ToUInt16(managedArray, 50) * 0.0001;
-                                                CGDV[3] = BitConverter.ToUInt16(managedArray, 54) * 0.0001;
-                                                CGDV[4] = BitConverter.ToUInt16(managedArray, 56) * 0.0001;
-                                                CGDV[5] = BitConverter.ToUInt16(managedArray, 58) * 0.0001;
-                                                CGDV[6] = BitConverter.ToUInt16(managedArray, 62) * 0.0001;
-                                                CGDV[7] = BitConverter.ToUInt16(managedArray, 64) * 0.0001;
-
-                                                modules[uiDeviceSource].CGDV = CGDV;
-                                            }
-                                            else if (uiPacketID == 1)
-                                            {
-
-                                                byte[] managedArray = new byte[uiPayloadLength];
-                                                Marshal.Copy(ptr, managedArray, 0, uiPayloadLength);
-                                                /*
-                                                managedArray[0] = Marshal.ReadByte(ptr, 8);
-                                                managedArray[1] = Marshal.ReadByte(ptr, 9);
-                                                managedArray[2] = Marshal.ReadByte(ptr, 10);
-                                                managedArray[3] = Marshal.ReadByte(ptr, 11);
-                                                */
-
-                                                modules[uiDeviceSource].FillThermistorValues(managedArray.Skip(8).Take(4).ToArray());
-                                                modules[uiDeviceSource].Packet1 = managedArray;
-                                            }
+                                            modules[uiDeviceSource].UpdateData(managedArray, uiPacketID, dTime);
                                         }
                                         else
                                         {
@@ -936,29 +871,11 @@ namespace CSnet
                                         {
                                             // wBMS Packet Payload is located in the ExtraDataPtr
                                             IntPtr ptr = stMessages[lCount - 1].iExtraDataPtr;
-
-                                            // Copy each packet into the object arrays
                                             byte[] managedArray = new byte[uiPayloadLength];
                                             Marshal.Copy(ptr, managedArray, 0, uiPayloadLength);
 
-                                            managers[0].PMSPacket0 = managedArray;
-
-                                            if (uiPacketID == 0)
-                                            {
-                                                managers[0].I1 = BitConverter.ToUInt16(managedArray, 11);
-                                                managers[0].I2 = BitConverter.ToUInt16(managedArray, 13);
-                                                managers[0].VBAT = BitConverter.ToUInt16(managedArray, 15);
-                                                managers[0].AUX1 = BitConverter.ToUInt16(managedArray, 19);
-                                                managers[0].AUX2 = BitConverter.ToUInt16(managedArray, 27);
-                                                managers[0].AUX3 = BitConverter.ToUInt16(managedArray, 40);
-                                                managers[0].AUX4 = BitConverter.ToUInt16(managedArray, 48);
-                                                managers[0].AUX5 = BitConverter.ToUInt16(managedArray, 61);
-                                                managers[0].AUX6 = BitConverter.ToUInt16(managedArray, 69);
-                                            }
-                                            else if (uiPacketID == 2)
-                                            {
-                                                managers[0].AUX7 = BitConverter.ToUInt16(managedArray, 69); //TODO: check if we can look in a different packet for AUX values? They are different sometimes
-                                            }
+                                            //TODO: check that manager 0 is the primary manager
+                                            managers[0].UpdatePMSData(managedArray, uiPacketID);
                                         }
                                         else
                                         {
@@ -974,29 +891,10 @@ namespace CSnet
                                     {
                                         // wBMS Packet Payload is located in the ExtraDataPtr
                                         IntPtr ptr = stMessages[lCount - 1].iExtraDataPtr;
+                                        byte[] managedArray = new byte[uiPayloadLength];
+                                        Marshal.Copy(ptr, managedArray, 0, uiPayloadLength);
 
-                                        // Copy each packet into the object arrays
-
-                                        if (uiPacketID == 0)
-                                        {
-                                            byte[] managedArray = new byte[uiPayloadLength];
-                                            Marshal.Copy(ptr, managedArray, 0, uiPayloadLength);
-
-                                            //Debug.WriteLine($"EMS {managedArray[5]}");
-
-                                            managers[0].C1V = BitConverter.ToUInt16(managedArray, 6);
-                                            managers[0].G1V = BitConverter.ToUInt16(managedArray, 24); //TODO: check this is the correct offset, should it be 16?
-                                            managers[0].G2V = BitConverter.ToUInt16(managedArray, 26);
-                                            managers[0].G3V = BitConverter.ToUInt16(managedArray, 30);
-                                            managers[0].G4V = BitConverter.ToUInt16(managedArray, 32);
-                                            managers[0].G5V = BitConverter.ToUInt16(managedArray, 34);
-                                            managers[0].G6V = BitConverter.ToUInt16(managedArray, 38);
-                                            managers[0].G7V = BitConverter.ToUInt16(managedArray, 40);
-
-                                            managers[0].EMSPacket0 = managedArray;
-
-                                            managers[0].CD1V = BitConverter.ToUInt16(managedArray, 14);
-                                        }
+                                        managers[0].UpdateEMSData(managedArray, uiPacketID);
                                     }
                                     else
                                     {
@@ -1011,46 +909,24 @@ namespace CSnet
                                     {
                                         // wBMS Packet Payload is located in the ExtraDataPtr
                                         IntPtr ptr = stMessages[lCount - 1].iExtraDataPtr;
-
-                                        // Copy each packet into the object arrays
-
-                                        if (uiPacketID == 0)
-                                        {
-                                            byte[] managedArray = new byte[uiPayloadLength];
-                                            Marshal.Copy(ptr, managedArray, 0, uiPayloadLength);
-
-                                            modules[uiDeviceSource].Latency = BitConverter.ToUInt16(managedArray, 24);
-
-                                            byte RSSI = managedArray[31];
-                                            if (RSSI > modules[uiDeviceSource].PeakRSSI)
-                                            {
-                                                modules[uiDeviceSource].PeakRSSI = RSSI;
-                                            }
-                                            //TODO: also calculate average RSSI here & compare to health report packet ave RSSI, as seen below
-
-                                            break;
-                                        }
+                                        byte[] managedArray = new byte[uiPayloadLength];
+                                        Marshal.Copy(ptr, managedArray, 0, uiPayloadLength);
+                                        
+                                        modules[uiDeviceSource].UpdateMetadata(managedArray, uiPacketID);
                                     }
 
                                     break;
                                 case HEALTH_REPORTS_PACKET_TYPE:
                                     //Health Report
 
-                                    if (uiPayloadLength <= 514 && uiPayloadLength > 0)
+                                    if (uiPayloadLength <= 514 && uiPayloadLength > 0 && uiDeviceSource < 64)
                                     {
                                         // wBMS Packet Payload is located in the ExtraDataPtr
                                         IntPtr ptr = stMessages[lCount - 1].iExtraDataPtr;
+                                        byte[] managedArray = new byte[uiPayloadLength];
+                                        Marshal.Copy(ptr, managedArray, 0, uiPayloadLength);
 
-                                        // Copy each packet into the object arrays
-
-                                        if (uiPacketID == 1)
-                                        {
-                                            byte[] managedArray = new byte[uiPayloadLength];
-                                            Marshal.Copy(ptr, managedArray, 0, uiPayloadLength);
-
-                                            //Get average RSSI to manager 0
-                                            modules[uiDeviceSource].AverageRSSI = managedArray[1]; //TODO: make sure I'm checking the correct average RSSI
-                                        }
+                                        modules[uiDeviceSource].UpdateHealthdata(managedArray, uiPacketID);
                                     }
 
                                     break;
