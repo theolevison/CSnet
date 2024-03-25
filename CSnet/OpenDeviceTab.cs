@@ -619,7 +619,6 @@ namespace CSnet
             {
                 //read mac addresses from user input (Form 2) TODO: do some input validation
                 macAddresses[i] = MyINI.GetIniKeyValueForStr("macAddress", $"{i+1}", Application.StartupPath + "\\config.ini");
-                //macAddresses[i] = macAddresses[i].Trim();
             }
 
             byte function = ADI_WIL_API_SET_ACL;
