@@ -55,6 +55,37 @@ namespace CSnet
             return doubleArray1;
         }
 
+        public static int DoubleToInt(double Double)
+        {
+
+            //byte[] byteArray = new byte[doubleArray.Length * sizeof(double)];
+            // Buffer.BlockCopy(doubleArray, 0, byteArray, 0, byteArray.Length);
+            //return byteArray;
+            int Int;
+            if (Double > 10000)
+                Int = (int)(Double);
+            else if (Double < 1000)
+                Int = (int)(Double * 100);
+            else
+                Int = (int)(Double);
+
+
+            return Int;
+        }
+
+        //新增最大值最小值平均值的计算
+        public static double[] calulate(double[] voltage)
+        {
+            double[] numbers = new double[3];
+
+            numbers[0] = voltage.Min();
+            numbers[1] = voltage.Max();
+            numbers[2] = voltage.Average();
+
+
+            return numbers;
+        }
+
         public static string packVersion = "";
     }
 }

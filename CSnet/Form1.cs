@@ -112,7 +112,7 @@ namespace CSnet
         private void CmdOpenDevices_Click(object sender, EventArgs e)
         {
             int iResult;
-            NeoDeviceEx[] ndNeoToOpenex = new NeoDeviceEx[16];	//Struct holding detected hardware information
+            NeoDeviceEx[] ndNeoToOpenex = new NeoDeviceEx[16];	//Struct holding detected hardware information, TODO: this is limiting us to 16 devices
             OptionsOpenNeoEx OptionOpenNeoEX = new OptionsOpenNeoEx();
             byte[] bNetwork = new byte[255];    //List of hardware IDs
             int iNumberOfDevices;   //Number of hardware devices to look for 
@@ -221,11 +221,11 @@ namespace CSnet
             //Add the version number to the title of the application.  
             try
             {
-                this.Text = "ICS API Example API Version " + Convert.ToString(icsNeoDll.icsneoGetDLLVersion());
+                this.Text = "ADI box communication, API Version " + Convert.ToString(icsNeoDll.icsneoGetDLLVersion());
             }
             catch
             {
-                this.Text = "ICS API Example, DLL Missing or Not Accessable";
+                this.Text = "DLL Missing or Not Accessable";
             }
         }
 
@@ -237,6 +237,12 @@ namespace CSnet
         private const byte ModuleVersion = 4;
         private const byte PackVersion = 5;
         private const byte DiagnosticVoltage = 6;
+        private const byte Latency = 7;
+        private const byte TotalPECErrors = 8;
+        private const byte AverageUpdateRate = 9;
+        private const byte PeakUpdateRate = 10;
+        private const byte AverageRSSI = 11;
+        private const byte PeakRSSI = 12;
 
         private void UDPListener()
         {
@@ -274,7 +280,7 @@ namespace CSnet
                         OpenDeviceTab uc1 = (OpenDeviceTab)tabPage.Controls[0];
 
                         //check serial number against request                        
-                        if (uc1.Name == "BS0226")//TODO: actually parse serial number
+                        if (uc1.Name != "")//TODO: actually parse serial number
                         {
                             if (data[1] == BMSPACKET)
                             {
@@ -339,15 +345,18 @@ namespace CSnet
                             {
 
 
-                                byte[] tempPacket = BitConverter.GetBytes(uc1.managers[0].G1V)
-                                    .Concat(BitConverter.GetBytes(uc1.managers[0].G2V))
-                                    .Concat(BitConverter.GetBytes(uc1.managers[0].G3V))
-                                    .Concat(BitConverter.GetBytes(uc1.managers[0].G4V))
-                                    .Concat(BitConverter.GetBytes(uc1.managers[0].G5V))
-                                    .Concat(BitConverter.GetBytes(uc1.managers[0].G6V))
-                                    .Concat(BitConverter.GetBytes(uc1.managers[0].G7V))
-                                    //.Concat(BitConverter.GetBytes(uc1.managers[0].GetBEVDCFCMinus()))
-                                    .ToArray();
+                                byte[] tempPacket = BitConverter.GetBytes(uc1.managers[0].CD1V)
+                                      .Concat(BitConverter.GetBytes(uconst.DoubleToInt(uc1.managers[0].EMSReferenceVoltage1())))
+                                      .Concat(BitConverter.GetBytes(uconst.DoubleToInt(uc1.managers[0].EMSReferenceVoltage2())))
+                                      .Concat(BitConverter.GetBytes(uconst.DoubleToInt(uc1.managers[0].EMSTemperature1())))
+                                      .Concat(BitConverter.GetBytes(uconst.DoubleToInt(uc1.managers[0].EMSTemperature2())))
+                                      .Concat(BitConverter.GetBytes(uconst.DoubleToInt(uc1.managers[0].EMSPressure1())))
+                                      .Concat(BitConverter.GetBytes(uconst.DoubleToInt(uc1.managers[0].EMSPressure2())))
+                                      .Concat(BitConverter.GetBytes(uconst.DoubleToInt(uc1.managers[0].EMSGas1())))
+                                      .Concat(BitConverter.GetBytes(uconst.DoubleToInt(uc1.managers[0].EMSGas2())))
+
+                                      //.Concat(BitConverter.GetBytes(uc1.managers[0].GetBEVDCFCMinus()))
+                                      .ToArray();
 
                                 server.SendTo(tempPacket, remoteEnd);
                             }
@@ -374,6 +383,48 @@ namespace CSnet
                                 int[] data1 = uconst.DoubleArrayToIntArray(uc1.modules[data[2]].CGDV);
                                 byte[] CGDV1 = uconst.IntArrayToByteArray(data1);
                                 server.SendTo(CGDV1, remoteEnd);
+                            }
+                            else if (data[1] == Latency)
+                            {
+                                //                         private const byte Latency = 7;
+                                //private const byte TotalPECErrors = 8;
+                                //private const byte AverageUpdateRate = 9;
+                                //private const byte PeakUpdateRate = 10;
+                                //private const byte AverageRSSI = 11;
+                                //private const byte PeakRSSI = 12;
+                                int data1 = uc1.modules[data[2]].Latency;
+                                byte[] latency = BitConverter.GetBytes(data1);
+                                server.SendTo(latency, remoteEnd);
+                            }
+                            else if (data[1] == TotalPECErrors)
+                            {
+                                int data1 = uc1.modules[data[2]].TotalPECErrors;
+                                byte[] latency = BitConverter.GetBytes(data1);
+                                server.SendTo(latency, remoteEnd);
+                            }
+                            else if (data[1] == AverageUpdateRate)
+                            {
+                                double data1 = uc1.modules[data[2]].AverageUpdateRate;
+                                byte[] latency = BitConverter.GetBytes(data1);
+                                server.SendTo(latency, remoteEnd);
+                            }
+                            else if (data[1] == PeakUpdateRate)
+                            {
+                                double data1 = uc1.modules[data[2]].PeakUpdateRate;
+                                byte[] latency = BitConverter.GetBytes(data1);
+                                server.SendTo(latency, remoteEnd);
+                            }
+                            else if (data[1] == AverageRSSI)
+                            {
+                                int data1 = uc1.modules[data[2]].AverageRSSI;
+                                byte[] latency = BitConverter.GetBytes(data1);
+                                server.SendTo(latency, remoteEnd);
+                            }
+                            else if (data[1] == PeakRSSI)
+                            {
+                                int data1 = uc1.modules[data[2]].PeakRSSI;
+                                byte[] latency = BitConverter.GetBytes(data1);
+                                server.SendTo(latency, remoteEnd);
                             }
                             else
                             {

@@ -341,9 +341,8 @@ namespace CSnet
                 //finished or in progress, either way read the latest offset
                 uint uReturnedDataLength;
 
-
                 iResult = icsNeoDll.icsneoGenericAPIReadData(m_hObject, uAPISelected, uInstanceSelected, out uCurrentFunction, Marshal.UnsafeAddrOfPinnedArrayElement(pReturnedData, 0), out uReturnedDataLength);
-
+                                
                 if (uCurrentFunction != uFunctionSelected || iResult != 1) //1 is success
                 {
                     // Handle Error Here
@@ -484,26 +483,8 @@ namespace CSnet
 
             SendGenericCommand(function, parameters);
 
-            byte uAPISelected, uInstanceSelected, uCurrentFunction;
-            byte[] pReturnedData = new byte[512];
+            adi_wil_dev_version_t version = (adi_wil_dev_version_t)Marshal.PtrToStructure(ReadGenericCommand(function), typeof(adi_wil_dev_version_t));
 
-            uint uReturnedDataLength;
-            //adi_wil_dev_version_t version = new adi_wil_dev_version_t();
-
-            uAPISelected = 1;
-            uInstanceSelected = 0;
-
-            //TODO: Template Method pattern
-
-            int iResult = icsNeoDll.icsneoGenericAPIReadData(m_hObject, uAPISelected, uInstanceSelected, out uCurrentFunction, Marshal.UnsafeAddrOfPinnedArrayElement(pReturnedData, 0), out uReturnedDataLength);
-            adi_wil_dev_version_t version = (adi_wil_dev_version_t)Marshal.PtrToStructure(Marshal.UnsafeAddrOfPinnedArrayElement(pReturnedData, 0), typeof(adi_wil_dev_version_t));
-
-            if (uCurrentFunction != function || iResult != 1) //1 is success
-            {
-                // Handle Error Here
-                MessageBox.Show($"Read error {iResult}");
-                return 0;
-            }
             string temp = "";
             parameters.ToList().ForEach(x => temp += x);
             Debug.WriteLine($"node {deviceID} {temp} version: {version.MainProcSWVersion.iVersionMajor}.{version.MainProcSWVersion.iVersionMinor}.{version.MainProcSWVersion.iVersionPatch}");
@@ -565,25 +546,8 @@ namespace CSnet
             parameters[8] = Convert.ToByte(adi_wil_contextual_id_t.ADI_WIL_CONTEXTUAL_ID_0);
 
             SendGenericCommand(function, parameters);
-
-            byte uAPISelected, uInstanceSelected, uCurrentFunction;
-            byte[] pReturnedData = new byte[512];
-
-            uint uReturnedDataLength;
-            //adi_wil_dev_version_t version = new adi_wil_dev_version_t();
-
-            uAPISelected = 1;
-            uInstanceSelected = 0;
-
-            int iResult = icsNeoDll.icsneoGenericAPIReadData(m_hObject, uAPISelected, uInstanceSelected, out uCurrentFunction, Marshal.UnsafeAddrOfPinnedArrayElement(pReturnedData, 0), out uReturnedDataLength);
-            adi_wil_contextual_data_t contextualData = (adi_wil_contextual_data_t)Marshal.PtrToStructure(Marshal.UnsafeAddrOfPinnedArrayElement(pReturnedData, 0), typeof(adi_wil_contextual_data_t));
-
-            if (uCurrentFunction != function || iResult != 1) //1 is success
-            {
-                //Handle Error Here
-                MessageBox.Show($"Read error {iResult}");
-                return;
-            }
+            
+            adi_wil_contextual_data_t contextualData = (adi_wil_contextual_data_t)Marshal.PtrToStructure(ReadGenericCommand(function), typeof(adi_wil_contextual_data_t));
 
             Debug.WriteLine(contextualData.iLength);
 
@@ -594,6 +558,27 @@ namespace CSnet
             GetMessages_Click(ButtonGetMessages, null);
         }
 
+        private IntPtr ReadGenericCommand(byte function)
+        {
+            byte uAPISelected, uInstanceSelected, uCurrentFunction;
+            byte[] pReturnedData = new byte[512];
+
+            uint uReturnedDataLength;
+            //adi_wil_dev_version_t version = new adi_wil_dev_version_t();
+
+            uAPISelected = 1;
+            uInstanceSelected = 0;
+
+            int iResult = icsNeoDll.icsneoGenericAPIReadData(m_hObject, uAPISelected, uInstanceSelected, out uCurrentFunction, Marshal.UnsafeAddrOfPinnedArrayElement(pReturnedData, 0), out uReturnedDataLength);
+            
+            if (uCurrentFunction != function || iResult != 1) //1 is success
+            {
+                //Handle Error Here
+                MessageBox.Show($"Read error {iResult}");
+            }
+
+            return Marshal.UnsafeAddrOfPinnedArrayElement(pReturnedData, 0);
+        }
         private void SendGenericCommand(byte function, byte[] parameters)
         {
             byte functionError = 0;
@@ -700,39 +685,24 @@ namespace CSnet
 
             SendGenericCommand(function, new byte[0]);
 
-            byte uAPISelected, uInstanceSelected, uFunctionError, uCurrentFunction;
-            byte[] pReturnedData = new byte[ADI_WIL_MAC_SIZE * ADI_WIL_MAX_NODES + 1];
+            byte[] returnedData = new byte[ADI_WIL_MAC_SIZE * ADI_WIL_MAX_NODES + 1];
 
-            uint uReturnedDataLength;
+            Marshal.Copy(ReadGenericCommand(function), returnedData, 0, returnedData.Length);
 
-            uAPISelected = 1;
-            uInstanceSelected = 0;
+            byte uNodeCount = returnedData[ADI_WIL_MAC_SIZE * ADI_WIL_MAX_NODES];
 
-            int iResult = icsNeoDll.icsneoGenericAPIReadData(m_hObject, uAPISelected, uInstanceSelected, out uCurrentFunction, Marshal.UnsafeAddrOfPinnedArrayElement(pReturnedData, 0), out uReturnedDataLength);
-
-            if (uCurrentFunction != function || iResult != 1) //1 is success
+            for (int i = 0; i < uNodeCount; i++)
             {
-                MessageBox.Show($"Read error {iResult}");
-                return;
-            }
-
-            if (uReturnedDataLength > 0)
-            {
-                byte uNodeCount = pReturnedData[ADI_WIL_MAC_SIZE * ADI_WIL_MAX_NODES];
-
-                for (int i = 0; i < uNodeCount; i++)
+                byte[] byteMacAddress = new byte[ADI_WIL_MAC_SIZE];
+                Buffer.BlockCopy(returnedData, i * ADI_WIL_MAC_SIZE, byteMacAddress, 0, ADI_WIL_MAC_SIZE);
+                string stringMacAddress = "";
+                foreach (byte x in byteMacAddress)
                 {
-                    byte[] byteMacAddress = new byte[ADI_WIL_MAC_SIZE];
-                    Buffer.BlockCopy(pReturnedData, i * ADI_WIL_MAC_SIZE, byteMacAddress, 0, ADI_WIL_MAC_SIZE);
-                    string stringMacAddress = "";
-                    foreach (byte x in byteMacAddress)
-                    {
-                        stringMacAddress += $"{x:X2}";
-                    }
-                    if (!nodeMacAddresses.ContainsKey(i))
-                    {
-                        nodeMacAddresses.Add(i, stringMacAddress);
-                    }
+                    stringMacAddress += $"{x:X2}";
+                }
+                if (!nodeMacAddresses.ContainsKey(i))
+                {
+                    nodeMacAddresses.Add(i, stringMacAddress);
                 }
             }
         }
@@ -777,16 +747,11 @@ namespace CSnet
             // was the read successful?
             if (lResult == 1)
             {
-                // clear the previous list of messages
-                lstMessage.Items.Clear();
-                PMSBox.Items.Clear();
-                EMSBox.Items.Clear();
                 lblReadCount.Text = "Number Read : " + Convert.ToString(lNumberOfMessages);
                 lblReadErrors.Text = "Number Errors : " + Convert.ToString(lNumberOfErrors);
                 // for each message we read
                 for (lCount = 1; lCount <= lNumberOfMessages; lCount++)
                 {
-                    // Calculate the messages timestamp in seconds
                     lResult = icsNeoDll.icsneoGetTimeStampForMsg(m_hObject, ref stMessages[lCount - 1], ref dTime);
 
                     //Decode based on the protocol
@@ -795,7 +760,6 @@ namespace CSnet
                         case (int)ePROTOCOL.SPY_PROTOCOL_WBMS:
                             //this is the only protocol we care about
 
-                            //translate data from raw form, to data we can use
                             int iNetId = (stMessages[lCount - 1].NetworkID2 << 8) | stMessages[lCount - 1].NetworkID;
 
                             if (iNetId == 532)
@@ -810,29 +774,6 @@ namespace CSnet
                             uint uiPacketType = GetPacketTypeFromArbId((uint)stMessages[lCount - 1].ArbIDOrHeader);
                             uint uiPacketID = GetPacketIdFromArbId((uint)stMessages[lCount - 1].ArbIDOrHeader);
                             uint uiDeviceSource = GetSourceFromArbId((uint)stMessages[lCount - 1].ArbIDOrHeader);
-
-                            //Debug.WriteLine($" {uiPacketType} {uiPacketID} {uiDeviceSource} ");
-
-                            if (0 <= uiDeviceSource && uiDeviceSource < MAX_NODES)
-                            {
-                                //Module
-                            }
-                            else if (uiDeviceSource == MANAGER_0_ID || uiDeviceSource == MANAGER_1_ID)
-                            {
-                                //Manager
-                            }
-                            else if (uiDeviceSource == SOURCE_WIL)
-                            {
-                                //WIL
-                            }
-                            else if (uiDeviceSource == SOURCE_HOST)
-                            {
-                                //HOST
-                            }
-                            else
-                            {
-                                //Unknown
-                            }
 
                             // Combine the wBMS message together
                             int uiPayloadLength = (stMessages[lCount - 1].NumberBytesHeader << 8) | stMessages[lCount - 1].NumberBytesData;
@@ -925,6 +866,11 @@ namespace CSnet
 
         private void OutputData()
         {
+            // clear the previous list of messages
+            lstMessage.Items.Clear();
+            PMSBox.Items.Clear();
+            EMSBox.Items.Clear();
+
             string outputText = "";
 
             //iterate through each node, printing the latest packet in the requested format
@@ -1053,6 +999,8 @@ namespace CSnet
             {
                 modules[i].version = DeviceFirmwareVersion(i);
             }
+            managers[0].Version = DeviceFirmwareVersion(62); //afaik, manager 0 is always the primary manager, responsible for EMS & PMS
+            //managers[1].Version = DeviceFirmwareVersion(63); //this should throw an error if the pack is BEV & only has one manager
         }
 
         private void Config_Click(object sender, EventArgs e)
