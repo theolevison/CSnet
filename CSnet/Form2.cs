@@ -61,8 +61,6 @@ namespace CSnet
 
         private void button1_Click(object sender, EventArgs e)
         {
-
-
             MyINI.WritePrivateProfileString("macAddress", "1", textBox1.Text, Application.StartupPath + "\\config.ini");
             MyINI.WritePrivateProfileString("macAddress", "2", textBox2.Text, Application.StartupPath + "\\config.ini");
             MyINI.WritePrivateProfileString("macAddress", "3", textBox3.Text, Application.StartupPath + "\\config.ini");
@@ -86,11 +84,5 @@ namespace CSnet
             // Process.GetCurrentProcess().Kill();
            // Application.Exit();
         }
-
-
-
-
-
-
     }
 }

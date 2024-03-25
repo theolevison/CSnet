@@ -174,11 +174,8 @@ namespace CSnet
 
         public bool chkHexFormat = false;
 
-        private byte[] sListStringV1 = new byte[128]; //Node1 00数据
-        private byte[] sListStringV2 = new byte[128]; //Node2 00数据
-
         public IntPtr m_hObject;		 //handle for device
-        bool m_bPortOpen;	 //tells the port status of the device
+    
         icsSpyMessage[] stMessages = new icsSpyMessage[20000];   //TempSpace for messages
         private byte currentMode = ADI_WIL_MODE_STANDBY;
 
@@ -205,7 +202,6 @@ namespace CSnet
         public OpenDeviceTab(ref IntPtr obj)
         {
             m_hObject = obj;
-            m_bPortOpen = true;
 
             managers[0] = new ManagerData();
             managers[1] = new ManagerData();
@@ -440,7 +436,6 @@ namespace CSnet
                     return false;
                 }
 
-
                 // wBMS Packet Payload is located in the ExtraDataPtr
                 IntPtr ptr = fileChunk.pData;
                 Debug.WriteLine(fileChunk.pData);
@@ -471,8 +466,6 @@ namespace CSnet
             byte function = ADI_WIL_API_SET_GPIO; // adi_wil_SetMode ADI_WIL_API_SET_MODE = 4;
             byte[] parameters = new byte[512];
 
-
-            //little endian?
             BitConverter.GetBytes(manager).CopyTo(parameters, 0);
             //parameters[0] = ADI_WIL_DEV_MANAGER_0; //target first manager //64 or 65
             parameters[8] = 4; // pin 9
@@ -486,45 +479,6 @@ namespace CSnet
             }
 
             /*
-            //read GPIO to check it was done successfully 
-            function = ADI_WIL_API_GET_GPIO;
-
-            BitConverter.GetBytes(ADI_WIL_DEV_MANAGER_0).CopyTo(parameters, 0);
-            //parameters[0] = ADI_WIL_DEV_MANAGER_0; //target first manager //64 or 65
-            parameters[8] = 4; // pin 9
-                               //parameters[9] = 1; // set to high
-
-
-            iResult = icsNeoDll.icsneoGenericAPISendCommand(m_hObject, 1, 0, function, Marshal.UnsafeAddrOfPinnedArrayElement(parameters, 0), 9, out functionError);
-
-            if (!checkStatus(1, 0, function) || iResult != 1)
-            {
-                MessageBox.Show("GPIO error");
-            }
-
-            byte uAPISelected, uInstanceSelected, uFunctionError, uCurrentFunction, uNodeCount;
-            byte[] pReturnedData = new byte[512];
-            pReturnedData[0] = 4;
-
-            uint uParametersLength, uReturnedDataLength;
-            //adi_wil_dev_version_t version = new adi_wil_dev_version_t();
-
-            uAPISelected = 1;
-            uInstanceSelected = 0;
-
-            iResult = icsNeoDll.icsneoGenericAPIReadData(m_hObject, uAPISelected, uInstanceSelected, out uCurrentFunction, Marshal.UnsafeAddrOfPinnedArrayElement(pReturnedData, 0), out uReturnedDataLength);
-
-            if (uCurrentFunction != function || iResult != 1) //1 is success
-            {
-                // Handle Error Here
-                MessageBox.Show($"Read error {iResult}");
-                return;
-            }
-
-            
-            Debug.WriteLine($"GPIO pin output: {BitConverter.ToUInt64(pReturnedData, 0)}");
-
-            
                 The GPIO pin on the target device is set to be an output pin before its value is set. 
                 Note that the GPIO pin is set to output mode only, therefore it cannot be set to a value 
                 then re-read back by using adi_wil_GetGPIO since adi_wil_GetGPIO will reconfigure the pin 
@@ -593,7 +547,7 @@ namespace CSnet
 
             if (!checkStatus(1, 0, function) || iResult != 1)
             {
-                Debug.WriteLine($"Find version check status error");
+                
                 MessageBox.Show("Find version error");
             }
 
@@ -679,31 +633,21 @@ namespace CSnet
         }
         private void Timer1_Tick(object sender, EventArgs e)
         {
-            CmdReceive_Click(cmdReceive, null);
+            CmdReceive_Click(ButtonGetMessages, null);
         }
 
-        private void button4_Click(object sender, EventArgs e)
+        private void setACL_Click(object sender, EventArgs e)
         {
-            //Get ACL flash
-            string Addr1 = MyINI.GetIniKeyValueForStr("macAddress", "1", Application.StartupPath + "\\config.ini");
-            string Addr2 = MyINI.GetIniKeyValueForStr("macAddress", "2", Application.StartupPath + "\\config.ini");
-            string Addr3 = MyINI.GetIniKeyValueForStr("macAddress", "3", Application.StartupPath + "\\config.ini");
-            string Addr4 = MyINI.GetIniKeyValueForStr("macAddress", "4", Application.StartupPath + "\\config.ini");
-            string Addr5 = MyINI.GetIniKeyValueForStr("macAddress", "5", Application.StartupPath + "\\config.ini");
-            string Addr6 = MyINI.GetIniKeyValueForStr("macAddress", "6", Application.StartupPath + "\\config.ini");
-            string Addr7 = MyINI.GetIniKeyValueForStr("macAddress", "7", Application.StartupPath + "\\config.ini");
-            string Addr8 = MyINI.GetIniKeyValueForStr("macAddress", "8", Application.StartupPath + "\\config.ini");
-            string Addr9 = MyINI.GetIniKeyValueForStr("macAddress", "9", Application.StartupPath + "\\config.ini");
-            string Addr10 = MyINI.GetIniKeyValueForStr("macAddress", "10", Application.StartupPath + "\\config.ini");
-            string Addr11 = MyINI.GetIniKeyValueForStr("macAddress", "11", Application.StartupPath + "\\config.ini");
-            string Addr12 = MyINI.GetIniKeyValueForStr("macAddress", "12", Application.StartupPath + "\\config.ini");
-            string Addr13 = MyINI.GetIniKeyValueForStr("macAddress", "13", Application.StartupPath + "\\config.ini");
-            string Addr14 = MyINI.GetIniKeyValueForStr("macAddress", "14", Application.StartupPath + "\\config.ini");
-            string Addr15 = MyINI.GetIniKeyValueForStr("macAddress", "15", Application.StartupPath + "\\config.ini");
-            string Addr16 = MyINI.GetIniKeyValueForStr("macAddress", "16", Application.StartupPath + "\\config.ini");
-            int iResult;
-            int iTimeOutCounter = 0;
-            byte uAPISelected, uInstanceSelected, uFunctionSelected, uFunctionError, uCallbackError = 1, uCurrentFunction, uFinishedProcessing;
+            string[] macAddresses = new string[16];
+
+            for(int i =0; i < 16; i++)
+            {
+                //read mac addresses from user input (Form 2) TODO: do some input validation
+                macAddresses[i] = MyINI.GetIniKeyValueForStr("macAddress", $"{i+1}", Application.StartupPath + "\\config.ini");
+                //macAddresses[i] = macAddresses[i].Trim();
+            }
+
+            byte uAPISelected, uInstanceSelected, uFunctionSelected, uFunctionError;
             byte[] pParameters = new byte[512];
             uint uTotalLength;
             uAPISelected = 1;
@@ -711,492 +655,32 @@ namespace CSnet
             uFunctionSelected = ADI_WIL_API_SET_ACL;
             byte uNodeCount = 16;
 
-            //set 
-            UInt64[] address1_1 = strToToHexByte(Addr1.Substring(0, 2));
-            UInt64[] address1_2 = strToToHexByte(Addr1.Substring(2, 2));
-            UInt64[] address1_3 = strToToHexByte(Addr1.Substring(4, 2));
+            List<byte> ACLList = new List<byte>();
 
-            UInt64[] address2_1 = strToToHexByte(Addr2.Substring(0, 2));
-            UInt64[] address2_2 = strToToHexByte(Addr2.Substring(2, 2));
-            UInt64[] address2_3 = strToToHexByte(Addr2.Substring(4, 2));
-
-            UInt64[] address3_1 = strToToHexByte(Addr3.Substring(0, 2));
-            UInt64[] address3_2 = strToToHexByte(Addr3.Substring(2, 2));
-            UInt64[] address3_3 = strToToHexByte(Addr3.Substring(4, 2));
-
-            UInt64[] address4_1 = strToToHexByte(Addr4.Substring(0, 2));
-            UInt64[] address4_2 = strToToHexByte(Addr4.Substring(2, 2));
-            UInt64[] address4_3 = strToToHexByte(Addr4.Substring(4, 2));
-
-            UInt64[] address5_1 = strToToHexByte(Addr5.Substring(0, 2));
-            UInt64[] address5_2 = strToToHexByte(Addr5.Substring(2, 2));
-            UInt64[] address5_3 = strToToHexByte(Addr5.Substring(4, 2));
-
-            UInt64[] address6_1 = strToToHexByte(Addr6.Substring(0, 2));
-            UInt64[] address6_2 = strToToHexByte(Addr6.Substring(2, 2));
-            UInt64[] address6_3 = strToToHexByte(Addr6.Substring(4, 2));
-
-            UInt64[] address7_1 = strToToHexByte(Addr7.Substring(0, 2));
-            UInt64[] address7_2 = strToToHexByte(Addr7.Substring(2, 2));
-            UInt64[] address7_3 = strToToHexByte(Addr7.Substring(4, 2));
-
-            UInt64[] address8_1 = strToToHexByte(Addr8.Substring(0, 2));
-            UInt64[] address8_2 = strToToHexByte(Addr8.Substring(2, 2));
-            UInt64[] address8_3 = strToToHexByte(Addr8.Substring(4, 2));
-
-            UInt64[] address9_1 = strToToHexByte(Addr9.Substring(0, 2));
-            UInt64[] address9_2 = strToToHexByte(Addr9.Substring(2, 2));
-            UInt64[] address9_3 = strToToHexByte(Addr9.Substring(4, 2));
-
-            UInt64[] address10_1 = strToToHexByte(Addr10.Substring(0, 2));
-            UInt64[] address10_2 = strToToHexByte(Addr10.Substring(2, 2));
-            UInt64[] address10_3 = strToToHexByte(Addr10.Substring(4, 2));
-
-            UInt64[] address11_1 = strToToHexByte(Addr11.Substring(0, 2));
-            UInt64[] address11_2 = strToToHexByte(Addr11.Substring(2, 2));
-            UInt64[] address11_3 = strToToHexByte(Addr11.Substring(4, 2));
-
-            UInt64[] address12_1 = strToToHexByte(Addr12.Substring(0, 2));
-            UInt64[] address12_2 = strToToHexByte(Addr12.Substring(2, 2));
-            UInt64[] address12_3 = strToToHexByte(Addr12.Substring(4, 2));
-
-            UInt64[] address13_1 = strToToHexByte(Addr13.Substring(0, 2));
-            UInt64[] address13_2 = strToToHexByte(Addr13.Substring(2, 2));
-            UInt64[] address13_3 = strToToHexByte(Addr13.Substring(4, 2));
-
-            UInt64[] address14_1 = strToToHexByte(Addr14.Substring(0, 2));
-            UInt64[] address14_2 = strToToHexByte(Addr14.Substring(2, 2));
-            UInt64[] address14_3 = strToToHexByte(Addr14.Substring(4, 2));
-
-            UInt64[] address15_1 = strToToHexByte(Addr15.Substring(0, 2));
-            UInt64[] address15_2 = strToToHexByte(Addr15.Substring(2, 2));
-            UInt64[] address15_3 = strToToHexByte(Addr15.Substring(4, 2));
-
-            UInt64[] address16_1 = strToToHexByte(Addr16.Substring(0, 2));
-            UInt64[] address16_2 = strToToHexByte(Addr16.Substring(2, 2));
-            UInt64[] address16_3 = strToToHexByte(Addr16.Substring(4, 2));
-
-            //set int[] to string
-            string strAddr1_1 = "";
-            string strAddr1_2 = "";
-            string strAddr1_3 = "";
-
-            for (int i = 0; i < address1_1.Length; i++)
+            //construct the list of mac addresses
+            for (int i = 0; i < 16; i++)
             {
-                strAddr1_1 += address1_1[i].ToString();
+                ACLList.AddRange(new byte[] { 0x64, 0xF9, 0xC0, 0x00, 0x00, Convert.ToByte(macAddresses[i].Substring(0, 2), 16) , Convert.ToByte(macAddresses[i].Substring(2, 2), 16) , Convert.ToByte(macAddresses[i].Substring(4, 2), 16) });
             }
-            byte A1_1 = byte.Parse(strAddr1_1);
 
-            for (int i = 0; i < address1_2.Length; i++)
-            {
-                strAddr1_2 += address1_2[i].ToString();
-            }
-            byte A1_2 = byte.Parse(strAddr1_2);
+            byte[] pACLArray = ACLList.ToArray();
 
-            for (int i = 0; i < address1_3.Length; i++)
-            {
-                strAddr1_3 += address1_3[i].ToString();
-            }
-            byte A1_3 = byte.Parse(strAddr1_3);
+            setMode(ADI_WIL_MODE_STANDBY);
 
-            string strAddr2_1 = "";
-            string strAddr2_2 = "";
-            string strAddr2_3 = "";
-
-            for (int i = 0; i < address2_1.Length; i++)
-            {
-                strAddr2_1 += address2_1[i].ToString();
-            }
-            byte A2_1 = byte.Parse(strAddr2_1);
-
-            for (int i = 0; i < address2_2.Length; i++)
-            {
-                strAddr2_2 += address2_2[i].ToString();
-            }
-            byte A2_2 = byte.Parse(strAddr2_2);
-
-            for (int i = 0; i < address2_3.Length; i++)
-            {
-                strAddr2_3 += address2_3[i].ToString();
-            }
-            byte A2_3 = byte.Parse(strAddr2_3);
-
-            string strAddr3_1 = "";
-            string strAddr3_2 = "";
-            string strAddr3_3 = "";
-
-            for (int i = 0; i < address3_1.Length; i++)
-            {
-                strAddr3_1 += address3_1[i].ToString();
-            }
-            byte A3_1 = byte.Parse(strAddr3_1);
-
-            for (int i = 0; i < address3_2.Length; i++)
-            {
-                strAddr3_2 += address3_2[i].ToString();
-            }
-            byte A3_2 = byte.Parse(strAddr3_2);
-
-            for (int i = 0; i < address3_3.Length; i++)
-            {
-                strAddr3_3 += address3_3[i].ToString();
-            }
-            byte A3_3 = byte.Parse(strAddr3_3);
-
-            string strAddr4_1 = "";
-            string strAddr4_2 = "";
-            string strAddr4_3 = "";
-
-            for (int i = 0; i < address4_1.Length; i++)
-            {
-                strAddr4_1 += address4_1[i].ToString();
-            }
-            byte A4_1 = byte.Parse(strAddr4_1);
-
-            for (int i = 0; i < address4_2.Length; i++)
-            {
-                strAddr4_2 += address4_2[i].ToString();
-            }
-            byte A4_2 = byte.Parse(strAddr4_2);
-
-            for (int i = 0; i < address4_3.Length; i++)
-            {
-                strAddr4_3 += address4_3[i].ToString();
-            }
-            byte A4_3 = byte.Parse(strAddr4_3);
-
-            string strAddr5_1 = "";
-            string strAddr5_2 = "";
-            string strAddr5_3 = "";
-
-            for (int i = 0; i < address5_1.Length; i++)
-            {
-                strAddr5_1 += address5_1[i].ToString();
-            }
-            byte A5_1 = byte.Parse(strAddr5_1);
-
-            for (int i = 0; i < address5_2.Length; i++)
-            {
-                strAddr5_2 += address5_2[i].ToString();
-            }
-            byte A5_2 = byte.Parse(strAddr5_2);
-
-            for (int i = 0; i < address5_3.Length; i++)
-            {
-                strAddr5_3 += address5_3[i].ToString();
-            }
-            byte A5_3 = byte.Parse(strAddr5_3);
-
-
-            string strAddr6_1 = "";
-            string strAddr6_2 = "";
-            string strAddr6_3 = "";
-
-            for (int i = 0; i < address6_1.Length; i++)
-            {
-                strAddr6_1 += address6_1[i].ToString();
-            }
-            byte A6_1 = byte.Parse(strAddr6_1);
-
-            for (int i = 0; i < address6_2.Length; i++)
-            {
-                strAddr6_2 += address6_2[i].ToString();
-            }
-            byte A6_2 = byte.Parse(strAddr6_2);
-
-            for (int i = 0; i < address6_3.Length; i++)
-            {
-                strAddr6_3 += address6_3[i].ToString();
-            }
-            byte A6_3 = byte.Parse(strAddr6_3);
-
-            string strAddr7_1 = "";
-            string strAddr7_2 = "";
-            string strAddr7_3 = "";
-
-            for (int i = 0; i < address7_1.Length; i++)
-            {
-                strAddr7_1 += address7_1[i].ToString();
-            }
-            byte A7_1 = byte.Parse(strAddr7_1);
-
-            for (int i = 0; i < address7_2.Length; i++)
-            {
-                strAddr7_2 += address7_2[i].ToString();
-            }
-            byte A7_2 = byte.Parse(strAddr7_2);
-
-            for (int i = 0; i < address7_3.Length; i++)
-            {
-                strAddr7_3 += address7_3[i].ToString();
-            }
-            byte A7_3 = byte.Parse(strAddr7_3);
-
-            string strAddr8_1 = "";
-            string strAddr8_2 = "";
-            string strAddr8_3 = "";
-
-            for (int i = 0; i < address8_1.Length; i++)
-            {
-                strAddr8_1 += address8_1[i].ToString();
-            }
-            byte A8_1 = byte.Parse(strAddr8_1);
-
-            for (int i = 0; i < address8_2.Length; i++)
-            {
-                strAddr8_2 += address8_2[i].ToString();
-            }
-            byte A8_2 = byte.Parse(strAddr8_2);
-
-            for (int i = 0; i < address8_3.Length; i++)
-            {
-                strAddr8_3 += address8_3[i].ToString();
-            }
-            byte A8_3 = byte.Parse(strAddr8_3);
-
-            string strAddr9_1 = "";
-            string strAddr9_2 = "";
-            string strAddr9_3 = "";
-
-            for (int i = 0; i < address9_1.Length; i++)
-            {
-                strAddr9_1 += address9_1[i].ToString();
-            }
-            byte A9_1 = byte.Parse(strAddr9_1);
-
-            for (int i = 0; i < address9_2.Length; i++)
-            {
-                strAddr9_2 += address9_2[i].ToString();
-            }
-            byte A9_2 = byte.Parse(strAddr9_2);
-
-            for (int i = 0; i < address9_3.Length; i++)
-            {
-                strAddr9_3 += address9_3[i].ToString();
-            }
-            byte A9_3 = byte.Parse(strAddr9_3);
-
-            string strAddr10_1 = "";
-            string strAddr10_2 = "";
-            string strAddr10_3 = "";
-
-            for (int i = 0; i < address10_1.Length; i++)
-            {
-                strAddr10_1 += address10_1[i].ToString();
-            }
-            byte A10_1 = byte.Parse(strAddr10_1);
-
-            for (int i = 0; i < address10_2.Length; i++)
-            {
-                strAddr10_2 += address10_2[i].ToString();
-            }
-            byte A10_2 = byte.Parse(strAddr10_2);
-
-            for (int i = 0; i < address10_3.Length; i++)
-            {
-                strAddr10_3 += address10_3[i].ToString();
-            }
-            byte A10_3 = byte.Parse(strAddr10_3);
-
-
-            string strAddr11_1 = "";
-            string strAddr11_2 = "";
-            string strAddr11_3 = "";
-
-            for (int i = 0; i < address11_1.Length; i++)
-            {
-                strAddr11_1 += address11_1[i].ToString();
-            }
-            byte A11_1 = byte.Parse(strAddr11_1);
-
-            for (int i = 0; i < address11_2.Length; i++)
-            {
-                strAddr11_2 += address11_2[i].ToString();
-            }
-            byte A11_2 = byte.Parse(strAddr11_2);
-
-            for (int i = 0; i < address11_3.Length; i++)
-            {
-                strAddr11_3 += address11_3[i].ToString();
-            }
-            byte A11_3 = byte.Parse(strAddr1_3);
-
-            string strAddr12_1 = "";
-            string strAddr12_2 = "";
-            string strAddr12_3 = "";
-
-            for (int i = 0; i < address12_1.Length; i++)
-            {
-                strAddr12_1 += address12_1[i].ToString();
-            }
-            byte A12_1 = byte.Parse(strAddr12_1);
-
-            for (int i = 0; i < address12_2.Length; i++)
-            {
-                strAddr12_2 += address12_2[i].ToString();
-            }
-            byte A12_2 = byte.Parse(strAddr12_2);
-
-            for (int i = 0; i < address12_3.Length; i++)
-            {
-                strAddr12_3 += address12_3[i].ToString();
-            }
-            byte A12_3 = byte.Parse(strAddr12_3);
-
-            string strAddr13_1 = "";
-            string strAddr13_2 = "";
-            string strAddr13_3 = "";
-
-            for (int i = 0; i < address13_1.Length; i++)
-            {
-                strAddr13_1 += address13_1[i].ToString();
-            }
-            byte A13_1 = byte.Parse(strAddr13_1);
-
-            for (int i = 0; i < address13_2.Length; i++)
-            {
-                strAddr13_2 += address13_2[i].ToString();
-            }
-            byte A13_2 = byte.Parse(strAddr13_2);
-
-            for (int i = 0; i < address13_3.Length; i++)
-            {
-                strAddr13_3 += address13_3[i].ToString();
-            }
-            byte A13_3 = byte.Parse(strAddr13_3);
-
-            string strAddr14_1 = "";
-            string strAddr14_2 = "";
-            string strAddr14_3 = "";
-
-            for (int i = 0; i < address14_1.Length; i++)
-            {
-                strAddr14_1 += address14_1[i].ToString();
-            }
-            byte A14_1 = byte.Parse(strAddr14_1);
-
-            for (int i = 0; i < address14_2.Length; i++)
-            {
-                strAddr14_2 += address14_2[i].ToString();
-            }
-            byte A14_2 = byte.Parse(strAddr14_2);
-
-            for (int i = 0; i < address14_3.Length; i++)
-            {
-                strAddr14_3 += address14_3[i].ToString();
-            }
-            byte A14_3 = byte.Parse(strAddr14_3);
-
-            string strAddr15_1 = "";
-            string strAddr15_2 = "";
-            string strAddr15_3 = "";
-
-            for (int i = 0; i < address15_1.Length; i++)
-            {
-                strAddr15_1 += address15_1[i].ToString();
-            }
-            byte A15_1 = byte.Parse(strAddr15_1);
-
-            for (int i = 0; i < address15_2.Length; i++)
-            {
-                strAddr15_2 += address15_2[i].ToString();
-            }
-            byte A15_2 = byte.Parse(strAddr15_2);
-
-            for (int i = 0; i < address15_3.Length; i++)
-            {
-                strAddr15_3 += address15_3[i].ToString();
-            }
-            byte A15_3 = byte.Parse(strAddr15_3);
-
-
-            string strAddr16_1 = "";
-            string strAddr16_2 = "";
-            string strAddr16_3 = "";
-
-            for (int i = 0; i < address16_1.Length; i++)
-            {
-                strAddr16_1 += address16_1[i].ToString();
-            }
-            byte A16_1 = byte.Parse(strAddr16_1);
-
-            for (int i = 0; i < address16_2.Length; i++)
-            {
-                strAddr16_2 += address16_2[i].ToString();
-            }
-            byte A16_2 = byte.Parse(strAddr16_2);
-
-            for (int i = 0; i < address16_3.Length; i++)
-            {
-                strAddr16_3 += address16_3[i].ToString();
-            }
-            byte A16_3 = byte.Parse(strAddr16_3);
-
-            byte[] pACLArray = { 0x64, 0xF9, 0xC0, 0x00, 0x00, A1_1, A1_2, A1_3,
-                0x64, 0xF9, 0xC0, 0x00, 0x00, A2_1, A2_2, A2_3,
-                0x64, 0xF9, 0xC0, 0x00, 0x00, A3_1, A3_2, A3_3,
-                0x64, 0xF9, 0xC0, 0x00, 0x00, A4_1, A4_2, A4_3,
-                0x64, 0xF9, 0xC0, 0x00, 0x00, A5_1, A5_2, A5_3,
-                0x64, 0xF9, 0xC0, 0x00, 0x00, A6_1, A6_2, A6_3,
-                0x64, 0xF9, 0xC0, 0x00, 0x00, A7_1, A7_2, A7_3,
-                0x64, 0xF9, 0xC0, 0x00, 0x00, A8_1, A8_2, A8_3 ,
-                0x64, 0xF9, 0xC0, 0x00, 0x00, A9_1, A9_2, A9_3,
-                0x64, 0xF9, 0xC0, 0x00, 0x00, A10_1, A10_2, A10_3,
-                0x64, 0xF9, 0xC0, 0x00, 0x00, A11_1, A11_2, A11_3,
-                0x64, 0xF9, 0xC0, 0x00, 0x00, A12_1, A12_2, A12_3,
-                0x64, 0xF9, 0xC0, 0x00, 0x00, A13_1, A13_2, A13_3,
-                0x64, 0xF9, 0xC0, 0x00, 0x00, A14_1, A14_2, A14_3,
-                0x64, 0xF9, 0xC0, 0x00, 0x00, A15_1, A15_2, A15_3,
-                0x64, 0xF9, 0xC0, 0x00, 0x00, A16_1, A16_2, A16_3};
-
-
-            //byte[] pACLArray = { 0x64, 0xF9, 0xC0, 0x00, 0x00, 0x0D, 0x16, 0xBB, 0x64, 0xF9, 0xC0, 0x00, 0x00, 0x0A, 0x83, 0x89, 0x64, 0xF9, 0xC0, 0x00, 0x00, 0x0A, 0xCC, 0xEF, 0x64, 0xF9, 0xC0, 0x00, 0x00, 0x0E, 0xAD, 0x03, 0x64, 0xF9, 0xC0, 0x00, 0x00, 0x12, 0x9E, 0xFE, 0x64, 0xF9, 0xC0, 0x00, 0x00, 0x0E, 0x99, 0xB1, 0x64, 0xF9, 0xC0, 0x00, 0x00, 0x0B, 0x36, 0x72, 0x64, 0xF9, 0xC0, 0x00, 0x00, 0x0A, 0xAC, 0xD4
-            // ,0x64, 0xF9, 0xC0, 0x00, 0x00, 0x0E, 0x92, 0x59, 0x64, 0xF9, 0xC0, 0x00, 0x00, 0x0E, 0xAB, 0x2F, 0x64, 0xF9, 0xC0, 0x00, 0x00, 0x0C, 0xCE, 0xDF, 0x64, 0xF9, 0xC0, 0x00, 0x00, 0x0B, 0x91, 0x02, 0x64, 0xF9, 0xC0, 0x00, 0x00, 0x0C, 0xCE, 0x4D, 0x64, 0xF9, 0xC0, 0x00, 0x00, 0x0E, 0x99, 0xB1, 0x64, 0xF9, 0xC0, 0x00, 0x00, 0x0A, 0xBF, 0x8D, 0x64, 0xF9, 0xC0, 0x00, 0x00, 0x0D, 0x29, 0xAB};
             pParameters[0] = uNodeCount;
             Buffer.BlockCopy(pACLArray, 0, pParameters, 1, pACLArray.Length);
 
             uTotalLength = (uint)(1 + pACLArray.Length);
 
-            iResult = icsNeoDll.icsneoGenericAPISendCommand(m_hObject, uAPISelected, uInstanceSelected, uFunctionSelected, Marshal.UnsafeAddrOfPinnedArrayElement(pParameters, 0), uTotalLength, out uFunctionError);
+            int iResult = icsNeoDll.icsneoGenericAPISendCommand(m_hObject, uAPISelected, uInstanceSelected, uFunctionSelected, Marshal.UnsafeAddrOfPinnedArrayElement(pParameters, 0), uTotalLength, out uFunctionError);
 
-            if (iResult != 1 && uFunctionError != ADI_WIL_ERR_SUCCESS)
+            if (!checkStatus(1, 0, uFunctionSelected) || iResult != 1)
             {
-                // Handle Error Here
-                MessageBox.Show($"Command error {uFunctionError}");
-                return;
+                MessageBox.Show("Set ACL error");
             }
-
-            while (iTimeOutCounter < 10)
-            {
-                iResult = icsNeoDll.icsneoGenericAPIGetStatus(m_hObject, uAPISelected, uInstanceSelected, out uCurrentFunction, out uCallbackError, out uFinishedProcessing);
-
-                if (uCurrentFunction != uFunctionSelected || iResult != 1)
-                {
-                    // Handle Error Here
-                    MessageBox.Show($"Status error {uFunctionError}");
-                    return;
-                }
-
-                if (uFinishedProcessing == 1)
-                {
-                    break;
-                }
-
-                Thread.Sleep(100);
-                iTimeOutCounter++;
-            }
-
-            if (uCallbackError != ADI_WIL_ERR_SUCCESS || iTimeOutCounter > 10)
-            {
-                // Handle Error Here
-                MessageBox.Show($"Timeout/callback error {uCallbackError}");
-                return;
-            }
-
-            MessageBox.Show("Apparently finished succesfully");
         }
 
-        private void button3_Click(object sender, EventArgs e)
+        private void ACLPage(object sender, EventArgs e)
         {
             //must set mode to standby before setting ACL
 
@@ -1207,8 +691,6 @@ namespace CSnet
             //fw.WindowState.
             //fw.Owner = this;
             fw.ShowDialog();
-
-            setMode(ADI_WIL_MODE_STANDBY);
         }
 
         private bool checkStatus(byte uAPISelected, byte uInstanceSelected, byte uFunctionSelected)
@@ -1274,15 +756,7 @@ namespace CSnet
 
         private void getAclButton_Click(object sender, EventArgs e)//获取ACL
         {
-            if (m_bPortOpen == false)
-            {
-                MessageBox.Show("neoVI not opened");
-                return;  // do not read messages if we haven't opened neoVI yet
-            }
-
             //get ACL is available in all system modes
-
-            int iResult;
 
             byte uAPISelected, uInstanceSelected, uFunctionSelected, uFunctionError, uCurrentFunction, uNodeCount;
             byte[] pReturnedData = new byte[ADI_WIL_MAC_SIZE * ADI_WIL_MAX_NODES + 1];
@@ -1293,18 +767,12 @@ namespace CSnet
             uInstanceSelected = 0;
             uFunctionSelected = ADI_WIL_API_GET_ACL;
 
-            iResult = icsNeoDll.icsneoGenericAPISendCommand(m_hObject, uAPISelected, uInstanceSelected, uFunctionSelected, IntPtr.Zero, 0, out uFunctionError);
+            int iResult = icsNeoDll.icsneoGenericAPISendCommand(m_hObject, uAPISelected, uInstanceSelected, uFunctionSelected, IntPtr.Zero, 0, out uFunctionError);
 
-            if (iResult != 1 && uFunctionError != ADI_WIL_ERR_SUCCESS)
-            {
-                // Handle Error Here
-                MessageBox.Show($"Send error {iResult} {uFunctionError}");
-                return;
-            }
-
-            if (!checkStatus(uAPISelected, uInstanceSelected, uFunctionSelected))
+            if (!checkStatus(uAPISelected, uInstanceSelected, uFunctionSelected) || iResult != 1)
             {
                 MessageBox.Show("ACL error");
+                return;
             }
 
             iResult = icsNeoDll.icsneoGenericAPIReadData(m_hObject, uAPISelected, uInstanceSelected, out uCurrentFunction, Marshal.UnsafeAddrOfPinnedArrayElement(pReturnedData, 0), out uReturnedDataLength);
@@ -1335,10 +803,7 @@ namespace CSnet
 
                     }
                 }
-                //MessageBox.Show(BitConverter.ToString(pReturnedData));
-
             }
-
         }
 
         private void cmdOTAP(object sender, EventArgs e)
@@ -1507,8 +972,6 @@ namespace CSnet
 
                                             if (uiPacketID == 0)
                                             {
-                                                
-
                                                 byte[] managedArray = new byte[uiPayloadLength];
                                                 Marshal.Copy(ptr, managedArray, 0, uiPayloadLength);
 
@@ -1895,29 +1358,6 @@ namespace CSnet
                     }
                 }
             }
-        }
-
-        public static UInt64[] strToToHexByte(string hexString, int len = 2, int mode = 0)
-        {
-            String s = "";
-            hexString = hexString.Replace(" ", "");
-            if ((hexString.Length % len) != 0)
-                hexString += "0";
-            if ((mode == 0) && (len > 2))
-            {
-                int l = hexString.Length;
-                while (l > 0)
-                {
-                    s += hexString.Substring(l - 2, 2);
-                    l -= 2;
-                }
-                hexString = s;
-            }
-            UInt64[] returnBytes = new UInt64[hexString.Length / len];
-            for (int i = 0; i < returnBytes.Length; i++)
-                returnBytes[i] = Convert.ToUInt64(hexString.Substring(i * len, len), 16);
-
-            return returnBytes;
         }
 
         private void chkAutoRead_CheckedChanged(object sender, EventArgs e)

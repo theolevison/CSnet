@@ -30,50 +30,50 @@
         {
             this.components = new System.ComponentModel.Container();
             this.GroupBox4 = new System.Windows.Forms.GroupBox();
-            this.button1 = new System.Windows.Forms.Button();
+            this.ButtonGetConfig = new System.Windows.Forms.Button();
+            this.ButtonVersion = new System.Windows.Forms.Button();
             this.label2 = new System.Windows.Forms.Label();
             this.EMSBox = new System.Windows.Forms.ListBox();
             this.label1 = new System.Windows.Forms.Label();
             this.PMSBox = new System.Windows.Forms.ListBox();
-            this.button5 = new System.Windows.Forms.Button();
+            this.ButtonGPIO = new System.Windows.Forms.Button();
             this.firmwareLabel = new System.Windows.Forms.Label();
             this.chkAutoRead = new System.Windows.Forms.CheckBox();
-            this.button4 = new System.Windows.Forms.Button();
-            this.button3 = new System.Windows.Forms.Button();
-            this.button2 = new System.Windows.Forms.Button();
+            this.ButtonSetACL = new System.Windows.Forms.Button();
+            this.ButtonACLPage = new System.Windows.Forms.Button();
+            this.ButtonGetACL = new System.Windows.Forms.Button();
             this.lblWaitForRxMessageWithTimeOutResult = new System.Windows.Forms.Label();
-            this.cmdWaitForMessageWithTimeOut = new System.Windows.Forms.Button();
+            this.ButtonOTAP = new System.Windows.Forms.Button();
             this.lblReadErrors = new System.Windows.Forms.Label();
             this.lblReadCount = new System.Windows.Forms.Label();
             this.lstMessage = new System.Windows.Forms.ListBox();
-            this.cmdReceive = new System.Windows.Forms.Button();
+            this.ButtonGetMessages = new System.Windows.Forms.Button();
             this.lstErrorHolder = new System.Windows.Forms.ListBox();
             this.cmdGetErrors = new System.Windows.Forms.Button();
             this.Timer1 = new System.Windows.Forms.Timer(this.components);
-            this.button6 = new System.Windows.Forms.Button();
             this.GroupBox4.SuspendLayout();
             this.SuspendLayout();
             // 
             // GroupBox4
             // 
-            this.GroupBox4.Controls.Add(this.button6);
-            this.GroupBox4.Controls.Add(this.button1);
+            this.GroupBox4.Controls.Add(this.ButtonGetConfig);
+            this.GroupBox4.Controls.Add(this.ButtonVersion);
             this.GroupBox4.Controls.Add(this.label2);
             this.GroupBox4.Controls.Add(this.EMSBox);
             this.GroupBox4.Controls.Add(this.label1);
             this.GroupBox4.Controls.Add(this.PMSBox);
-            this.GroupBox4.Controls.Add(this.button5);
+            this.GroupBox4.Controls.Add(this.ButtonGPIO);
             this.GroupBox4.Controls.Add(this.firmwareLabel);
             this.GroupBox4.Controls.Add(this.chkAutoRead);
-            this.GroupBox4.Controls.Add(this.button4);
-            this.GroupBox4.Controls.Add(this.button3);
-            this.GroupBox4.Controls.Add(this.button2);
+            this.GroupBox4.Controls.Add(this.ButtonSetACL);
+            this.GroupBox4.Controls.Add(this.ButtonACLPage);
+            this.GroupBox4.Controls.Add(this.ButtonGetACL);
             this.GroupBox4.Controls.Add(this.lblWaitForRxMessageWithTimeOutResult);
-            this.GroupBox4.Controls.Add(this.cmdWaitForMessageWithTimeOut);
+            this.GroupBox4.Controls.Add(this.ButtonOTAP);
             this.GroupBox4.Controls.Add(this.lblReadErrors);
             this.GroupBox4.Controls.Add(this.lblReadCount);
             this.GroupBox4.Controls.Add(this.lstMessage);
-            this.GroupBox4.Controls.Add(this.cmdReceive);
+            this.GroupBox4.Controls.Add(this.ButtonGetMessages);
             this.GroupBox4.Controls.Add(this.lstErrorHolder);
             this.GroupBox4.Controls.Add(this.cmdGetErrors);
             this.GroupBox4.Location = new System.Drawing.Point(4, 4);
@@ -85,16 +85,27 @@
             this.GroupBox4.TabStop = false;
             this.GroupBox4.Text = "Receive Message";
             // 
-            // button1
+            // ButtonGetConfig
             // 
-            this.button1.Location = new System.Drawing.Point(1015, 43);
-            this.button1.Margin = new System.Windows.Forms.Padding(4);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(100, 32);
-            this.button1.TabIndex = 40;
-            this.button1.Text = "VERSIONS";
-            this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
+            this.ButtonGetConfig.Location = new System.Drawing.Point(688, 41);
+            this.ButtonGetConfig.Margin = new System.Windows.Forms.Padding(4);
+            this.ButtonGetConfig.Name = "ButtonGetConfig";
+            this.ButtonGetConfig.Size = new System.Drawing.Size(100, 31);
+            this.ButtonGetConfig.TabIndex = 41;
+            this.ButtonGetConfig.Text = "GET CONFIG";
+            this.ButtonGetConfig.UseVisualStyleBackColor = true;
+            this.ButtonGetConfig.Click += new System.EventHandler(this.button6_Click);
+            // 
+            // ButtonVersion
+            // 
+            this.ButtonVersion.Location = new System.Drawing.Point(1015, 43);
+            this.ButtonVersion.Margin = new System.Windows.Forms.Padding(4);
+            this.ButtonVersion.Name = "ButtonVersion";
+            this.ButtonVersion.Size = new System.Drawing.Size(100, 32);
+            this.ButtonVersion.TabIndex = 40;
+            this.ButtonVersion.Text = "VERSIONS";
+            this.ButtonVersion.UseVisualStyleBackColor = true;
+            this.ButtonVersion.Click += new System.EventHandler(this.button1_Click);
             // 
             // label2
             // 
@@ -138,16 +149,16 @@
             this.PMSBox.Size = new System.Drawing.Size(1209, 89);
             this.PMSBox.TabIndex = 37;
             // 
-            // button5
+            // ButtonGPIO
             // 
-            this.button5.Location = new System.Drawing.Point(904, 43);
-            this.button5.Margin = new System.Windows.Forms.Padding(4);
-            this.button5.Name = "button5";
-            this.button5.Size = new System.Drawing.Size(100, 32);
-            this.button5.TabIndex = 36;
-            this.button5.Text = "GPIO 9 HIGH";
-            this.button5.UseVisualStyleBackColor = true;
-            this.button5.Click += new System.EventHandler(this.button5_Click);
+            this.ButtonGPIO.Location = new System.Drawing.Point(904, 43);
+            this.ButtonGPIO.Margin = new System.Windows.Forms.Padding(4);
+            this.ButtonGPIO.Name = "ButtonGPIO";
+            this.ButtonGPIO.Size = new System.Drawing.Size(100, 32);
+            this.ButtonGPIO.TabIndex = 36;
+            this.ButtonGPIO.Text = "GPIO 9 HIGH";
+            this.ButtonGPIO.UseVisualStyleBackColor = true;
+            this.ButtonGPIO.Click += new System.EventHandler(this.button5_Click);
             // 
             // firmwareLabel
             // 
@@ -168,38 +179,38 @@
             this.chkAutoRead.Text = "AutoRead";
             this.chkAutoRead.CheckedChanged += new System.EventHandler(this.chkAutoRead_CheckedChanged);
             // 
-            // button4
+            // ButtonSetACL
             // 
-            this.button4.Location = new System.Drawing.Point(904, 4);
-            this.button4.Margin = new System.Windows.Forms.Padding(4);
-            this.button4.Name = "button4";
-            this.button4.Size = new System.Drawing.Size(100, 31);
-            this.button4.TabIndex = 33;
-            this.button4.Text = "SETACL";
-            this.button4.UseVisualStyleBackColor = true;
-            this.button4.Click += new System.EventHandler(this.button4_Click);
+            this.ButtonSetACL.Location = new System.Drawing.Point(904, 4);
+            this.ButtonSetACL.Margin = new System.Windows.Forms.Padding(4);
+            this.ButtonSetACL.Name = "ButtonSetACL";
+            this.ButtonSetACL.Size = new System.Drawing.Size(100, 31);
+            this.ButtonSetACL.TabIndex = 33;
+            this.ButtonSetACL.Text = "SETACL";
+            this.ButtonSetACL.UseVisualStyleBackColor = true;
+            this.ButtonSetACL.Click += new System.EventHandler(this.setACL_Click);
             // 
-            // button3
+            // ButtonACLPage
             // 
-            this.button3.Location = new System.Drawing.Point(796, 41);
-            this.button3.Margin = new System.Windows.Forms.Padding(4);
-            this.button3.Name = "button3";
-            this.button3.Size = new System.Drawing.Size(100, 32);
-            this.button3.TabIndex = 32;
-            this.button3.Text = "ACL PAGE";
-            this.button3.UseVisualStyleBackColor = true;
-            this.button3.Click += new System.EventHandler(this.button3_Click);
+            this.ButtonACLPage.Location = new System.Drawing.Point(796, 41);
+            this.ButtonACLPage.Margin = new System.Windows.Forms.Padding(4);
+            this.ButtonACLPage.Name = "ButtonACLPage";
+            this.ButtonACLPage.Size = new System.Drawing.Size(100, 32);
+            this.ButtonACLPage.TabIndex = 32;
+            this.ButtonACLPage.Text = "ACL PAGE";
+            this.ButtonACLPage.UseVisualStyleBackColor = true;
+            this.ButtonACLPage.Click += new System.EventHandler(this.ACLPage);
             // 
-            // button2
+            // ButtonGetACL
             // 
-            this.button2.Location = new System.Drawing.Point(796, 4);
-            this.button2.Margin = new System.Windows.Forms.Padding(4);
-            this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(100, 31);
-            this.button2.TabIndex = 31;
-            this.button2.Text = "GETACL";
-            this.button2.UseVisualStyleBackColor = true;
-            this.button2.Click += new System.EventHandler(this.getAclButton_Click);
+            this.ButtonGetACL.Location = new System.Drawing.Point(796, 4);
+            this.ButtonGetACL.Margin = new System.Windows.Forms.Padding(4);
+            this.ButtonGetACL.Name = "ButtonGetACL";
+            this.ButtonGetACL.Size = new System.Drawing.Size(100, 31);
+            this.ButtonGetACL.TabIndex = 31;
+            this.ButtonGetACL.Text = "GETACL";
+            this.ButtonGetACL.UseVisualStyleBackColor = true;
+            this.ButtonGetACL.Click += new System.EventHandler(this.getAclButton_Click);
             // 
             // lblWaitForRxMessageWithTimeOutResult
             // 
@@ -210,15 +221,15 @@
             this.lblWaitForRxMessageWithTimeOutResult.TabIndex = 27;
             this.lblWaitForRxMessageWithTimeOutResult.Text = "Status";
             // 
-            // cmdWaitForMessageWithTimeOut
+            // ButtonOTAP
             // 
-            this.cmdWaitForMessageWithTimeOut.Location = new System.Drawing.Point(396, 21);
-            this.cmdWaitForMessageWithTimeOut.Margin = new System.Windows.Forms.Padding(4);
-            this.cmdWaitForMessageWithTimeOut.Name = "cmdWaitForMessageWithTimeOut";
-            this.cmdWaitForMessageWithTimeOut.Size = new System.Drawing.Size(139, 49);
-            this.cmdWaitForMessageWithTimeOut.TabIndex = 26;
-            this.cmdWaitForMessageWithTimeOut.Text = "OTAP";
-            this.cmdWaitForMessageWithTimeOut.Click += new System.EventHandler(this.cmdOTAP);
+            this.ButtonOTAP.Location = new System.Drawing.Point(396, 21);
+            this.ButtonOTAP.Margin = new System.Windows.Forms.Padding(4);
+            this.ButtonOTAP.Name = "ButtonOTAP";
+            this.ButtonOTAP.Size = new System.Drawing.Size(139, 49);
+            this.ButtonOTAP.TabIndex = 26;
+            this.ButtonOTAP.Text = "OTAP";
+            this.ButtonOTAP.Click += new System.EventHandler(this.cmdOTAP);
             // 
             // lblReadErrors
             // 
@@ -251,15 +262,15 @@
             this.lstMessage.Size = new System.Drawing.Size(1209, 181);
             this.lstMessage.TabIndex = 19;
             // 
-            // cmdReceive
+            // ButtonGetMessages
             // 
-            this.cmdReceive.Location = new System.Drawing.Point(13, 24);
-            this.cmdReceive.Margin = new System.Windows.Forms.Padding(4);
-            this.cmdReceive.Name = "cmdReceive";
-            this.cmdReceive.Size = new System.Drawing.Size(139, 49);
-            this.cmdReceive.TabIndex = 20;
-            this.cmdReceive.Text = "Get Messages";
-            this.cmdReceive.Click += new System.EventHandler(this.CmdReceive_Click);
+            this.ButtonGetMessages.Location = new System.Drawing.Point(13, 24);
+            this.ButtonGetMessages.Margin = new System.Windows.Forms.Padding(4);
+            this.ButtonGetMessages.Name = "ButtonGetMessages";
+            this.ButtonGetMessages.Size = new System.Drawing.Size(139, 49);
+            this.ButtonGetMessages.TabIndex = 20;
+            this.ButtonGetMessages.Text = "Get Messages";
+            this.ButtonGetMessages.Click += new System.EventHandler(this.CmdReceive_Click);
             // 
             // lstErrorHolder
             // 
@@ -288,17 +299,6 @@
             this.Timer1.Interval = 1000;
             this.Timer1.Tick += new System.EventHandler(this.Timer1_Tick);
             // 
-            // button6
-            // 
-            this.button6.Location = new System.Drawing.Point(688, 41);
-            this.button6.Margin = new System.Windows.Forms.Padding(4);
-            this.button6.Name = "button6";
-            this.button6.Size = new System.Drawing.Size(100, 31);
-            this.button6.TabIndex = 41;
-            this.button6.Text = "GET CONFIG";
-            this.button6.UseVisualStyleBackColor = true;
-            this.button6.Click += new System.EventHandler(this.button6_Click);
-            // 
             // OpenDeviceTab
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
@@ -314,26 +314,26 @@
         #endregion
 
         internal System.Windows.Forms.GroupBox GroupBox4;
-        private System.Windows.Forms.Button button4;
-        private System.Windows.Forms.Button button3;
-        private System.Windows.Forms.Button button2;
+        private System.Windows.Forms.Button ButtonSetACL;
+        private System.Windows.Forms.Button ButtonACLPage;
+        private System.Windows.Forms.Button ButtonGetACL;
         internal System.Windows.Forms.Label lblWaitForRxMessageWithTimeOutResult;
-        internal System.Windows.Forms.Button cmdWaitForMessageWithTimeOut;
+        internal System.Windows.Forms.Button ButtonOTAP;
         internal System.Windows.Forms.Label lblReadErrors;
         internal System.Windows.Forms.Label lblReadCount;
         internal System.Windows.Forms.ListBox lstMessage;
-        internal System.Windows.Forms.Button cmdReceive;
+        internal System.Windows.Forms.Button ButtonGetMessages;
         internal System.Windows.Forms.ListBox lstErrorHolder;
         internal System.Windows.Forms.Button cmdGetErrors;
         internal System.Windows.Forms.CheckBox chkAutoRead;
         public System.Windows.Forms.Timer Timer1;
         internal System.Windows.Forms.Label firmwareLabel;
-        private System.Windows.Forms.Button button5;
+        private System.Windows.Forms.Button ButtonGPIO;
         internal System.Windows.Forms.ListBox PMSBox;
         internal System.Windows.Forms.ListBox EMSBox;
         internal System.Windows.Forms.Label label1;
         internal System.Windows.Forms.Label label2;
-        private System.Windows.Forms.Button button1;
-        private System.Windows.Forms.Button button6;
+        private System.Windows.Forms.Button ButtonVersion;
+        private System.Windows.Forms.Button ButtonGetConfig;
     }
 }
