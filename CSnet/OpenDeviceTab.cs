@@ -93,79 +93,79 @@ namespace CSnet
         private const int MANAGER_0_ID = 240;
         private const int MANAGER_1_ID = 241;
 
-        public const ulong ADI_WIL_DEV_NODE_0 = 0x0000000000000001u;     
-        public const ulong ADI_WIL_DEV_NODE_1 = 0x0000000000000002u;     
-        public const ulong ADI_WIL_DEV_NODE_2 = 0x0000000000000004u;     
-        public const ulong ADI_WIL_DEV_NODE_3 = 0x0000000000000008u;     
-        public const ulong ADI_WIL_DEV_NODE_4 = 0x0000000000000010u;     
-        public const ulong ADI_WIL_DEV_NODE_5 = 0x0000000000000020u;     
-        public const ulong ADI_WIL_DEV_NODE_6 = 0x0000000000000040u;     
-        public const ulong ADI_WIL_DEV_NODE_7 = 0x0000000000000080u;     
-        public const ulong ADI_WIL_DEV_NODE_8 = 0x0000000000000100u;     
-        public const ulong ADI_WIL_DEV_NODE_9 = 0x0000000000000200u;     
-        public const ulong ADI_WIL_DEV_NODE_10 = 0x0000000000000400u;    
-        public const ulong ADI_WIL_DEV_NODE_11 = 0x0000000000000800u;    
-        public const ulong ADI_WIL_DEV_NODE_12 = 0x0000000000001000u;    
-        public const ulong ADI_WIL_DEV_NODE_13 = 0x0000000000002000u;    
-        public const ulong ADI_WIL_DEV_NODE_14 = 0x0000000000004000u;    
-        public const ulong ADI_WIL_DEV_NODE_15 = 0x0000000000008000u;    
-        public const ulong ADI_WIL_DEV_NODE_16 = 0x0000000000010000u;    
-        public const ulong ADI_WIL_DEV_NODE_17 = 0x0000000000020000u;    
-        public const ulong ADI_WIL_DEV_NODE_18 = 0x0000000000040000u;    
-        public const ulong ADI_WIL_DEV_NODE_19 = 0x0000000000080000u;    
-        public const ulong ADI_WIL_DEV_NODE_20 = 0x0000000000100000u;    
-        public const ulong ADI_WIL_DEV_NODE_21 = 0x0000000000200000u;    
-        public const ulong ADI_WIL_DEV_NODE_22 = 0x0000000000400000u;    
-        public const ulong ADI_WIL_DEV_NODE_23 = 0x0000000000800000u;    
-        public const ulong ADI_WIL_DEV_NODE_24 = 0x0000000001000000u;    
-        public const ulong ADI_WIL_DEV_NODE_25 = 0x0000000002000000u;    
-        public const ulong ADI_WIL_DEV_NODE_26 = 0x0000000004000000u;    
-        public const ulong ADI_WIL_DEV_NODE_27 = 0x0000000008000000u;    
-        public const ulong ADI_WIL_DEV_NODE_28 = 0x0000000010000000u;    
-        public const ulong ADI_WIL_DEV_NODE_29 = 0x0000000020000000u;    
-        public const ulong ADI_WIL_DEV_NODE_30 = 0x0000000040000000u;    
-        public const ulong ADI_WIL_DEV_NODE_31 = 0x0000000080000000u;    
-        public const ulong ADI_WIL_DEV_NODE_32 = 0x0000000100000000u;    
-        public const ulong ADI_WIL_DEV_NODE_33 = 0x0000000200000000u;    
-        public const ulong ADI_WIL_DEV_NODE_34 = 0x0000000400000000u;    
-        public const ulong ADI_WIL_DEV_NODE_35 = 0x0000000800000000u;    
-        public const ulong ADI_WIL_DEV_NODE_36 = 0x0000001000000000u;    
-        public const ulong ADI_WIL_DEV_NODE_37 = 0x0000002000000000u;    
-        public const ulong ADI_WIL_DEV_NODE_38 = 0x0000004000000000u;    
-        public const ulong ADI_WIL_DEV_NODE_39 = 0x0000008000000000u;    
-        public const ulong ADI_WIL_DEV_NODE_40 = 0x0000010000000000u;    
-        public const ulong ADI_WIL_DEV_NODE_41 = 0x0000020000000000u;    
-        public const ulong ADI_WIL_DEV_NODE_42 = 0x0000040000000000u;    
-        public const ulong ADI_WIL_DEV_NODE_43 = 0x0000080000000000u;    
-        public const ulong ADI_WIL_DEV_NODE_44 = 0x0000100000000000u;    
-        public const ulong ADI_WIL_DEV_NODE_45 = 0x0000200000000000u;    
-        public const ulong ADI_WIL_DEV_NODE_46 = 0x0000400000000000u;    
-        public const ulong ADI_WIL_DEV_NODE_47 = 0x0000800000000000u;    
-        public const ulong ADI_WIL_DEV_NODE_48 = 0x0001000000000000u;    
-        public const ulong ADI_WIL_DEV_NODE_49 = 0x0002000000000000u;    
-        public const ulong ADI_WIL_DEV_NODE_50 = 0x0004000000000000u;    
-        public const ulong ADI_WIL_DEV_NODE_51 = 0x0008000000000000u;    
-        public const ulong ADI_WIL_DEV_NODE_52 = 0x0010000000000000u;    
-        public const ulong ADI_WIL_DEV_NODE_53 = 0x0020000000000000u;    
-        public const ulong ADI_WIL_DEV_NODE_54 = 0x0040000000000000u;    
-        public const ulong ADI_WIL_DEV_NODE_55 = 0x0080000000000000u;    
-        public const ulong ADI_WIL_DEV_NODE_56 = 0x0100000000000000u;    
-        public const ulong ADI_WIL_DEV_NODE_57 = 0x0200000000000000u;    
-        public const ulong ADI_WIL_DEV_NODE_58 = 0x0400000000000000u;    
-        public const ulong ADI_WIL_DEV_NODE_59 = 0x0800000000000000u;    
-        public const ulong ADI_WIL_DEV_NODE_60 = 0x1000000000000000u;    
+        public const ulong ADI_WIL_DEV_NODE_0 = 0x0000000000000001u;
+        public const ulong ADI_WIL_DEV_NODE_1 = 0x0000000000000002u;
+        public const ulong ADI_WIL_DEV_NODE_2 = 0x0000000000000004u;
+        public const ulong ADI_WIL_DEV_NODE_3 = 0x0000000000000008u;
+        public const ulong ADI_WIL_DEV_NODE_4 = 0x0000000000000010u;
+        public const ulong ADI_WIL_DEV_NODE_5 = 0x0000000000000020u;
+        public const ulong ADI_WIL_DEV_NODE_6 = 0x0000000000000040u;
+        public const ulong ADI_WIL_DEV_NODE_7 = 0x0000000000000080u;
+        public const ulong ADI_WIL_DEV_NODE_8 = 0x0000000000000100u;
+        public const ulong ADI_WIL_DEV_NODE_9 = 0x0000000000000200u;
+        public const ulong ADI_WIL_DEV_NODE_10 = 0x0000000000000400u;
+        public const ulong ADI_WIL_DEV_NODE_11 = 0x0000000000000800u;
+        public const ulong ADI_WIL_DEV_NODE_12 = 0x0000000000001000u;
+        public const ulong ADI_WIL_DEV_NODE_13 = 0x0000000000002000u;
+        public const ulong ADI_WIL_DEV_NODE_14 = 0x0000000000004000u;
+        public const ulong ADI_WIL_DEV_NODE_15 = 0x0000000000008000u;
+        public const ulong ADI_WIL_DEV_NODE_16 = 0x0000000000010000u;
+        public const ulong ADI_WIL_DEV_NODE_17 = 0x0000000000020000u;
+        public const ulong ADI_WIL_DEV_NODE_18 = 0x0000000000040000u;
+        public const ulong ADI_WIL_DEV_NODE_19 = 0x0000000000080000u;
+        public const ulong ADI_WIL_DEV_NODE_20 = 0x0000000000100000u;
+        public const ulong ADI_WIL_DEV_NODE_21 = 0x0000000000200000u;
+        public const ulong ADI_WIL_DEV_NODE_22 = 0x0000000000400000u;
+        public const ulong ADI_WIL_DEV_NODE_23 = 0x0000000000800000u;
+        public const ulong ADI_WIL_DEV_NODE_24 = 0x0000000001000000u;
+        public const ulong ADI_WIL_DEV_NODE_25 = 0x0000000002000000u;
+        public const ulong ADI_WIL_DEV_NODE_26 = 0x0000000004000000u;
+        public const ulong ADI_WIL_DEV_NODE_27 = 0x0000000008000000u;
+        public const ulong ADI_WIL_DEV_NODE_28 = 0x0000000010000000u;
+        public const ulong ADI_WIL_DEV_NODE_29 = 0x0000000020000000u;
+        public const ulong ADI_WIL_DEV_NODE_30 = 0x0000000040000000u;
+        public const ulong ADI_WIL_DEV_NODE_31 = 0x0000000080000000u;
+        public const ulong ADI_WIL_DEV_NODE_32 = 0x0000000100000000u;
+        public const ulong ADI_WIL_DEV_NODE_33 = 0x0000000200000000u;
+        public const ulong ADI_WIL_DEV_NODE_34 = 0x0000000400000000u;
+        public const ulong ADI_WIL_DEV_NODE_35 = 0x0000000800000000u;
+        public const ulong ADI_WIL_DEV_NODE_36 = 0x0000001000000000u;
+        public const ulong ADI_WIL_DEV_NODE_37 = 0x0000002000000000u;
+        public const ulong ADI_WIL_DEV_NODE_38 = 0x0000004000000000u;
+        public const ulong ADI_WIL_DEV_NODE_39 = 0x0000008000000000u;
+        public const ulong ADI_WIL_DEV_NODE_40 = 0x0000010000000000u;
+        public const ulong ADI_WIL_DEV_NODE_41 = 0x0000020000000000u;
+        public const ulong ADI_WIL_DEV_NODE_42 = 0x0000040000000000u;
+        public const ulong ADI_WIL_DEV_NODE_43 = 0x0000080000000000u;
+        public const ulong ADI_WIL_DEV_NODE_44 = 0x0000100000000000u;
+        public const ulong ADI_WIL_DEV_NODE_45 = 0x0000200000000000u;
+        public const ulong ADI_WIL_DEV_NODE_46 = 0x0000400000000000u;
+        public const ulong ADI_WIL_DEV_NODE_47 = 0x0000800000000000u;
+        public const ulong ADI_WIL_DEV_NODE_48 = 0x0001000000000000u;
+        public const ulong ADI_WIL_DEV_NODE_49 = 0x0002000000000000u;
+        public const ulong ADI_WIL_DEV_NODE_50 = 0x0004000000000000u;
+        public const ulong ADI_WIL_DEV_NODE_51 = 0x0008000000000000u;
+        public const ulong ADI_WIL_DEV_NODE_52 = 0x0010000000000000u;
+        public const ulong ADI_WIL_DEV_NODE_53 = 0x0020000000000000u;
+        public const ulong ADI_WIL_DEV_NODE_54 = 0x0040000000000000u;
+        public const ulong ADI_WIL_DEV_NODE_55 = 0x0080000000000000u;
+        public const ulong ADI_WIL_DEV_NODE_56 = 0x0100000000000000u;
+        public const ulong ADI_WIL_DEV_NODE_57 = 0x0200000000000000u;
+        public const ulong ADI_WIL_DEV_NODE_58 = 0x0400000000000000u;
+        public const ulong ADI_WIL_DEV_NODE_59 = 0x0800000000000000u;
+        public const ulong ADI_WIL_DEV_NODE_60 = 0x1000000000000000u;
         public const ulong ADI_WIL_DEV_NODE_61 = 0x2000000000000000u;
 
         public const ulong ADI_WIL_DEV_ALL_NODES = 0x3FFFFFFFFFFFFFFFu;
-        
+
         public const ulong ADI_WIL_DEV_MANAGER_0 = 0x4000000000000000UL;
         public const ulong ADI_WIL_DEV_MANAGER_1 = 0x8000000000000000UL;
         public const ulong ADI_WIL_DEV_ALL_MANAGERS = 0xC000000000000000u;
 
         public bool chkHexFormat = false;
 
-        public IntPtr m_hObject;		 //handle for device
-    
+        public IntPtr m_hObject;         //handle for device
+
         icsSpyMessage[] stMessages = new icsSpyMessage[20000];   //TempSpace for messages
         private byte currentMode = ADI_WIL_MODE_STANDBY;
 
@@ -194,8 +194,9 @@ namespace CSnet
             managers[0] = new ManagerData();
             managers[1] = new ManagerData();
 
-            managers[0].Version = DeviceFirmwareVersion(62);
-            managers[1].Version = DeviceFirmwareVersion(63); //this should throw an error if the pack is BEV & only has one manager
+            //TODO: at some point check firmware versions. Must 
+            managers[0].Version = DeviceFirmwareVersion(62); //afaik, manager 0 is always the primary manager, responsible for EMS & PMS
+            //managers[1].Version = DeviceFirmwareVersion(63); //this should throw an error if the pack is BEV & only has one manager
 
             GetAclButton_Click(null, null);
             modules = new ModuleData[nodeMacAddresses.Count];
@@ -203,7 +204,7 @@ namespace CSnet
             for (int i = 0; i < nodeMacAddresses.Count; i++)
             {
                 modules[i] = new ModuleData();
-                modules[i].MacAddress = nodeMacAddresses[i];                
+                modules[i].MacAddress = nodeMacAddresses[i];
             }
 
             InitializeComponent();
@@ -252,20 +253,22 @@ namespace CSnet
 
             byte[] buffer = new byte[64];
             int offset = 0;
-                long fileSize = fileStream.Length;
+            long fileSize = fileStream.Length;
             int count = -1;
             Debug.WriteLine($"filesize: {fileSize}");
-            while (count != 0){ //not guaranteed to be 64 bytes long
+            while (count != 0)
+            { //not guaranteed to be 64 bytes long
                 count = fileStream.Read(buffer, offset, 64);
                 //what happens when we hit the end of the file?
                 Debug.WriteLine($"reading: {count}");
                 offset = SendOTAPFileChunk(offset, buffer);
-                
+
                 if (offset >= fileSize)
                 {
                     //done
                     break;
-                } else if (offset == -1)
+                }
+                else if (offset == -1)
                 {
                     //error
                     Debug.WriteLine("OTAP problem high level");
@@ -287,7 +290,7 @@ namespace CSnet
                 if (timeout == 1000)
                 {
                     Debug.WriteLine("OTAP timeout");
-                    return 0;                    
+                    return 0;
                 }
                 timeout++;
                 //only breaks if command has been successfully sent, or timesout
@@ -298,11 +301,13 @@ namespace CSnet
                 //still writing file
                 Debug.WriteLine("file thing in progress");
                 return 1;
-            } else if (uCallbackError == ADI_WIL_ERR_SUCCESS)
+            }
+            else if (uCallbackError == ADI_WIL_ERR_SUCCESS)
             {
                 //written entire file
                 return 2;
-            } else
+            }
+            else
             {
                 Debug.WriteLine($"OTAP bad response from get status, Callback: {uCallbackError} finishedProcessing: {uFinishedProcessing} result: {result}");
                 return 0;
@@ -332,11 +337,11 @@ namespace CSnet
                 return -1;
             }
 
-            if(OTAPCheckStatus(uAPISelected, uInstanceSelected, uFunctionSelected) != 0)
+            if (OTAPCheckStatus(uAPISelected, uInstanceSelected, uFunctionSelected) != 0)
             {
                 //finished or in progress, either way read the latest offset
                 uint uReturnedDataLength;
-                
+
 
                 iResult = icsNeoDll.icsneoGenericAPIReadData(m_hObject, uAPISelected, uInstanceSelected, out uCurrentFunction, Marshal.UnsafeAddrOfPinnedArrayElement(pReturnedData, 0), out uReturnedDataLength);
 
@@ -350,7 +355,8 @@ namespace CSnet
                 //return offset;
                 Debug.WriteLine($"Returned file position: {BitConverter.ToInt32(pReturnedData, 0)}");
                 return BitConverter.ToInt32(pReturnedData, 0);
-            } else
+            }
+            else
             {
                 MessageBox.Show("OTAP status error");
                 return -1;
@@ -367,7 +373,7 @@ namespace CSnet
             using (FileStream SourceStream = File.Open(filename, FileMode.OpenOrCreate))
             {
                 SourceStream.Seek(0, SeekOrigin.Begin);//go to the start of the file. I don't think this is necessary, unless we are writing over the top
-                
+
                 while (GetConfigurationFileChunk(SourceStream))
                 {
                     //method appends to file
@@ -389,7 +395,7 @@ namespace CSnet
             //4 bytes enum for file type
             int deviceID = 62; //Manager 0
             BitConverter.GetBytes(Convert.ToUInt64(Math.Pow(2, deviceID))).CopyTo(parameters, 0); //add address to parameters
-            
+
             parameters[8] = 2;//file type, ADI_WIL_FILE_TYPE_CONFIGURATION = 2
 
             int iResult = icsNeoDll.icsneoGenericAPISendCommand(m_hObject, uAPISelected, uInstanceSelected, uFunctionSelected, Marshal.UnsafeAddrOfPinnedArrayElement(parameters, 0), (uint)parameters.Length, out uFunctionError);
@@ -419,20 +425,20 @@ namespace CSnet
                 if (uCurrentFunction != uFunctionSelected || iResult != 1) //1 is success
                 {
                     // Handle Error Here
-                    MessageBox.Show($"Read error {iResult}");        
+                    MessageBox.Show($"Read error {iResult}");
                     return false;
                 }
 
                 // wBMS Packet Payload is located in the ExtraDataPtr
                 IntPtr ptr = fileChunk.pData;
                 Debug.WriteLine(fileChunk.pData);
-                Debug.WriteLine(Marshal.UnsafeAddrOfPinnedArrayElement(pReturnedData,5));
-                
+                Debug.WriteLine(Marshal.UnsafeAddrOfPinnedArrayElement(pReturnedData, 5));
+
                 byte[] managedArray = new byte[fileChunk.iByteCount];
                 Buffer.BlockCopy(pReturnedData, 5, managedArray, 0, fileChunk.iByteCount);
 
                 Debug.WriteLine(managedArray[0]);
-                
+
                 //Marshal.Copy(ptr, managedArray, 0, managedArray.Length); for some reason, this results in an access violation exception
 
                 //append file chunk
@@ -474,7 +480,7 @@ namespace CSnet
 
             byte function = ADI_WIL_API_GET_DEVICE_VERSION; // adi_wil_SetMode ADI_WIL_API_SET_MODE = 4;
             byte[] parameters = new byte[8];
-            
+
             //node id's are converted to powers of 2, for some reason
             BitConverter.GetBytes(Convert.ToUInt64(Math.Pow(2, deviceID))).CopyTo(parameters, 0);
 
@@ -519,7 +525,7 @@ namespace CSnet
 
             if (!CheckStatus(1, 0, function) || iResult != 1)
             {
-                
+
                 MessageBox.Show("Find version error");
             }
 
@@ -563,10 +569,10 @@ namespace CSnet
 
             byte function = 23;  //ADI_WIL_API_GET_CONTEXTUAL_DATA = 23
             byte[] parameters = new byte[9];
-           
+
             //node id's are converted to powers of 2, for some reason
             BitConverter.GetBytes(Convert.ToUInt64(Math.Pow(2, deviceID))).CopyTo(parameters, 0);
-            
+
             parameters[8] = Convert.ToByte(adi_wil_contextual_id_t.ADI_WIL_CONTEXTUAL_ID_0);
 
             SendGenericCommand(function, parameters);
@@ -579,7 +585,7 @@ namespace CSnet
 
             uAPISelected = 1;
             uInstanceSelected = 0;
-            
+
             int iResult = icsNeoDll.icsneoGenericAPIReadData(m_hObject, uAPISelected, uInstanceSelected, out uCurrentFunction, Marshal.UnsafeAddrOfPinnedArrayElement(pReturnedData, 0), out uReturnedDataLength);
             adi_wil_contextual_data_t contextualData = (adi_wil_contextual_data_t)Marshal.PtrToStructure(Marshal.UnsafeAddrOfPinnedArrayElement(pReturnedData, 0), typeof(adi_wil_contextual_data_t));
 
@@ -591,7 +597,7 @@ namespace CSnet
             }
 
             Debug.WriteLine(contextualData.iLength);
-            
+
             //adi_wil_contextual_data_t
         }
         private void Timer1_Tick(object sender, EventArgs e)
@@ -607,22 +613,28 @@ namespace CSnet
 
             if (!CheckStatus(1, 0, function) || iResult != 1)
             {
-                throw new Exception("Error whilst sending command to device");
+
             }
         }
 
         private void SetACL_Click(object sender, EventArgs e)
         {
-            string[] macAddresses = new string[16];
 
-            for(int i =0; i < 16; i++)
+            List<string> macAddresses = new List<string>();
+
+            for (int i = 0; i < 16; i++)
             {
-                //read mac addresses from user input (Form 2) TODO: do some input validation
-                macAddresses[i] = MyINI.GetIniKeyValueForStr("macAddress", $"{i+1}", Application.StartupPath + "\\config.ini");
+                //read mac addresses from user input (Form 2)
+                string address = MyINI.GetIniKeyValueForStr("macAddress", $"{i + 1}", Application.StartupPath + "\\config.ini");
+                if (address != "000000") // TODO: do some more input validation
+                {
+                    macAddresses.Add(address);
+                }
+
             }
 
             byte function = ADI_WIL_API_SET_ACL;
-            byte nodeCount = 16;
+            byte nodeCount = (byte)macAddresses.Count;
 
             List<byte> ACLList = new List<byte>
             {
@@ -630,9 +642,9 @@ namespace CSnet
             };
 
             //construct the list of mac addresses
-            for (int i = 0; i < 16; i++)
+            for (int i = 0; i < macAddresses.Count; i++)
             {
-                ACLList.AddRange(new byte[] { 0x64, 0xF9, 0xC0, 0x00, 0x00, Convert.ToByte(macAddresses[i].Substring(0, 2), 16) , Convert.ToByte(macAddresses[i].Substring(2, 2), 16) , Convert.ToByte(macAddresses[i].Substring(4, 2), 16) });
+                ACLList.AddRange(new byte[] { 0x64, 0xF9, 0xC0, 0x00, 0x00, Convert.ToByte(macAddresses[i].Substring(0, 2), 16), Convert.ToByte(macAddresses[i].Substring(2, 2), 16), Convert.ToByte(macAddresses[i].Substring(4, 2), 16) });
             }
 
             SetMode(ADI_WIL_MODE_STANDBY);
@@ -655,32 +667,41 @@ namespace CSnet
 
         private bool CheckStatus(byte uAPISelected, byte uInstanceSelected, byte uFunctionSelected)
         {
-            int timeOutCounter = 0;
+            int timeOutCounter = 0, result = 0;
 
             byte uCallbackError = 1, uFinishedProcessing, uCurrentFunction;
 
             do
             {
-                int iResult = icsNeoDll.icsneoGenericAPIGetStatus(m_hObject, uAPISelected, uInstanceSelected, out uCurrentFunction, out uCallbackError, out uFinishedProcessing);
-  
+                result = icsNeoDll.icsneoGenericAPIGetStatus(m_hObject, uAPISelected, uInstanceSelected, out uCurrentFunction, out uCallbackError, out uFinishedProcessing);
+
                 if (timeOutCounter == 1000)
                 {
-                    Debug.WriteLine("check status timeout");
-                    return false;
+                    throw new Exception($"Timeout whilst sending command to device {uCallbackError}");
                 }
                 timeOutCounter++;
                 Thread.Sleep(1);
                 //only breaks if command has been successfully sent, or timesout
-            } while (uFinishedProcessing == 0);            
+            } while (uFinishedProcessing == 0);
 
-            if (uCallbackError != ADI_WIL_ERR_SUCCESS)
+            if (uCallbackError == ADI_WIL_ERR_SUCCESS && result == 1)
             {
-                // Handle Error Here
+                return true;
+            }
+            else if (result != 1)
+            {
+                Debug.WriteLine("Command not sent");
+                return false;
+            }
+            else if (uCallbackError == 3)
+            {
+                Debug.WriteLine("Device not connected");
                 return false;
             }
             else
             {
-                return true;
+                Debug.WriteLine($"Operation not succesful {uCallbackError}");
+                return false;
             }
         }
 
@@ -765,11 +786,11 @@ namespace CSnet
                     using (Stream fileStream = openFileDialog.OpenFile())
                     {
                         OTAP(fileStream);
-                    }                    
+                    }
                 }
             }
 
-            
+
         }
 
         private void CmdReceive_Click(object sender, EventArgs e)
@@ -813,7 +834,7 @@ namespace CSnet
                     // Calculate the messages timestamp in seconds
                     lResult = icsNeoDll.icsneoGetTimeStampForMsg(m_hObject, ref stMessages[lCount - 1], ref dTime);
 
-                    
+
                     //Decode based on the protocol
                     switch (stMessages[lCount - 1].Protocol)
                     {
@@ -865,12 +886,12 @@ namespace CSnet
 
                             switch (uiPacketType)
                             {
-                                case API_PACKET_TYPE:                                    
+                                case API_PACKET_TYPE:
                                     //ignore
                                     break;
                                 case BMS_PACKET_TYPE:
                                     {
-                                        
+
                                         if (uiPayloadLength <= 514 && uiPayloadLength > 0)
                                         {
                                             // wBMS Packet Payload is located in the ExtraDataPtr
@@ -902,7 +923,7 @@ namespace CSnet
                                                 //calculate cumulative average for time between packets
                                                 modules[uiDeviceSource].AverageUpdateRate = (difference + modules[uiDeviceSource].UpdateRateCount * modules[uiDeviceSource].AverageUpdateRate) / (modules[uiDeviceSource].UpdateRateCount + 1);
                                                 modules[uiDeviceSource].UpdateRateCount++;
-                                                
+
                                                 //modules[uiDeviceSource].AverageUpdateRate;
                                                 //modules[uiDeviceSource].PeakUpdateRate;
 
@@ -951,7 +972,7 @@ namespace CSnet
                                             Debug.WriteLine("Payload Length exceeds the Maximum size of 514!");
                                         }
                                     }
-                               
+
                                     break;
                                 case PMS_PACKET_TYPE:
                                     {
@@ -969,7 +990,7 @@ namespace CSnet
                                             managers[0].PMSPacket0 = managedArray;
 
                                             if (uiPacketID == 0)
-                                            {                                                
+                                            {
                                                 managers[0].I1 = BitConverter.ToUInt16(managedArray, 11);
                                                 managers[0].I2 = BitConverter.ToUInt16(managedArray, 13);
                                                 managers[0].VBAT = BitConverter.ToUInt16(managedArray, 15);
@@ -979,7 +1000,8 @@ namespace CSnet
                                                 managers[0].AUX4 = BitConverter.ToUInt16(managedArray, 48);
                                                 managers[0].AUX5 = BitConverter.ToUInt16(managedArray, 61);
                                                 managers[0].AUX6 = BitConverter.ToUInt16(managedArray, 69);
-                                            } else if (uiPacketID == 2)
+                                            }
+                                            else if (uiPacketID == 2)
                                             {
                                                 managers[0].AUX7 = BitConverter.ToUInt16(managedArray, 69); //TODO: check if we can look in a different packet for AUX values? They are different sometimes
                                             }
@@ -1016,10 +1038,10 @@ namespace CSnet
                                             managers[0].G5V = BitConverter.ToUInt16(managedArray, 34);
                                             managers[0].G6V = BitConverter.ToUInt16(managedArray, 38);
                                             managers[0].G7V = BitConverter.ToUInt16(managedArray, 40);
-                                                     
+
                                             managers[0].EMSPacket0 = managedArray;
 
-                                            managers[0].CD1V = BitConverter.ToUInt16(managedArray,14);
+                                            managers[0].CD1V = BitConverter.ToUInt16(managedArray, 14);
                                         }
                                     }
                                     else
@@ -1042,7 +1064,7 @@ namespace CSnet
                                         {
                                             byte[] managedArray = new byte[uiPayloadLength];
                                             Marshal.Copy(ptr, managedArray, 0, uiPayloadLength);
-                                                                                        
+
                                             modules[uiDeviceSource].Latency = BitConverter.ToUInt16(managedArray, 24);
 
                                             byte RSSI = managedArray[31];
@@ -1051,7 +1073,7 @@ namespace CSnet
                                                 modules[uiDeviceSource].PeakRSSI = RSSI;
                                             }
                                             //TODO: also calculate average RSSI here & compare to health report packet ave RSSI, as seen below
-           
+
                                             break;
                                         }
                                     }
@@ -1118,16 +1140,16 @@ namespace CSnet
                 {
                     if (chkHexFormat)
                     {
-                        
+
                         module.Packet0.ToList().ForEach(x => outputText += $"{x:X2} ");
                         lstMessage.Items.Add(outputText);
                         outputText = "";
                     }
                     else
                     {
-                        Debug.WriteLine($"Peak update : {module.PeakUpdateRate}");
-                        Debug.WriteLine($"Average update : {module.AverageUpdateRate}");
-                        Debug.WriteLine($"Timestamp : {module.BMSMessageTimestamp}");
+                        //Debug.WriteLine($"Peak update : {module.PeakUpdateRate}");
+                        //Debug.WriteLine($"Average update : {module.AverageUpdateRate}");
+                        //Debug.WriteLine($"Timestamp : {module.BMSMessageTimestamp}");
                         outputText = $"Module {module.MacAddress} Version {module.version}";
                         foreach (double cgv in module.CGV)
                         {
@@ -1136,7 +1158,7 @@ namespace CSnet
                         outputText += $" {module.Thermistor1:0.00}C {module.Thermistor2:0.00}C";
                         lstMessage.Items.Add(outputText);
                         outputText = "";
-                    }                    
+                    }
                 }
 
                 if (chkHexFormat)
@@ -1175,7 +1197,7 @@ namespace CSnet
 
                     //EMS data
                     outputText = $"Manager 0 {managers[0].CD1V:0.00V} {managers[0].EMSReferenceVoltage1():0.00} {managers[0].EMSReferenceVoltage2():0.00} {managers[0].EMSTemperature1():0.00} {managers[0].EMSTemperature2():0.00} {managers[0].EMSPressure1():0.00} {managers[0].EMSPressure2():0.00} {managers[0].EMSGas1():0.00} {managers[0].EMSGas2():0.00}";
-                    
+
                     EMSBox.Items.Add(outputText);
                 }
             }
