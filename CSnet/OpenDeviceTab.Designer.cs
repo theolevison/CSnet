@@ -94,7 +94,7 @@
             this.ButtonGetConfig.TabIndex = 41;
             this.ButtonGetConfig.Text = "GET CONFIG";
             this.ButtonGetConfig.UseVisualStyleBackColor = true;
-            this.ButtonGetConfig.Click += new System.EventHandler(this.button6_Click);
+            this.ButtonGetConfig.Click += new System.EventHandler(this.Config_Click);
             // 
             // ButtonVersion
             // 
@@ -105,7 +105,7 @@
             this.ButtonVersion.TabIndex = 40;
             this.ButtonVersion.Text = "VERSIONS";
             this.ButtonVersion.UseVisualStyleBackColor = true;
-            this.ButtonVersion.Click += new System.EventHandler(this.button1_Click);
+            this.ButtonVersion.Click += new System.EventHandler(this.Version_Click);
             // 
             // label2
             // 
@@ -158,7 +158,7 @@
             this.ButtonGPIO.TabIndex = 36;
             this.ButtonGPIO.Text = "GPIO 9 HIGH";
             this.ButtonGPIO.UseVisualStyleBackColor = true;
-            this.ButtonGPIO.Click += new System.EventHandler(this.button5_Click);
+            this.ButtonGPIO.Click += new System.EventHandler(this.GPIO_Click);
             // 
             // firmwareLabel
             // 
@@ -188,7 +188,7 @@
             this.ButtonSetACL.TabIndex = 33;
             this.ButtonSetACL.Text = "SETACL";
             this.ButtonSetACL.UseVisualStyleBackColor = true;
-            this.ButtonSetACL.Click += new System.EventHandler(this.setACL_Click);
+            this.ButtonSetACL.Click += new System.EventHandler(this.SetACL_Click);
             // 
             // ButtonACLPage
             // 
@@ -199,7 +199,7 @@
             this.ButtonACLPage.TabIndex = 32;
             this.ButtonACLPage.Text = "ACL PAGE";
             this.ButtonACLPage.UseVisualStyleBackColor = true;
-            this.ButtonACLPage.Click += new System.EventHandler(this.ACLPage);
+            this.ButtonACLPage.Click += new System.EventHandler(this.ACLPage_Click);
             // 
             // ButtonGetACL
             // 
@@ -210,7 +210,7 @@
             this.ButtonGetACL.TabIndex = 31;
             this.ButtonGetACL.Text = "GETACL";
             this.ButtonGetACL.UseVisualStyleBackColor = true;
-            this.ButtonGetACL.Click += new System.EventHandler(this.getAclButton_Click);
+            this.ButtonGetACL.Click += new System.EventHandler(this.GetAclButton_Click);
             // 
             // lblWaitForRxMessageWithTimeOutResult
             // 
@@ -229,7 +229,7 @@
             this.ButtonOTAP.Size = new System.Drawing.Size(139, 49);
             this.ButtonOTAP.TabIndex = 26;
             this.ButtonOTAP.Text = "OTAP";
-            this.ButtonOTAP.Click += new System.EventHandler(this.cmdOTAP);
+            this.ButtonOTAP.Click += new System.EventHandler(this.OTAP_Click);
             // 
             // lblReadErrors
             // 
@@ -292,7 +292,7 @@
             this.cmdGetErrors.Size = new System.Drawing.Size(1211, 29);
             this.cmdGetErrors.TabIndex = 22;
             this.cmdGetErrors.Text = "Get Errors";
-            this.cmdGetErrors.Click += new System.EventHandler(this.cmdGetErrors_Click);
+            this.cmdGetErrors.Click += new System.EventHandler(this.GetErrors_Click);
             // 
             // Timer1
             // 

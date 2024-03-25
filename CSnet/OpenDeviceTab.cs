@@ -1,22 +1,12 @@
 ﻿using System;
-using System.CodeDom.Compiler;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Diagnostics;
-using System.Diagnostics.Eventing.Reader;
-using System.Drawing;
 using System.IO;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Runtime.InteropServices;
-using System.Runtime.InteropServices.ComTypes;
-using System.Security.Policy;
 using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.Xml.Linq;
 using LiuQF.Common;
 
 namespace CSnet
@@ -182,8 +172,6 @@ namespace CSnet
         public ModuleData[] modules;
         public ManagerData[] managers = new ManagerData[2];
 
-        private string sListString = "";//转中位机
-
         private uint GetPacketTypeFromArbId(uint arbId)
         {
             return (arbId >> 16) & 0xFF;
@@ -209,14 +197,13 @@ namespace CSnet
             managers[0].Version = DeviceFirmwareVersion(62);
             managers[1].Version = DeviceFirmwareVersion(63); //this should throw an error if the pack is BEV & only has one manager
 
-            getAclButton_Click(null, null);
+            GetAclButton_Click(null, null);
             modules = new ModuleData[nodeMacAddresses.Count];
 
             for (int i = 0; i < nodeMacAddresses.Count; i++)
             {
                 modules[i] = new ModuleData();
-                modules[i].MacAddress = nodeMacAddresses[i];
-                
+                modules[i].MacAddress = nodeMacAddresses[i];                
             }
 
             InitializeComponent();
@@ -252,7 +239,7 @@ namespace CSnet
 
         private void OTAP(Stream fileStream)
         {
-            setMode(ADI_WIL_MODE_STANDBY);
+            SetMode(ADI_WIL_MODE_STANDBY);
             /*The user is able to switch between what type of file they want to flash and WIL version
     
                 opfw1x -  we need to have WIL 1.x flashed onto the RAD-wBMS and makes use the network is in standby
@@ -372,7 +359,7 @@ namespace CSnet
 
         private void GetConfigFile()
         {
-            setMode(ADI_WIL_MODE_STANDBY);
+            SetMode(ADI_WIL_MODE_STANDBY);
 
             //open file writer stream
             string filename = @"c:\Users\Public\Documents\configFile.txt";
@@ -462,21 +449,15 @@ namespace CSnet
 
         private void PMSGPIO(ulong manager, byte highLow)
         {
-            byte functionError = 0;
             byte function = ADI_WIL_API_SET_GPIO; // adi_wil_SetMode ADI_WIL_API_SET_MODE = 4;
-            byte[] parameters = new byte[512];
+            byte[] parameters = new byte[10];
 
             BitConverter.GetBytes(manager).CopyTo(parameters, 0);
             //parameters[0] = ADI_WIL_DEV_MANAGER_0; //target first manager //64 or 65
             parameters[8] = 4; // pin 9
             parameters[9] = highLow; // set to high
 
-            int iResult = icsNeoDll.icsneoGenericAPISendCommand(m_hObject, 1, 0, function, Marshal.UnsafeAddrOfPinnedArrayElement(parameters, 0), 10, out functionError);
-
-            if (!checkStatus(1, 0, function) || iResult != 1)
-            {
-                MessageBox.Show("GPIO error");
-            }
+            SendGenericCommand(function, parameters);
 
             /*
                 The GPIO pin on the target device is set to be an output pin before its value is set. 
@@ -489,24 +470,15 @@ namespace CSnet
 
         private int DeviceFirmwareVersion(int deviceID)
         {
-            setMode(ADI_WIL_MODE_STANDBY);
+            SetMode(ADI_WIL_MODE_STANDBY);
 
-            //Get Device version
-            byte functionError = 0;
             byte function = ADI_WIL_API_GET_DEVICE_VERSION; // adi_wil_SetMode ADI_WIL_API_SET_MODE = 4;
             byte[] parameters = new byte[8];
-
-
+            
             //node id's are converted to powers of 2, for some reason
             BitConverter.GetBytes(Convert.ToUInt64(Math.Pow(2, deviceID))).CopyTo(parameters, 0);
 
-            int iResult = icsNeoDll.icsneoGenericAPISendCommand(m_hObject, 1, 0, function, Marshal.UnsafeAddrOfPinnedArrayElement(parameters, 0), (uint)parameters.Length, out functionError);
-
-            if (!checkStatus(1, 0, function) || iResult != 1)
-            {
-                MessageBox.Show("Find version error");
-                return 0;
-            }
+            SendGenericCommand(function, parameters);
 
             byte uAPISelected, uInstanceSelected, uFunctionError, uCurrentFunction, uNodeCount;
             byte[] pReturnedData = new byte[512];
@@ -517,7 +489,7 @@ namespace CSnet
             uAPISelected = 1;
             uInstanceSelected = 0;
 
-            iResult = icsNeoDll.icsneoGenericAPIReadData(m_hObject, uAPISelected, uInstanceSelected, out uCurrentFunction, Marshal.UnsafeAddrOfPinnedArrayElement(pReturnedData, 0), out uReturnedDataLength);
+            int iResult = icsNeoDll.icsneoGenericAPIReadData(m_hObject, uAPISelected, uInstanceSelected, out uCurrentFunction, Marshal.UnsafeAddrOfPinnedArrayElement(pReturnedData, 0), out uReturnedDataLength);
             adi_wil_dev_version_t version = (adi_wil_dev_version_t)Marshal.PtrToStructure(Marshal.UnsafeAddrOfPinnedArrayElement(pReturnedData, 0), typeof(adi_wil_dev_version_t));
 
             if (uCurrentFunction != function || iResult != 1) //1 is success
@@ -535,7 +507,7 @@ namespace CSnet
 
         private void WilFirmwareVersion()
         {
-            setMode(ADI_WIL_MODE_STANDBY);
+            SetMode(ADI_WIL_MODE_STANDBY);
 
             //Get WIL version
             byte functionError = 0;
@@ -545,12 +517,11 @@ namespace CSnet
 
             iResult = icsNeoDll.icsneoGenericAPISendCommand(m_hObject, 1, 0, function, Marshal.UnsafeAddrOfPinnedArrayElement(parameters, 0), 0, out functionError);
 
-            if (!checkStatus(1, 0, function) || iResult != 1)
+            if (!CheckStatus(1, 0, function) || iResult != 1)
             {
                 
                 MessageBox.Show("Find version error");
             }
-
 
             byte uAPISelected, uInstanceSelected, uFunctionError, uCurrentFunction, uNodeCount;
             byte[] pReturnedData = new byte[512];
@@ -588,10 +559,8 @@ namespace CSnet
 
         public void GetContextualData(int deviceID)
         {
-            setMode(ADI_WIL_MODE_STANDBY);
+            SetMode(ADI_WIL_MODE_STANDBY);
 
-            //Get Device version
-            byte functionError = 0;
             byte function = 23;  //ADI_WIL_API_GET_CONTEXTUAL_DATA = 23
             byte[] parameters = new byte[9];
            
@@ -600,13 +569,7 @@ namespace CSnet
             
             parameters[8] = Convert.ToByte(adi_wil_contextual_id_t.ADI_WIL_CONTEXTUAL_ID_0);
 
-            int iResult = icsNeoDll.icsneoGenericAPISendCommand(m_hObject, 1, 0, function, Marshal.UnsafeAddrOfPinnedArrayElement(parameters, 0), (uint)parameters.Length, out functionError);
-
-            if (!checkStatus(1, 0, function) || iResult != 1)
-            {
-                MessageBox.Show("Find version error");
-                return;
-            }
+            SendGenericCommand(function, parameters);
 
             byte uAPISelected, uInstanceSelected, uFunctionError, uCurrentFunction, uNodeCount;
             byte[] pReturnedData = new byte[512];
@@ -617,7 +580,7 @@ namespace CSnet
             uAPISelected = 1;
             uInstanceSelected = 0;
             
-            iResult = icsNeoDll.icsneoGenericAPIReadData(m_hObject, uAPISelected, uInstanceSelected, out uCurrentFunction, Marshal.UnsafeAddrOfPinnedArrayElement(pReturnedData, 0), out uReturnedDataLength);
+            int iResult = icsNeoDll.icsneoGenericAPIReadData(m_hObject, uAPISelected, uInstanceSelected, out uCurrentFunction, Marshal.UnsafeAddrOfPinnedArrayElement(pReturnedData, 0), out uReturnedDataLength);
             adi_wil_contextual_data_t contextualData = (adi_wil_contextual_data_t)Marshal.PtrToStructure(Marshal.UnsafeAddrOfPinnedArrayElement(pReturnedData, 0), typeof(adi_wil_contextual_data_t));
 
             if (uCurrentFunction != function || iResult != 1) //1 is success
@@ -636,7 +599,19 @@ namespace CSnet
             CmdReceive_Click(ButtonGetMessages, null);
         }
 
-        private void setACL_Click(object sender, EventArgs e)
+        private void SendGenericCommand(byte function, byte[] parameters)
+        {
+            byte functionError = 0;
+
+            int iResult = icsNeoDll.icsneoGenericAPISendCommand(m_hObject, 1, 0, function, Marshal.UnsafeAddrOfPinnedArrayElement(parameters, 0), (uint)parameters.Length, out functionError);
+
+            if (!CheckStatus(1, 0, function) || iResult != 1)
+            {
+                throw new Exception("Error whilst sending command to device");
+            }
+        }
+
+        private void SetACL_Click(object sender, EventArgs e)
         {
             string[] macAddresses = new string[16];
 
@@ -647,15 +622,13 @@ namespace CSnet
                 //macAddresses[i] = macAddresses[i].Trim();
             }
 
-            byte uAPISelected, uInstanceSelected, uFunctionSelected, uFunctionError;
-            byte[] pParameters = new byte[512];
-            uint uTotalLength;
-            uAPISelected = 1;
-            uInstanceSelected = 0;
-            uFunctionSelected = ADI_WIL_API_SET_ACL;
-            byte uNodeCount = 16;
+            byte function = ADI_WIL_API_SET_ACL;
+            byte nodeCount = 16;
 
-            List<byte> ACLList = new List<byte>();
+            List<byte> ACLList = new List<byte>
+            {
+                nodeCount
+            };
 
             //construct the list of mac addresses
             for (int i = 0; i < 16; i++)
@@ -663,24 +636,12 @@ namespace CSnet
                 ACLList.AddRange(new byte[] { 0x64, 0xF9, 0xC0, 0x00, 0x00, Convert.ToByte(macAddresses[i].Substring(0, 2), 16) , Convert.ToByte(macAddresses[i].Substring(2, 2), 16) , Convert.ToByte(macAddresses[i].Substring(4, 2), 16) });
             }
 
-            byte[] pACLArray = ACLList.ToArray();
+            SetMode(ADI_WIL_MODE_STANDBY);
 
-            setMode(ADI_WIL_MODE_STANDBY);
-
-            pParameters[0] = uNodeCount;
-            Buffer.BlockCopy(pACLArray, 0, pParameters, 1, pACLArray.Length);
-
-            uTotalLength = (uint)(1 + pACLArray.Length);
-
-            int iResult = icsNeoDll.icsneoGenericAPISendCommand(m_hObject, uAPISelected, uInstanceSelected, uFunctionSelected, Marshal.UnsafeAddrOfPinnedArrayElement(pParameters, 0), uTotalLength, out uFunctionError);
-
-            if (!checkStatus(1, 0, uFunctionSelected) || iResult != 1)
-            {
-                MessageBox.Show("Set ACL error");
-            }
+            SendGenericCommand(function, ACLList.ToArray());
         }
 
-        private void ACLPage(object sender, EventArgs e)
+        private void ACLPage_Click(object sender, EventArgs e)
         {
             //must set mode to standby before setting ACL
 
@@ -693,7 +654,7 @@ namespace CSnet
             fw.ShowDialog();
         }
 
-        private bool checkStatus(byte uAPISelected, byte uInstanceSelected, byte uFunctionSelected)
+        private bool CheckStatus(byte uAPISelected, byte uInstanceSelected, byte uFunctionSelected)
         {
             int timeOutCounter = 0;
 
@@ -724,60 +685,41 @@ namespace CSnet
             }
         }
 
-        private void setMode(byte mode)
+        private void SetMode(byte mode)
         {
             if (mode != currentMode)
             {
-                //set mode to active
-                //adi_wil_SetMode(m_hObject, 3);
-                byte functionError = 0;
                 byte function = ADI_WIL_API_SET_MODE; // adi_wil_SetMode ADI_WIL_API_SET_MODE = 4;
                 byte[] parameters = new byte[512];
 
                 parameters[0] = mode; //3 = active mode
 
-                int result = icsNeoDll.icsneoGenericAPISendCommand(m_hObject, 1, 0, function, Marshal.UnsafeAddrOfPinnedArrayElement(parameters, 0), 1, out functionError);
-                if (result != 1)
-                {
-                    Debug.WriteLine("Set mode command not sent to device");
-                }
+                SendGenericCommand(function, parameters);
 
-                if (!checkStatus(1, 0, function))
-                {
-                    MessageBox.Show("Set mode error");
-                } else
-                {
-                    currentMode = mode;
-                }
+                currentMode = mode;
             }
         }
 
         private Dictionary<int, string> nodeMacAddresses = new Dictionary<int, string>();
 
-        private void getAclButton_Click(object sender, EventArgs e)//获取ACL
+        private void GetAclButton_Click(object sender, EventArgs e)//获取ACL
         {
             //get ACL is available in all system modes
+            byte function = ADI_WIL_API_GET_ACL;
 
-            byte uAPISelected, uInstanceSelected, uFunctionSelected, uFunctionError, uCurrentFunction, uNodeCount;
+            SendGenericCommand(function, new byte[0]);
+
+            byte uAPISelected, uInstanceSelected, uFunctionError, uCurrentFunction, uNodeCount;
             byte[] pReturnedData = new byte[ADI_WIL_MAC_SIZE * ADI_WIL_MAX_NODES + 1];
 
-            uint uParametersLength, uReturnedDataLength;
+            uint uReturnedDataLength;
 
             uAPISelected = 1;
             uInstanceSelected = 0;
-            uFunctionSelected = ADI_WIL_API_GET_ACL;
 
-            int iResult = icsNeoDll.icsneoGenericAPISendCommand(m_hObject, uAPISelected, uInstanceSelected, uFunctionSelected, IntPtr.Zero, 0, out uFunctionError);
+            int iResult = icsNeoDll.icsneoGenericAPIReadData(m_hObject, uAPISelected, uInstanceSelected, out uCurrentFunction, Marshal.UnsafeAddrOfPinnedArrayElement(pReturnedData, 0), out uReturnedDataLength);
 
-            if (!checkStatus(uAPISelected, uInstanceSelected, uFunctionSelected) || iResult != 1)
-            {
-                MessageBox.Show("ACL error");
-                return;
-            }
-
-            iResult = icsNeoDll.icsneoGenericAPIReadData(m_hObject, uAPISelected, uInstanceSelected, out uCurrentFunction, Marshal.UnsafeAddrOfPinnedArrayElement(pReturnedData, 0), out uReturnedDataLength);
-
-            if (uCurrentFunction != uFunctionSelected || iResult != 1) //1 is success
+            if (uCurrentFunction != function || iResult != 1) //1 is success
             {
                 // Handle Error Here
                 MessageBox.Show($"Read error {iResult}");
@@ -806,7 +748,7 @@ namespace CSnet
             }
         }
 
-        private void cmdOTAP(object sender, EventArgs e)
+        private void OTAP_Click(object sender, EventArgs e)
         {
             var fileContent = string.Empty;
             var filePath = string.Empty;
@@ -833,7 +775,7 @@ namespace CSnet
 
         private void CmdReceive_Click(object sender, EventArgs e)
         {
-            setMode(ADI_WIL_MODE_ACTIVE);
+            SetMode(ADI_WIL_MODE_ACTIVE);
 
             long lResult;
             int lNumberOfMessages = 0;
@@ -873,23 +815,6 @@ namespace CSnet
                     lResult = icsNeoDll.icsneoGetTimeStampForMsg(m_hObject, ref stMessages[lCount - 1], ref dTime);
 
                     
-                    //sListString1 = "Time : " + Convert.ToString(dTime);  //Build String
-                    //TODO: unpack raw data into correct format
-
-                    // Was it a tx or rx message
-                    if ((stMessages[lCount - 1].StatusBitField & Convert.ToInt32(eDATA_STATUS_BITFIELD_1.SPY_STATUS_TX_MSG)) > 0)
-                    {
-                        sListString = sListString + " Tx ";
-                    }
-                    else
-                    {
-                        sListString = sListString + " Rx ";
-                    }
-
-                    //Add the network name to the string
-
-                    sListString = sListString + "Network " + icsNeoDll.GetStringForNetworkID(Convert.ToInt16((stMessages[lCount - 1].NetworkID2 << 8) + stMessages[lCount - 1].NetworkID));
-
                     //Decode based on the protocol
                     switch (stMessages[lCount - 1].Protocol)
                     {
@@ -901,12 +826,11 @@ namespace CSnet
 
                             if (iNetId == 532)
                             {
-                                sListString += "wBMS 01 ";
+                                //wBMS 01;
                             }
                             else
                             {
                                 //This is not a wBMS message
-                                sListString += "Unknown ";
                             }
                             // Grab wBMS specific fields from the ArbIDOrHeader value
                             uint uiPacketType = GetPacketTypeFromArbId((uint)stMessages[lCount - 1].ArbIDOrHeader);
@@ -917,35 +841,23 @@ namespace CSnet
 
                             if (0 <= uiDeviceSource && uiDeviceSource < MAX_NODES)
                             {
-                                sListString += $"Node {uiDeviceSource} ";
-
-                                /*
-                                //16台设备00数据收集
-                                if (uiPacketID == 0)
-                                {
-                                    modules[uiDeviceSource].Packet0[0] = (byte)uiDeviceSource;
-                                }
-                                else
-                                {
-                                    modules[uiDeviceSource].Packet1[0] = (byte)uiDeviceSource;
-                                }
-                                */
+                                //Module
                             }
                             else if (uiDeviceSource == MANAGER_0_ID || uiDeviceSource == MANAGER_1_ID)
                             {
-                                sListString += $"Manager {uiDeviceSource - MANAGER_0_ID} ";
+                                //Manager
                             }
                             else if (uiDeviceSource == SOURCE_WIL)
                             {
-                                sListString += "WIL ";
+                                //WIL
                             }
                             else if (uiDeviceSource == SOURCE_HOST)
                             {
-                                sListString += "HOST ";
+                                //HOST
                             }
                             else
                             {
-                                sListString += "Unknown ";
+                                //Unknown
                             }
 
                             // Combine the wBMS message together
@@ -954,15 +866,12 @@ namespace CSnet
 
                             switch (uiPacketType)
                             {
-                                case API_PACKET_TYPE:
-                                    sListString += "API ";
-
-                                    //TODO: ignore
+                                case API_PACKET_TYPE:                                    
+                                    //ignore
                                     break;
                                 case BMS_PACKET_TYPE:
                                     {
-                                        sListString += "BMS ";
-
+                                        
                                         if (uiPayloadLength <= 514 && uiPayloadLength > 0)
                                         {
                                             // wBMS Packet Payload is located in the ExtraDataPtr
@@ -1043,7 +952,7 @@ namespace CSnet
                                             Debug.WriteLine("Payload Length exceeds the Maximum size of 514!");
                                         }
                                     }
-                                    //TODO: look in ICS WIL DLL Deliverables\wbmsapitester\wbmsapitester\containers for information on decoding bms payload
+                               
                                     break;
                                 case PMS_PACKET_TYPE:
                                     {
@@ -1082,7 +991,6 @@ namespace CSnet
                                         }
                                     }
 
-                                    //TODO: look in ICS WIL DLL Deliverables\wbmsapitester\wbmsapitester\containers for information on decoding pms payload
                                     break;
                                 case EMS_PACKET_TYPE:
                                     //EMS
@@ -1187,66 +1095,24 @@ namespace CSnet
                                     //TODO: decode payload
                                     break;
                                 default:
-                                    sListString += "Unknown ";
+                                    //Unknown
                                     break;
                             }
 
                             break;
 
                         case (int)ePROTOCOL.SPY_PROTOCOL_CAN:
-                            // list the arb id
-                            sListString = sListString + " ArbID : " + icsNeoDll.ConvertToHex(Convert.ToString(stMessages[lCount - 1].ArbIDOrHeader)) + "  Data ";
                             break;
                         case (int)ePROTOCOL.SPY_PROTOCOL_CANFD:
+                            break;
                         case (int)ePROTOCOL.SPY_PROTOCOL_ETHERNET:
-                            if (stMessages[lCount - 1].ExtraDataPtrEnabled == 0)
-                            {
-                                //8 bytes of data
-                                sListString = sListString + " FD ArbID : " + Convert.ToString(stMessages[lCount - 1].ArbIDOrHeader, 16) + "  Data ";
-                            }
-                            else
-                            {
-                                if (stMessages[lCount - 1].Protocol == Convert.ToByte(ePROTOCOL.SPY_PROTOCOL_CANFD))
-                                {
-                                    //Count for CAN FD
-                                    iLongMessageTotalByteCount = stMessages[lCount - 1].NumberBytesData;
-                                }
-                                else
-                                {
-                                    //Count for Ethernet
-                                    iLongMessageTotalByteCount = ((stMessages[lCount - 1].NumberBytesHeader * 0x100) + stMessages[lCount - 1].NumberBytesData);
-                                }
-
-                                //More than 8 bytes of data
-                                iDataBytes = new byte[iLongMessageTotalByteCount];
-
-                                Marshal.Copy(stMessages[lCount - 1].iExtraDataPtr, iDataBytes, 0, iLongMessageTotalByteCount);
-                                GCHandle gcHandle = GCHandle.Alloc(iDataBytes, GCHandleType.Pinned);
-
-                                if (stMessages[lCount - 1].Protocol == (int)ePROTOCOL.SPY_PROTOCOL_CANFD) sListString = sListString + " FD ArbID : " + Convert.ToString(stMessages[lCount - 1].ArbIDOrHeader, 16);
-                                sListString = sListString + "  Data ";
-                                for (iByteCount = 0; iByteCount < iLongMessageTotalByteCount; iByteCount++)
-                                {
-                                    sListString = sListString + Convert.ToString(iDataBytes[iByteCount], 16) + " ";
-                                }
-                                gcHandle.Free();
-                            }
                             break;
                         default:
-                            // list the headers bytes
-                            icsNeoDll.ConvertCANtoJ1850Message(ref stMessages[lCount - 1], ref stJMsg);
-                            sListString = sListString + " Data : ";
-
-                            //add the data bytes
-                            if (stJMsg.NumberBytesHeader >= 1) sListString = sListString + icsNeoDll.ConvertToHex(Convert.ToString(stJMsg.Header1)) + " ";
-                            if (stJMsg.NumberBytesHeader >= 2) sListString = sListString + icsNeoDll.ConvertToHex(Convert.ToString(stJMsg.Header2)) + " ";
-                            if (stJMsg.NumberBytesHeader >= 3) sListString = sListString + icsNeoDll.ConvertToHex(Convert.ToString(stJMsg.Header3)) + " ";
-                            sListString = sListString + "  ";
                             break;
                     }
                 }
 
-                string temp = "";
+                string outputText = "";
 
                 //iterate through each node, printing the latest packet in the requested format
                 foreach (ModuleData module in modules)
@@ -1254,33 +1120,32 @@ namespace CSnet
                     if (chkHexFormat)
                     {
                         
-                        module.Packet0.ToList().ForEach(x => temp += $"{x:X2} ");
-                        lstMessage.Items.Add(temp);
-                        temp = "";
+                        module.Packet0.ToList().ForEach(x => outputText += $"{x:X2} ");
+                        lstMessage.Items.Add(outputText);
+                        outputText = "";
                     }
                     else
                     {
                         Debug.WriteLine($"Peak update : {module.PeakUpdateRate}");
                         Debug.WriteLine($"Average update : {module.AverageUpdateRate}");
                         Debug.WriteLine($"Timestamp : {module.BMSMessageTimestamp}");
-                        temp = $"Module {module.MacAddress} Version {module.version}";
+                        outputText = $"Module {module.MacAddress} Version {module.version}";
                         foreach (double cgv in module.CGV)
                         {
-                            temp += $" {cgv:0.000}V";
+                            outputText += $" {cgv:0.000}V";
                         }
-                        temp += $" {module.Thermistor1:0.00}C {module.Thermistor2:0.00}C";
-                        lstMessage.Items.Add(temp);
-                        temp = "";
-                    }
-                    //lstMessage.Items.Add(String.Join(" ", message.packet0));
+                        outputText += $" {module.Thermistor1:0.00}C {module.Thermistor2:0.00}C";
+                        lstMessage.Items.Add(outputText);
+                        outputText = "";
+                    }                    
                 }
 
                 if (chkHexFormat)
                 {
                     //PMS data
-                    managers[0].PMSPacket0.ToList().ForEach(x => temp += $"{x:X2} ");
-                    PMSBox.Items.Add(temp);
-                    temp = "";
+                    managers[0].PMSPacket0.ToList().ForEach(x => outputText += $"{x:X2} ");
+                    PMSBox.Items.Add(outputText);
+                    outputText = "";
                     /*
                     managers[1].PMSPacket0.ToList().ForEach(x => temp += $"{x:X2} ");
                     PMSBox.Items.Add(temp);
@@ -1288,8 +1153,8 @@ namespace CSnet
                     */
 
                     //EMS data
-                    managers[0].EMSPacket0.ToList().ForEach(x => temp += $"{x:X2} ");
-                    EMSBox.Items.Add(temp);
+                    managers[0].EMSPacket0.ToList().ForEach(x => outputText += $"{x:X2} ");
+                    EMSBox.Items.Add(outputText);
 
                     /*
                     managers[1].EMSPacket0.ToList().ForEach(x => temp += $"{x:X2} "); //TODO: make this an option in packet reading
@@ -1299,20 +1164,20 @@ namespace CSnet
                 else
                 {
                     //PMS data
-                    temp = $"Manager 0 BEV {managers[0].I1:0.00}A {managers[0].I2:0.00}A {managers[0].GetBEVDCFCPlus():0.00} {managers[0].GetBEVDCFCMinus():0.00} {managers[0].GetBEVShuntTemp():0.00} {managers[0].GetBEVDCFCContactorTemp():0.00} {managers[0].GetBEVMainContactorTemp():0.00} {managers[0].GetBEVVREF():0.00}";
-                    PMSBox.Items.Add(temp);
-                    temp = $"Manager 0 BETA {managers[0].GetBETAHVCDMinus()} {managers[0].GetBETASA1Temp()} {managers[0].GetBETASA4Temp()} {managers[0].GetBETASA3Temp()} {managers[0].GetBETAShuntTemperature()}";
-                    PMSBox.Items.Add(temp);
-                    temp = $"Manager 0 BETB {managers[0].GetBETBDCFCDifferential()} {managers[0].GetBETBDCFCMinus()} {managers[0].GetBETBDCFCPlus()} {managers[0].GetBETBSB1Temp()} {managers[0].GetBETBShuntTemp()} {managers[0].GetBETBHVDCMinus()}";
-                    PMSBox.Items.Add(temp);
+                    outputText = $"Manager 0 BEV {managers[0].I1:0.00}A {managers[0].I2:0.00}A {managers[0].GetBEVDCFCPlus():0.00} {managers[0].GetBEVDCFCMinus():0.00} {managers[0].GetBEVShuntTemp():0.00} {managers[0].GetBEVDCFCContactorTemp():0.00} {managers[0].GetBEVMainContactorTemp():0.00} {managers[0].GetBEVVREF():0.00}";
+                    PMSBox.Items.Add(outputText);
+                    outputText = $"Manager 0 BETA {managers[0].GetBETAHVCDMinus()} {managers[0].GetBETASA1Temp()} {managers[0].GetBETASA4Temp()} {managers[0].GetBETASA3Temp()} {managers[0].GetBETAShuntTemperature()}";
+                    PMSBox.Items.Add(outputText);
+                    outputText = $"Manager 0 BETB {managers[0].GetBETBDCFCDifferential()} {managers[0].GetBETBDCFCMinus()} {managers[0].GetBETBDCFCPlus()} {managers[0].GetBETBSB1Temp()} {managers[0].GetBETBShuntTemp()} {managers[0].GetBETBHVDCMinus()}";
+                    PMSBox.Items.Add(outputText);
                     //Debug.WriteLine(managers[0].PMSPacket0);
                     //Debug.WriteLine(managers[0].AUX1);
                     //Debug.WriteLine(managers[0].AUX2);
 
                     //EMS data
-                    temp = $"Manager 0 {managers[0].CD1V:0.00V} {managers[0].EMSReferenceVoltage1():0.00} {managers[0].EMSReferenceVoltage2():0.00} {managers[0].EMSTemperature1():0.00} {managers[0].EMSTemperature2():0.00} {managers[0].EMSPressure1():0.00} {managers[0].EMSPressure2():0.00} {managers[0].EMSGas1():0.00} {managers[0].EMSGas2():0.00}";
+                    outputText = $"Manager 0 {managers[0].CD1V:0.00V} {managers[0].EMSReferenceVoltage1():0.00} {managers[0].EMSReferenceVoltage2():0.00} {managers[0].EMSTemperature1():0.00} {managers[0].EMSTemperature2():0.00} {managers[0].EMSPressure1():0.00} {managers[0].EMSPressure2():0.00} {managers[0].EMSGas1():0.00} {managers[0].EMSGas2():0.00}";
                     
-                    EMSBox.Items.Add(temp);
+                    EMSBox.Items.Add(outputText);
                 }
             }
             else
@@ -1321,7 +1186,7 @@ namespace CSnet
             }
         }
 
-        private void cmdGetErrors_Click(object sender, EventArgs e)
+        private void GetErrors_Click(object sender, EventArgs e)
         {
             int iResult = 0;  //Storage for Result of Call
             int[] iErrors = new int[600];  //Array for Error Numbers
@@ -1372,13 +1237,13 @@ namespace CSnet
             }
         }
 
-        private void button5_Click(object sender, EventArgs e)
+        private void GPIO_Click(object sender, EventArgs e)
         {
             //WilFirmwareVersion(); //don't need to check this
             PMSGPIO(ADI_WIL_DEV_MANAGER_0, 1);
             PMSGPIO(ADI_WIL_DEV_MANAGER_1, 1);
         }
-        private void button1_Click(object sender, EventArgs e)
+        private void Version_Click(object sender, EventArgs e)
         {
             for (int i = 0; i < modules.Length; i++)
             {
@@ -1386,7 +1251,7 @@ namespace CSnet
             }
         }
 
-        private void button6_Click(object sender, EventArgs e)
+        private void Config_Click(object sender, EventArgs e)
         {
             //GetConfigFile();
             GetContextualData(0);
