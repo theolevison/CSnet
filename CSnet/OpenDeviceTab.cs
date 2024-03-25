@@ -962,78 +962,78 @@ namespace CSnet
                             break;
                     }
                 }
-
-                string outputText = "";
-
-                //iterate through each node, printing the latest packet in the requested format
-                foreach (ModuleData module in modules)
-                {
-                    if (chkHexFormat)
-                    {
-
-                        module.Packet0.ToList().ForEach(x => outputText += $"{x:X2} ");
-                        lstMessage.Items.Add(outputText);
-                        outputText = "";
-                    }
-                    else
-                    {
-                        //Debug.WriteLine($"Peak update : {module.PeakUpdateRate}");
-                        //Debug.WriteLine($"Average update : {module.AverageUpdateRate}");
-                        //Debug.WriteLine($"Timestamp : {module.BMSMessageTimestamp}");
-                        outputText = $"Module {module.MacAddress} Version {module.version}";
-                        foreach (double cgv in module.CGV)
-                        {
-                            outputText += $" {cgv:0.000}V";
-                        }
-                        outputText += $" {module.Thermistor1:0.00}C {module.Thermistor2:0.00}C";
-                        lstMessage.Items.Add(outputText);
-                        outputText = "";
-                    }
-                }
-
-                if (chkHexFormat)
-                {
-                    //PMS data
-                    managers[0].PMSPacket0.ToList().ForEach(x => outputText += $"{x:X2} ");
-                    PMSBox.Items.Add(outputText);
-                    outputText = "";
-                    /*
-                    managers[1].PMSPacket0.ToList().ForEach(x => temp += $"{x:X2} ");
-                    PMSBox.Items.Add(temp);
-                    temp = "";
-                    */
-
-                    //EMS data
-                    managers[0].EMSPacket0.ToList().ForEach(x => outputText += $"{x:X2} ");
-                    EMSBox.Items.Add(outputText);
-
-                    /*
-                    managers[1].EMSPacket0.ToList().ForEach(x => temp += $"{x:X2} "); //TODO: make this an option in packet reading
-                    EMSBox.Items.Add(temp);
-                    */
-                }
-                else
-                {
-                    //PMS data
-                    outputText = $"Manager 0 BEV {managers[0].I1:0.00}A {managers[0].I2:0.00}A {managers[0].GetBEVDCFCPlus():0.00} {managers[0].GetBEVDCFCMinus():0.00} {managers[0].GetBEVShuntTemp():0.00} {managers[0].GetBEVDCFCContactorTemp():0.00} {managers[0].GetBEVMainContactorTemp():0.00} {managers[0].GetBEVVREF():0.00}";
-                    PMSBox.Items.Add(outputText);
-                    outputText = $"Manager 0 BETA {managers[0].GetBETAHVCDMinus()} {managers[0].GetBETASA1Temp()} {managers[0].GetBETASA4Temp()} {managers[0].GetBETASA3Temp()} {managers[0].GetBETAShuntTemperature()}";
-                    PMSBox.Items.Add(outputText);
-                    outputText = $"Manager 0 BETB {managers[0].GetBETBDCFCDifferential()} {managers[0].GetBETBDCFCMinus()} {managers[0].GetBETBDCFCPlus()} {managers[0].GetBETBSB1Temp()} {managers[0].GetBETBShuntTemp()} {managers[0].GetBETBHVDCMinus()}";
-                    PMSBox.Items.Add(outputText);
-                    //Debug.WriteLine(managers[0].PMSPacket0);
-                    //Debug.WriteLine(managers[0].AUX1);
-                    //Debug.WriteLine(managers[0].AUX2);
-
-                    //EMS data
-                    outputText = $"Manager 0 {managers[0].CD1V:0.00V} {managers[0].EMSReferenceVoltage1():0.00} {managers[0].EMSReferenceVoltage2():0.00} {managers[0].EMSTemperature1():0.00} {managers[0].EMSTemperature2():0.00} {managers[0].EMSPressure1():0.00} {managers[0].EMSPressure2():0.00} {managers[0].EMSGas1():0.00} {managers[0].EMSGas2():0.00}";
-
-                    EMSBox.Items.Add(outputText);
-                }
+                OutputData();
             }
             else
             {
                 MessageBox.Show("Problem Reading Messages");
+            }
+        }
+
+        private void OutputData()
+        {
+            string outputText = "";
+
+            //iterate through each node, printing the latest packet in the requested format
+            foreach (ModuleData module in modules)
+            {
+                if (chkHexFormat)
+                {
+                    module.Packet0.ToList().ForEach(x => outputText += $"{x:X2} ");
+                    lstMessage.Items.Add(outputText);
+                    outputText = "";
+                }
+                else
+                {
+                    outputText = $"Module {module.MacAddress} Version {module.version}";
+                    foreach (double cgv in module.CGV)
+                    {
+                        outputText += $" {cgv:0.000}V";
+                    }
+                    outputText += $" {module.Thermistor1:0.00}C {module.Thermistor2:0.00}C";
+                    lstMessage.Items.Add(outputText);
+                    outputText = "";
+                }
+            }
+
+            if (chkHexFormat)
+            {
+                //PMS data
+                managers[0].PMSPacket0.ToList().ForEach(x => outputText += $"{x:X2} ");
+                PMSBox.Items.Add(outputText);
+                outputText = "";
+                /*
+                managers[1].PMSPacket0.ToList().ForEach(x => temp += $"{x:X2} ");
+                PMSBox.Items.Add(temp);
+                temp = "";
+                */
+
+                //EMS data
+                managers[0].EMSPacket0.ToList().ForEach(x => outputText += $"{x:X2} ");
+                EMSBox.Items.Add(outputText);
+
+                /*
+                managers[1].EMSPacket0.ToList().ForEach(x => temp += $"{x:X2} "); //TODO: make this an option in packet reading
+                EMSBox.Items.Add(temp);
+                */
+            }
+            else
+            {
+                //PMS data
+                outputText = $"Manager 0 BEV {managers[0].I1:0.00}A {managers[0].I2:0.00}A {managers[0].GetBEVDCFCPlus():0.00} {managers[0].GetBEVDCFCMinus():0.00} {managers[0].GetBEVShuntTemp():0.00} {managers[0].GetBEVDCFCContactorTemp():0.00} {managers[0].GetBEVMainContactorTemp():0.00} {managers[0].GetBEVVREF():0.00}";
+                PMSBox.Items.Add(outputText);
+                outputText = $"Manager 0 BETA {managers[0].GetBETAHVCDMinus()} {managers[0].GetBETASA1Temp()} {managers[0].GetBETASA4Temp()} {managers[0].GetBETASA3Temp()} {managers[0].GetBETAShuntTemperature()}";
+                PMSBox.Items.Add(outputText);
+                outputText = $"Manager 0 BETB {managers[0].GetBETBDCFCDifferential()} {managers[0].GetBETBDCFCMinus()} {managers[0].GetBETBDCFCPlus()} {managers[0].GetBETBSB1Temp()} {managers[0].GetBETBShuntTemp()} {managers[0].GetBETBHVDCMinus()}";
+                PMSBox.Items.Add(outputText);
+                //Debug.WriteLine(managers[0].PMSPacket0);
+                //Debug.WriteLine(managers[0].AUX1);
+                //Debug.WriteLine(managers[0].AUX2);
+
+                //EMS data
+                outputText = $"Manager 0 {managers[0].CD1V:0.00V} {managers[0].EMSReferenceVoltage1():0.00} {managers[0].EMSReferenceVoltage2():0.00} {managers[0].EMSTemperature1():0.00} {managers[0].EMSTemperature2():0.00} {managers[0].EMSPressure1():0.00} {managers[0].EMSPressure2():0.00} {managers[0].EMSGas1():0.00} {managers[0].EMSGas2():0.00}";
+
+                EMSBox.Items.Add(outputText);
             }
         }
 
