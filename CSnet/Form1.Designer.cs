@@ -30,41 +30,18 @@
         {
             this.components = new System.ComponentModel.Container();
             this.Timer1 = new System.Windows.Forms.Timer(this.components);
-            this.Label5 = new System.Windows.Forms.Label();
-            this.cmdVersion = new System.Windows.Forms.Button();
             this.GroupBox1 = new System.Windows.Forms.GroupBox();
+            this.chkHexFormat = new System.Windows.Forms.CheckBox();
             this.CmdOpenFirstDevice = new System.Windows.Forms.Button();
             this.cmdCloseDevice = new System.Windows.Forms.Button();
             this.TabControl1 = new System.Windows.Forms.TabControl();
             this.tabPage5 = new System.Windows.Forms.TabPage();
-            this.chkHexFormat = new System.Windows.Forms.CheckBox();
             this.GroupBox1.SuspendLayout();
             this.SuspendLayout();
-            // 
-            // Label5
-            // 
-            this.Label5.Location = new System.Drawing.Point(457, 27);
-            this.Label5.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.Label5.Name = "Label5";
-            this.Label5.Size = new System.Drawing.Size(171, 20);
-            this.Label5.TabIndex = 44;
-            this.Label5.Text = "version";
-            // 
-            // cmdVersion
-            // 
-            this.cmdVersion.Location = new System.Drawing.Point(461, 59);
-            this.cmdVersion.Margin = new System.Windows.Forms.Padding(4);
-            this.cmdVersion.Name = "cmdVersion";
-            this.cmdVersion.Size = new System.Drawing.Size(160, 29);
-            this.cmdVersion.TabIndex = 43;
-            this.cmdVersion.Text = "Version";
-            this.cmdVersion.Click += new System.EventHandler(this.cmdVersion_Click);
             // 
             // GroupBox1
             // 
             this.GroupBox1.Controls.Add(this.chkHexFormat);
-            this.GroupBox1.Controls.Add(this.Label5);
-            this.GroupBox1.Controls.Add(this.cmdVersion);
             this.GroupBox1.Controls.Add(this.CmdOpenFirstDevice);
             this.GroupBox1.Controls.Add(this.cmdCloseDevice);
             this.GroupBox1.Location = new System.Drawing.Point(1, -1);
@@ -75,6 +52,16 @@
             this.GroupBox1.TabIndex = 50;
             this.GroupBox1.TabStop = false;
             this.GroupBox1.Text = "Connecting";
+            // 
+            // chkHexFormat
+            // 
+            this.chkHexFormat.Location = new System.Drawing.Point(205, 26);
+            this.chkHexFormat.Margin = new System.Windows.Forms.Padding(4);
+            this.chkHexFormat.Name = "chkHexFormat";
+            this.chkHexFormat.Size = new System.Drawing.Size(133, 21);
+            this.chkHexFormat.TabIndex = 52;
+            this.chkHexFormat.Text = "Raw Packet";
+            this.chkHexFormat.CheckedChanged += new System.EventHandler(this.chkHexFormat_CheckedChanged);
             // 
             // CmdOpenFirstDevice
             // 
@@ -114,16 +101,6 @@
             this.tabPage5.Text = "ISO15765";
             this.tabPage5.UseVisualStyleBackColor = true;
             // 
-            // chkHexFormat
-            // 
-            this.chkHexFormat.Location = new System.Drawing.Point(205, 26);
-            this.chkHexFormat.Margin = new System.Windows.Forms.Padding(4);
-            this.chkHexFormat.Name = "chkHexFormat";
-            this.chkHexFormat.Size = new System.Drawing.Size(133, 21);
-            this.chkHexFormat.TabIndex = 52;
-            this.chkHexFormat.Text = "Raw Packet";
-            this.chkHexFormat.CheckedChanged += new System.EventHandler(this.chkHexFormat_CheckedChanged);
-            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
@@ -142,8 +119,6 @@
 
         #endregion
         public System.Windows.Forms.Timer Timer1;
-        internal System.Windows.Forms.Label Label5;
-        internal System.Windows.Forms.Button cmdVersion;
         internal System.Windows.Forms.GroupBox GroupBox1;
         internal System.Windows.Forms.Button CmdOpenFirstDevice;
         internal System.Windows.Forms.Button cmdCloseDevice;

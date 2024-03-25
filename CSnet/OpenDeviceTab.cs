@@ -195,7 +195,7 @@ namespace CSnet
             managers[1] = new ManagerData();
 
             //TODO: at some point check firmware versions. Must 
-            managers[0].Version = DeviceFirmwareVersion(62); //afaik, manager 0 is always the primary manager, responsible for EMS & PMS
+            //managers[0].Version = DeviceFirmwareVersion(62); //afaik, manager 0 is always the primary manager, responsible for EMS & PMS
             //managers[1].Version = DeviceFirmwareVersion(63); //this should throw an error if the pack is BEV & only has one manager
 
             GetAclButton_Click(null, null);
@@ -486,10 +486,10 @@ namespace CSnet
 
             SendGenericCommand(function, parameters);
 
-            byte uAPISelected, uInstanceSelected, uFunctionError, uCurrentFunction, uNodeCount;
+            byte uAPISelected, uInstanceSelected, uCurrentFunction;
             byte[] pReturnedData = new byte[512];
 
-            uint uParametersLength, uReturnedDataLength;
+            uint uReturnedDataLength;
             //adi_wil_dev_version_t version = new adi_wil_dev_version_t();
 
             uAPISelected = 1;
@@ -515,39 +515,28 @@ namespace CSnet
         {
             SetMode(ADI_WIL_MODE_STANDBY);
 
-            //Get WIL version
-            byte functionError = 0;
             byte function = ADI_WIL_API_GET_WIL_SOFTWARE_VERSION; // adi_wil_SetMode ADI_WIL_API_SET_MODE = 4;
-            byte[] parameters = new byte[512];
-            int iResult;
+ 
+            SendGenericCommand(function, new byte[0]);
 
-            iResult = icsNeoDll.icsneoGenericAPISendCommand(m_hObject, 1, 0, function, Marshal.UnsafeAddrOfPinnedArrayElement(parameters, 0), 0, out functionError);
-
-            if (!CheckStatus(1, 0, function) || iResult != 1)
-            {
-
-                MessageBox.Show("Find version error");
-            }
-
-            byte uAPISelected, uInstanceSelected, uFunctionError, uCurrentFunction, uNodeCount;
+            byte uAPISelected, uInstanceSelected, uCurrentFunction;
             byte[] pReturnedData = new byte[512];
 
-
-            uint uParametersLength, uReturnedDataLength;
+            uint uReturnedDataLength;
             //adi_wil_dev_version_t version = new adi_wil_dev_version_t();
 
             uAPISelected = 1;
             uInstanceSelected = 0;
             IntPtr test = IntPtr.Zero;
 
-            iResult = icsNeoDll.icsneoGenericAPIReadData(m_hObject, uAPISelected, uInstanceSelected, out uCurrentFunction, test, out uReturnedDataLength);
+            int result = icsNeoDll.icsneoGenericAPIReadData(m_hObject, uAPISelected, uInstanceSelected, out uCurrentFunction, test, out uReturnedDataLength);
             adi_wil_dev_version_t version = (adi_wil_dev_version_t)Marshal.PtrToStructure(test, typeof(adi_wil_dev_version_t));
 
 
-            if (uCurrentFunction != function || iResult != 1) //1 is success
+            if (uCurrentFunction != function || result != 1) //1 is success
             {
                 // Handle Error Here
-                MessageBox.Show($"Read error {iResult}");
+                MessageBox.Show($"Read error {result}");
                 return;
             }
 
@@ -577,10 +566,10 @@ namespace CSnet
 
             SendGenericCommand(function, parameters);
 
-            byte uAPISelected, uInstanceSelected, uFunctionError, uCurrentFunction, uNodeCount;
+            byte uAPISelected, uInstanceSelected, uCurrentFunction;
             byte[] pReturnedData = new byte[512];
 
-            uint uParametersLength, uReturnedDataLength;
+            uint uReturnedDataLength;
             //adi_wil_dev_version_t version = new adi_wil_dev_version_t();
 
             uAPISelected = 1;
@@ -669,13 +658,13 @@ namespace CSnet
         {
             int timeOutCounter = 0, result = 0;
 
-            byte uCallbackError = 1, uFinishedProcessing, uCurrentFunction;
+            byte uCallbackError = 1, uFinishedProcessing = 1, uCurrentFunction;
 
             do
             {
                 result = icsNeoDll.icsneoGenericAPIGetStatus(m_hObject, uAPISelected, uInstanceSelected, out uCurrentFunction, out uCallbackError, out uFinishedProcessing);
 
-                if (timeOutCounter == 1000)
+                if (timeOutCounter == 2000)
                 {
                     throw new Exception($"Timeout whilst sending command to device {uCallbackError}");
                 }
@@ -683,6 +672,8 @@ namespace CSnet
                 Thread.Sleep(1);
                 //only breaks if command has been successfully sent, or timesout
             } while (uFinishedProcessing == 0);
+
+            Debug.WriteLine(timeOutCounter);
 
             if (uCallbackError == ADI_WIL_ERR_SUCCESS && result == 1)
             {
@@ -710,7 +701,7 @@ namespace CSnet
             if (mode != currentMode)
             {
                 byte function = ADI_WIL_API_SET_MODE; // adi_wil_SetMode ADI_WIL_API_SET_MODE = 4;
-                byte[] parameters = new byte[512];
+                byte[] parameters = new byte[1];
 
                 parameters[0] = mode; //3 = active mode
 
@@ -752,17 +743,16 @@ namespace CSnet
 
                 for (int i = 0; i < uNodeCount; i++)
                 {
-                    byte[] macAddress = new byte[ADI_WIL_MAC_SIZE];
-                    Buffer.BlockCopy(pReturnedData, i * ADI_WIL_MAC_SIZE, macAddress, 0, ADI_WIL_MAC_SIZE);
-                    string temp = "";
-                    foreach (byte x in macAddress)
+                    byte[] byteMacAddress = new byte[ADI_WIL_MAC_SIZE];
+                    Buffer.BlockCopy(pReturnedData, i * ADI_WIL_MAC_SIZE, byteMacAddress, 0, ADI_WIL_MAC_SIZE);
+                    string stringMacAddress = "";
+                    foreach (byte x in byteMacAddress)
                     {
-                        temp += $"{x:X2}";
+                        stringMacAddress += $"{x:X2}";
                     }
                     if (!nodeMacAddresses.ContainsKey(i))
                     {
-                        nodeMacAddresses.Add(i, temp);
-
+                        nodeMacAddresses.Add(i, stringMacAddress);
                     }
                 }
             }
@@ -801,21 +791,9 @@ namespace CSnet
             int lNumberOfMessages = 0;
             int lNumberOfErrors = 0;
             long lCount;
-            // string sListString;
-            //  server.Bind(new IPEndPoint(IPAddress.Parse("192.168.3.100"), 9011));
-            // string sListString2 = "";//Node 号
-            icsSpyMessageJ1850 stJMsg = new icsSpyMessageJ1850();
-            long iByteCount;
-            int iLongMessageTotalByteCount;
+           
             double dTime = 0;
-            byte[] iDataBytes;
-
-            //if (m_bPortOpen == false)
-            //{
-            //    MessageBox.Show("neoVI not opened");
-            //    return;  // do not read messages if we haven't opened neoVI yet
-            //}
-
+   
             // read the messages from the driver
             lResult = icsNeoDll.icsneoGetMessages(m_hObject, ref stMessages[0], ref lNumberOfMessages, ref lNumberOfErrors);
 

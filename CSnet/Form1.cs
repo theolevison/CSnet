@@ -209,12 +209,6 @@ namespace CSnet
             }
         }
 
-        private void cmdVersion_Click(object sender, EventArgs e)
-        {
-            //get version information and send to hardware.
-            cmdVersion.Text = Convert.ToString(icsNeoDll.icsneoGetDLLVersion());
-        }
-
         private void Form1_Load(object sender, EventArgs e)
         {
             //TabControl2.SelectTab(0);
