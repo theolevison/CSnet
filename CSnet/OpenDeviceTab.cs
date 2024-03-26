@@ -729,7 +729,6 @@ namespace CSnet
                 }
             }
         }
-
         private void GetMessages_Click(object sender, EventArgs e)
         {
             SetMode(ADI_WIL_MODE_ACTIVE);
@@ -930,7 +929,7 @@ namespace CSnet
                 //Debug.WriteLine(managers[0].AUX2);
 
                 //EMS data
-                outputText = $"Manager 0 {managers[0].CD1V:0.00V} {managers[0].EMSReferenceVoltage1():0.00} {managers[0].EMSReferenceVoltage2():0.00} {managers[0].EMSTemperature1():0.00} {managers[0].EMSTemperature2():0.00} {managers[0].EMSPressure1():0.00} {managers[0].EMSPressure2():0.00} {managers[0].EMSGas1():0.00} {managers[0].EMSGas2():0.00}";
+                outputText = $"Manager 0 {managers[0].EMSBDSBVoltage():0.00V} {managers[0].CD1V:0.00V} {managers[0].EMSReferenceVoltage1():0.00} {managers[0].EMSReferenceVoltage2():0.00} {managers[0].EMSTemperature1():0.00} {managers[0].EMSTemperature2():0.00} {managers[0].EMSPressure1():0.00} {managers[0].EMSPressure2():0.00} {managers[0].EMSGas1():0.00} {managers[0].EMSGas2():0.00}";
 
                 EMSBox.Items.Add(outputText);
             }
@@ -991,7 +990,7 @@ namespace CSnet
         {
             //WilFirmwareVersion(); //don't need to check this
             PMSGPIO(ADI_WIL_DEV_MANAGER_0, 1);
-            PMSGPIO(ADI_WIL_DEV_MANAGER_1, 1);
+            //PMSGPIO(ADI_WIL_DEV_MANAGER_1, 1); //TODO: make this BET specific
         }
         private void Version_Click(object sender, EventArgs e)
         {

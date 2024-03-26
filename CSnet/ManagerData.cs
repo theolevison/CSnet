@@ -198,7 +198,7 @@ namespace CSnet
         private double NTC_COEF_C = 0.0000005413360154836909;
         public double EMSBDSBVoltage()
         {
-            return CD1V * 0.001;
+            return CD1V * 0.0001;
         }
         public double EMSPressure1()
         {
