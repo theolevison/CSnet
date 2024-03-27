@@ -1829,7 +1829,7 @@ namespace CSnet
         public byte reserved4;
     }
 
-    [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    [StructLayout(LayoutKind.Sequential)]
     public struct adi_wil_file_t
     {
         public ushort iRemainingBytes;

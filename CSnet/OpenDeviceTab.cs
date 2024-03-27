@@ -70,6 +70,24 @@ namespace CSnet
         private const byte ADI_WIL_ERR_FILE_REJECTED = 13;
         private const byte ADI_WIL_ERR_PARTIAL_SUCCESS = 14;
 
+        /*
+         ADI_WIL_ERR_SUCCESS Operation successful.
+        ADI_WIL_ERR_FAIL The operation failed.
+        ADI_WIL_ERR_API_IN_PROGRESS The operation could not be completed because another operation is currently in progress.
+        ADI_WIL_ERR_TIMEOUT The operation has timed out.
+        ADI_WIL_ERR_NOT_CONNECTED The operation could not be completed because there is no active connection to the network managers.
+        ADI_WIL_ERR_INVALID_PARAMETER An invalid parameter has been specified.
+        ADI_WIL_ERR_INVALID_STATE The system was in an invalid state when processing the request was made.
+        ADI_WIL_ERR_NOT_SUPPORTED The requested feature is not supported.
+        ADI_WIL_ERR_EXTERNAL An error has been returned from a HAL or OSAL component.
+        ADI_WIL_ERR_INVALID_MODE The requested/current system mode is invalid.
+        ADI_WIL_ERR_IN_PROGRESS Requesting a block of data from the user during the file loading process.
+        ADI_WIL_ERR_CONFIGURATION_MISMATCH The two managers have mismatched configurations.
+        ADI_WIL_ERR_CRC The operation encountered a CRC error.
+        ADI_WIL_ERR_FILE_REJECTED The file was rejected by the end device.
+        ADI_WIL_ERR_PARTIAL_SUCCESS Some devices failed complete the operation while others were successful.
+         */
+
         private const byte ADI_WIL_MODE_STANDBY = 1;
         private const byte ADI_WIL_MODE_COMMISSIONING = 2;
         private const byte ADI_WIL_MODE_ACTIVE = 3;
@@ -262,63 +280,55 @@ namespace CSnet
                 Debug.WriteLine($"reading: {count}");
                 offset = SendOTAPFileChunk(offset, buffer);
 
-                if (offset >= fileSize)
+                if (offset >= fileSize)//TODO: test if this will work
                 {
                     //done
+                    Debug.WriteLine("offset exceeds filesize");
                     break;
                 }
-                else if (offset == -1)
+
+                if (offset == -1)
                 {
                     //error
-                    Debug.WriteLine("OTAP problem high level");
+                    Debug.WriteLine("Finished writing");
                     break;
                 }
             }
         }
 
-        private int OTAPCheckStatus(byte uAPISelected, byte uInstanceSelected, byte uFunctionSelected)
+        private bool OTAPCheckStatus(byte uAPISelected, byte uInstanceSelected, byte uFunctionSelected)
         {
-            int timeout = 0, result = 0;
-
-            byte uCallbackError, uFinishedProcessing, uCurrentFunction;
-
-            do
+            byte callbackError = 0;
+            if (CheckStatus(uAPISelected, uInstanceSelected, uFunctionSelected, out callbackError))
             {
-                Thread.Sleep(10);
-                result = icsNeoDll.icsneoGenericAPIGetStatus(m_hObject, uAPISelected, uInstanceSelected, out uCurrentFunction, out uCallbackError, out uFinishedProcessing);
-                if (timeout == 1000)
+                if (callbackError == ADI_WIL_ERR_IN_PROGRESS) //uFinishedProcessing == 1 && 
                 {
-                    Debug.WriteLine("OTAP timeout");
-                    return 0;
+                    //still writing file
+                    Debug.WriteLine("file operation in progress");
+                    return false;
                 }
-                timeout++;
-                //only breaks if command has been successfully sent, or timesout
-            } while (uFinishedProcessing == 0);
-
-            if (uCallbackError == ADI_WIL_ERR_IN_PROGRESS) //uFinishedProcessing == 1 && 
+                else if (callbackError == ADI_WIL_ERR_SUCCESS)
+                {
+                    //written entire file
+                    return true;
+                } else
+                {
+                    //something went wrong
+                    
+                    throw new Exception("error in otap");
+                }
+            } else
             {
-                //still writing file
-                Debug.WriteLine("file thing in progress");
-                return 1;
-            }
-            else if (uCallbackError == ADI_WIL_ERR_SUCCESS)
-            {
-                //written entire file
-                return 2;
-            }
-            else
-            {
-                Debug.WriteLine($"OTAP bad response from get status, Callback: {uCallbackError} finishedProcessing: {uFinishedProcessing} result: {result}");
-                return 0;
+                //something went wrong
+                throw new Exception("error in otap");
             }
         }
 
         private int SendOTAPFileChunk(int offset, byte[] buffer)
         {
-            byte[] parameters = new byte[67];
-            byte[] pReturnedData = new byte[4];
+            byte[] parameters = new byte[67];           
 
-            byte uAPISelected = 1, uInstanceSelected = 0, uFunctionSelected = ADI_WIL_API_LOAD_FILE, uFunctionError, uCurrentFunction;
+            byte function = ADI_WIL_API_LOAD_FILE;
 
             //typedef uint64_t adi_wil_device_t;
             //4 bytes enum for file type
@@ -327,36 +337,21 @@ namespace CSnet
             parameters[2] = 64;//file size, always send in 64 byte chunks
             Buffer.BlockCopy(buffer, offset, parameters, 3, 64); //copy chunk of file into parameters at position 3
 
-            int iResult = icsNeoDll.icsneoGenericAPISendCommand(m_hObject, uAPISelected, uInstanceSelected, uFunctionSelected, Marshal.UnsafeAddrOfPinnedArrayElement(parameters, 0), (uint)parameters.Length, out uFunctionError);
+            SendGenericCommand(function, parameters);
 
-            if (iResult != 1 && uFunctionError != ADI_WIL_ERR_SUCCESS)
+            if (!OTAPCheckStatus(1, 0, function))
             {
-                // Handle Error Here
-                MessageBox.Show($"Send error {iResult} {uFunctionError}");
-                return -1;
-            }
+                //in progress, read the latest offset
 
-            if (OTAPCheckStatus(uAPISelected, uInstanceSelected, uFunctionSelected) != 0)
-            {
-                //finished or in progress, either way read the latest offset
-                uint uReturnedDataLength;
-
-                iResult = icsNeoDll.icsneoGenericAPIReadData(m_hObject, uAPISelected, uInstanceSelected, out uCurrentFunction, Marshal.UnsafeAddrOfPinnedArrayElement(pReturnedData, 0), out uReturnedDataLength);
-                                
-                if (uCurrentFunction != uFunctionSelected || iResult != 1) //1 is success
-                {
-                    // Handle Error Here
-                    MessageBox.Show($"Read error {iResult}");
-                    return -1;
-                }
+                byte[] pReturnedData = new byte[4];
+                Marshal.Copy(ReadGenericCommand(function), pReturnedData, 0, pReturnedData.Length);
 
                 //return offset;
                 Debug.WriteLine($"Returned file position: {BitConverter.ToInt32(pReturnedData, 0)}");
                 return BitConverter.ToInt32(pReturnedData, 0);
-            }
-            else
+            } else
             {
-                MessageBox.Show("OTAP status error");
+                //finished
                 return -1;
             }
         }
@@ -387,57 +382,36 @@ namespace CSnet
         {
             byte[] parameters = new byte[9];
 
-            byte uAPISelected = 1, uInstanceSelected = 0, uFunctionSelected = ADI_WIL_API_GET_FILE, uFunctionError, uCurrentFunction;
-
             //typedef uint64_t adi_wil_device_t;
             //4 bytes enum for file type
-            int deviceID = 62; //Manager 0
+            int deviceID = 2; //module 3
+            //int deviceID = 62; //Manager 0
             BitConverter.GetBytes(Convert.ToUInt64(Math.Pow(2, deviceID))).CopyTo(parameters, 0); //add address to parameters
 
             parameters[8] = 2;//file type, ADI_WIL_FILE_TYPE_CONFIGURATION = 2
 
-            int iResult = icsNeoDll.icsneoGenericAPISendCommand(m_hObject, uAPISelected, uInstanceSelected, uFunctionSelected, Marshal.UnsafeAddrOfPinnedArrayElement(parameters, 0), (uint)parameters.Length, out uFunctionError);
+            byte function = ADI_WIL_API_GET_FILE;
+            SendGenericCommand(function, parameters);
 
-            if (iResult != 1 && uFunctionError != ADI_WIL_ERR_SUCCESS)
+            if (!OTAPCheckStatus(1, 0, function))
             {
-                // Handle Error Here
-                MessageBox.Show($"Get file error {iResult} {uFunctionError}");
-                return false;
-            }
-
-            if (OTAPCheckStatus(uAPISelected, uInstanceSelected, uFunctionSelected) == 1)
-            {
-                //in progress, read the latest offset
-                uint uReturnedDataLength;
-                byte[] pReturnedData = new byte[512];
-
-                IntPtr returnedDataPtr = IntPtr.Zero;
-
-                iResult = icsNeoDll.icsneoGenericAPIReadData(m_hObject, uAPISelected, uInstanceSelected, out uCurrentFunction, returnedDataPtr, out uReturnedDataLength);
-                adi_wil_file_t fileChunk = (adi_wil_file_t)Marshal.PtrToStructure(returnedDataPtr, typeof(adi_wil_file_t));
-
+                //in progress, read the latest offset                
+                adi_wil_file_t fileChunk = (adi_wil_file_t)Marshal.PtrToStructure(ReadGenericCommand(function), typeof(adi_wil_file_t));
 
                 //iResult = icsNeoDll.icsneoGenericAPIReadData(m_hObject, uAPISelected, uInstanceSelected, out uCurrentFunction, Marshal.UnsafeAddrOfPinnedArrayElement(pReturnedData, 0), out uReturnedDataLength);
                 //adi_wil_file_t fileChunk = (adi_wil_file_t)Marshal.PtrToStructure(Marshal.UnsafeAddrOfPinnedArrayElement(pReturnedData, 0), typeof(adi_wil_file_t));
 
-                if (uCurrentFunction != uFunctionSelected || iResult != 1) //1 is success
-                {
-                    // Handle Error Here
-                    MessageBox.Show($"Read error {iResult}");
-                    return false;
-                }
-
                 // wBMS Packet Payload is located in the ExtraDataPtr
-                IntPtr ptr = fileChunk.pData;
+                //IntPtr ptr = fileChunk.pData;
                 Debug.WriteLine(fileChunk.pData);
-                Debug.WriteLine(Marshal.UnsafeAddrOfPinnedArrayElement(pReturnedData, 5));
+                //Debug.WriteLine(Marshal.UnsafeAddrOfPinnedArrayElement(pReturnedData, 5));
 
                 byte[] managedArray = new byte[fileChunk.iByteCount];
-                Buffer.BlockCopy(pReturnedData, 5, managedArray, 0, fileChunk.iByteCount);
+                //Buffer.BlockCopy(pReturnedData, 5, managedArray, 0, fileChunk.iByteCount);
 
-                Debug.WriteLine(managedArray[0]);
+                //Debug.WriteLine(managedArray[0]);
 
-                //Marshal.Copy(ptr, managedArray, 0, managedArray.Length); for some reason, this results in an access violation exception
+                Marshal.Copy(fileChunk.pData, managedArray, 0, managedArray.Length-40); //for some reason, this results in an access violation exception
 
                 //append file chunk
                 SourceStream.Write(managedArray, 0, managedArray.Length);
@@ -446,7 +420,7 @@ namespace CSnet
             }
             else
             {
-                MessageBox.Show("Failed or succeeded"); //Either way close the filestream
+                MessageBox.Show("Succeeded"); //Either way close the filestream
                 return false;
             }
         }
@@ -500,28 +474,9 @@ namespace CSnet
 
             SendGenericCommand(function, new byte[0]);
 
-            byte uAPISelected, uInstanceSelected, uCurrentFunction;
-            byte[] pReturnedData = new byte[512];
+            adi_wil_dev_version_t version = (adi_wil_dev_version_t)Marshal.PtrToStructure(ReadGenericCommand(function), typeof(adi_wil_dev_version_t));
 
-            uint uReturnedDataLength;
-            //adi_wil_dev_version_t version = new adi_wil_dev_version_t();
-
-            uAPISelected = 1;
-            uInstanceSelected = 0;
-            IntPtr test = IntPtr.Zero;
-
-            int result = icsNeoDll.icsneoGenericAPIReadData(m_hObject, uAPISelected, uInstanceSelected, out uCurrentFunction, test, out uReturnedDataLength);
-            adi_wil_dev_version_t version = (adi_wil_dev_version_t)Marshal.PtrToStructure(test, typeof(adi_wil_dev_version_t));
-
-
-            if (uCurrentFunction != function || result != 1) //1 is success
-            {
-                // Handle Error Here
-                MessageBox.Show($"Read error {result}");
-                return;
-            }
-
-            Debug.WriteLine($"version object {version}");
+            Debug.WriteLine($"WIL version object {version}");
 
             firmwareLabel.Text = $"Firmware version: {version.MainProcSWVersion.iVersionMajor}";
         }
@@ -565,6 +520,8 @@ namespace CSnet
 
             uint uReturnedDataLength;
             //adi_wil_dev_version_t version = new adi_wil_dev_version_t();
+            //IntPtr pointer = IntPtr.Zero;
+            //TODO: use pointer instead of marshaling pReturnedData?
 
             uAPISelected = 1;
             uInstanceSelected = 0;
@@ -590,7 +547,8 @@ namespace CSnet
                 Debug.WriteLine("Couldn't send command");
             }
 
-            CheckStatus(1, 0, function);
+            byte callbackError = 0;
+            CheckStatus(1, 0, function, out callbackError) ;
         }
 
         private void SetACL_Click(object sender, EventArgs e)
@@ -620,11 +578,11 @@ namespace CSnet
             fw.ShowDialog();
         }
 
-        private bool CheckStatus(byte uAPISelected, byte uInstanceSelected, byte uFunctionSelected)
+        private bool CheckStatus(byte uAPISelected, byte uInstanceSelected, byte uFunctionSelected, out byte uCallbackError)
         {
             int timeOutCounter = 0, result = 0;
 
-            byte uCallbackError = 1, uFinishedProcessing = 1, uCurrentFunction;
+            byte uFinishedProcessing = 1, uCurrentFunction;
 
             do
             {
@@ -639,27 +597,37 @@ namespace CSnet
                 //only breaks if command has been successfully sent, or timesout
             } while (uFinishedProcessing == 0);
 
-            Debug.WriteLine(timeOutCounter);
-
-            if (uCallbackError == ADI_WIL_ERR_SUCCESS && result == 1)
+            if (result == 1)
             {
-                return true;
-            }
-            else if (result != 1)
+                if (uCallbackError == ADI_WIL_ERR_SUCCESS)
+                {
+                    return true;
+                }
+                else if (uCallbackError == ADI_WIL_ERR_PARTIAL_SUCCESS)
+                {
+                    return true; //TODO: make it obvious that there was a partial success
+                }
+                else if (uCallbackError == ADI_WIL_ERR_IN_PROGRESS)
+                {
+                    Debug.WriteLine("In progress");
+                    return true;
+                }
+                else if (uCallbackError == ADI_WIL_ERR_TIMEOUT)
+                {
+                    Debug.WriteLine("Timeout");
+                    return false;
+                }
+                else
+                {
+                    Debug.WriteLine($"Operation not succesful, error: {uCallbackError}");
+                    throw new Exception("unhandled status error");
+                }
+            } else
             {
                 Debug.WriteLine("Command not sent");
                 return false;
             }
-            else if (uCallbackError == 3)
-            {
-                Debug.WriteLine("Device not connected");
-                return false;
-            }
-            else
-            {
-                Debug.WriteLine($"Operation not succesful {uCallbackError}");
-                return false;
-            }
+            //TODO: add statements for all errors? Switch case?
         }
 
         private void SetMode(byte mode)
@@ -856,9 +824,9 @@ namespace CSnet
         private byte[] ConvertPacketToManaged(icsSpyMessage message, int payloadLength)
         {
             // wBMS Packet Payload is located in the ExtraDataPtr
-            IntPtr ptr = message.iExtraDataPtr;
+           
             byte[] managedArray = new byte[payloadLength];
-            Marshal.Copy(ptr, managedArray, 0, payloadLength);
+            Marshal.Copy(message.iExtraDataPtr, managedArray, 0, payloadLength);
 
             return managedArray;
         }
@@ -1004,8 +972,8 @@ namespace CSnet
 
         private void Config_Click(object sender, EventArgs e)
         {
-            //GetConfigFile();
-            GetContextualData(0);
+            GetConfigFile();
+            //GetContextualData(0);
         }
     }
 }

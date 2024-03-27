@@ -478,6 +478,7 @@ namespace CSnet
                                 {
                                     byte[] dataAll = new byte[uc1.modules[0].Packet0.Length * 12];
 
+                                    
                                     // uc1.modules[0].Packet0.Length
 
                                     Array.Copy(uc1.modules[0].Packet0, 0, dataAll, 0, uc1.modules[0].Packet0.Length);//复制模组1
