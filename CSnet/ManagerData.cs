@@ -6,6 +6,7 @@ using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace CSnet
 {
@@ -44,7 +45,6 @@ namespace CSnet
 
         public void UpdatePMSData(byte[] packet, uint packetID)
         {
-            
             if (packetID == 0)
             {
                 PMSPacket0 = packet;
@@ -137,22 +137,30 @@ namespace CSnet
         }
         public double GetBETAShuntTemperature()
         {
-            double b = AUX3 * 0.0001;//convert to correct decimal places
+            double b = AUX3 * 0.0001;//convert to correct decimal places TODO: check this is correct to do
 
             //put voltage against graph to find thermistor temperature
-            return (Math.Pow(b, 5) * -15.38) + (Math.Pow(b, 4) * 122.63) - (Math.Pow(b, 3) * 368.35) + (Math.Pow(b, 2) * 514.63) - b * 362.57 + 156.2;
+            return ShuntNTCTransferFunction(b);
+        }
+        public double ShuntNTCTransferFunction(double x)
+        {
+            return (Math.Pow(x, 5) * -15.38) + (Math.Pow(x, 4) * 122.63) + (Math.Pow(x, 3) * -368.35) + (Math.Pow(x, 2) * 514.63) + (x * -362.57) + 156.2;
         }
         public double GetBETASA1Temp()
         {
-            return AUX4;
+            return LittleFuseTransferFunction(AUX4);
         }
         public double GetBETASA4Temp()
         {
-            return AUX5;
+            return LittleFuseTransferFunction(AUX5);
         }
         public double GetBETASA3Temp()
         {
-            return AUX6;
+            return LittleFuseTransferFunction(AUX6);
+        }
+        private double LittleFuseTransferFunction(double x)
+        {
+            return (Math.Pow(x, 6) * 8.2901) + (Math.Pow(x, 5) * -88.588) + (Math.Pow(x, 4) * 365.45) + (Math.Pow(x, 3) * -741.33) + (Math.Pow(x, 2) * 778.02) + (x * -436.16) + 162.46;
         }
 
         //BET B
@@ -185,11 +193,11 @@ namespace CSnet
         }
         public double GetBETBShuntTemp()
         {
-            return AUX6; //TODO: transfer function
+            return ShuntNTCTransferFunction(AUX6); //TODO: transfer function
         }
         public double GetBETBSB1Temp()
         {
-            return AUX7; //TODO: transfer function
+            return LittleFuseTransferFunction(AUX7); //TODO: transfer function
         }
     
         //EMS measurements
