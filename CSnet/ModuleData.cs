@@ -115,7 +115,7 @@ namespace CSnet
                 stringCalcPEC += bit ? "1" : "0";
             }
 
-            Debug.WriteLine($"Original PEC: {stringPEC} \nCalculat PEC: {stringCalcPEC}");
+            //Debug.WriteLine($"Original PEC: {stringPEC} \nCalculat PEC: {stringCalcPEC}");
         }
 
         public void UpdateData(byte[] packet, uint packetID, double time)
@@ -135,6 +135,7 @@ namespace CSnet
                 {
                     PeakUpdateRate = difference;
                 }
+                //Debug.WriteLine($"Update {MacAddress} pu: {PeakUpdateRate}");
 
                 BMSMessageTimestamp = time; //time measured in seconds since device turned on
 

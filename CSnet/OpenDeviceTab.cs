@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Net.Mail;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
@@ -791,7 +792,7 @@ namespace CSnet
                                     case API_PACKET_TYPE:
                                         //ignore
                                         break;
-                                    case BMS_PACKET_TYPE:                                        
+                                    case BMS_PACKET_TYPE:
                                             modules[uiDeviceSource].UpdateData(packet, uiPacketID, dTime);
 
                                         break;
@@ -896,6 +897,8 @@ namespace CSnet
                     outputText += $" {module.Thermistor1:0.00}C {module.Thermistor2:0.00}C";
                     lstMessage.Items.Add(outputText);
                     outputText = "";
+
+                    //Debug.WriteLine($"Module {module.MacAddress} pu: {module.PeakUpdateRate}");
                 }
             }
 

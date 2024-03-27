@@ -415,7 +415,7 @@ namespace CSnet
                             else if (data[1] == PeakUpdateRate)
                             {
                                 double data1 = uc1.modules[data[2]].PeakUpdateRate;
-                                byte[] latency = BitConverter.GetBytes(data1);
+                                byte[] latency = BitConverter.GetBytes(data1);                                
                                 server.SendTo(latency, remoteEnd);
                             }
                             else if (data[1] == AverageRSSI)
