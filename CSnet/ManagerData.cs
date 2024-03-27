@@ -217,35 +217,36 @@ namespace CSnet
         {
             return 10.0 + 250.0 * (G3V/ (double)G7V); //TODO: do we need to * 0.0001? To convert Voltage?
         }
-        public double EMSTemperature1()
+        private double EMSThermistorTransferFunction(double thermistorVoltage, double referenceVoltage)
         {
-            if (C1V != 0)
+            if (thermistorVoltage != 0)
             {
-                double NTCResistance = ((10.0) / (C1V / (double)G2V - 1.0));
+                double NTCResistance = ((10.0) / (thermistorVoltage / referenceVoltage - 1.0));
                 return (1.0 / (NTC_COEF_A + (NTC_COEF_B * Math.Log(NTCResistance)) + (NTC_COEF_C * Math.Pow(Math.Log(NTCResistance), 3)))) - 273.0;
             } else
             {
                 return 0;
             }
+        }
+        public double EMSTemperature1()
+        {
+            return EMSThermistorTransferFunction(C1V, G2V);
         }
         public double EMSTemperature2()
         {
-            if (G7V != 0)
-            {
-                double NTCResistance = ((10.0) / (G7V / (double)G4V - 1.0));
-                return (1.0 / (NTC_COEF_A + (NTC_COEF_B * Math.Log(NTCResistance)) + (NTC_COEF_C * Math.Pow(Math.Log(NTCResistance), 3)))) - 273.0;
-            } else
-            {
-                return 0;
-            }
+            return EMSThermistorTransferFunction(G7V, G4V);
         }
         public double EMSGas1() 
-        { 
-            return (G5V / (double)C1V - 0.1) / 0.05;
+        {
+            return EMSGasTransferFunction(G5V, C1V);
         }
         public double EMSGas2()
         {
-            return (G6V / (double)G7V - 0.1) / 0.05;
+            return EMSGasTransferFunction(G6V, G7V);
+        }
+        private double EMSGasTransferFunction(double thermistorVoltage, double referenceVoltage)
+        {
+            return (thermistorVoltage / referenceVoltage - 0.1) / 0.05;
         }
         public double EMSReferenceVoltage1()
         {
