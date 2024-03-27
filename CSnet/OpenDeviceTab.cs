@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -8,6 +9,7 @@ using System.Text;
 using System.Threading;
 using System.Windows.Forms;
 using LiuQF.Common;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.ProgressBar;
 
 namespace CSnet
 {
@@ -296,10 +298,10 @@ namespace CSnet
             }
         }
 
-        private bool OTAPCheckStatus(byte uAPISelected, byte uInstanceSelected, byte uFunctionSelected)
+        private bool OTAPCheckStatus(byte uFunctionSelected)
         {
             byte callbackError = 0;
-            if (CheckStatus(uAPISelected, uInstanceSelected, uFunctionSelected, out callbackError))
+            if (CheckStatus(uFunctionSelected, out callbackError))
             {
                 if (callbackError == ADI_WIL_ERR_IN_PROGRESS) //uFinishedProcessing == 1 && 
                 {
@@ -339,7 +341,7 @@ namespace CSnet
 
             SendGenericCommand(function, parameters);
 
-            if (!OTAPCheckStatus(1, 0, function))
+            if (!OTAPCheckStatus(function))
             {
                 //in progress, read the latest offset
 
@@ -378,7 +380,7 @@ namespace CSnet
             //find version
         }
 
-        private bool GetConfigurationFileChunk(FileStream SourceStream)
+        private bool GetConfigurationFileChunk(FileStream SourceStream) //Current broken in icsNeoDLL, afaik
         {
             byte[] parameters = new byte[9];
 
@@ -393,7 +395,7 @@ namespace CSnet
             byte function = ADI_WIL_API_GET_FILE;
             SendGenericCommand(function, parameters);
 
-            if (!OTAPCheckStatus(1, 0, function))
+            if (!OTAPCheckStatus(function))
             {
                 //in progress, read the latest offset                
                 adi_wil_file_t fileChunk = (adi_wil_file_t)Marshal.PtrToStructure(ReadGenericCommand(function), typeof(adi_wil_file_t));
@@ -406,7 +408,7 @@ namespace CSnet
                 Debug.WriteLine(fileChunk.pData);
                 //Debug.WriteLine(Marshal.UnsafeAddrOfPinnedArrayElement(pReturnedData, 5));
 
-                byte[] managedArray = new byte[fileChunk.iByteCount];
+                byte[] managedArray = new byte[fileChunk.iByteCount*5];
                 //Buffer.BlockCopy(pReturnedData, 5, managedArray, 0, fileChunk.iByteCount);
 
                 //Debug.WriteLine(managedArray[0]);
@@ -422,6 +424,41 @@ namespace CSnet
             {
                 MessageBox.Show("Succeeded"); //Either way close the filestream
                 return false;
+            }
+        }
+
+        private void GetFileCRC()
+        {
+            SetMode(ADI_WIL_MODE_STANDBY);
+
+            byte[] parameters = new byte[9];
+            ulong deviceID = ADI_WIL_DEV_ALL_NODES; //module 3
+            //int deviceID = 62; //Manager 0
+            //BitConverter.GetBytes(Convert.ToUInt64(Math.Pow(2, deviceID))).CopyTo(parameters, 0); //add address to parameters
+            BitConverter.GetBytes(deviceID).CopyTo(parameters, 0);
+
+            parameters[8] = 2;//file type, ADI_WIL_FILE_TYPE_CONFIGURATION = 2
+
+            byte function = ADI_WIL_API_GET_FILE_CRC;
+            SendGenericCommand(function, parameters);
+
+            byte callbackError = 0;
+            CheckStatus(function, out callbackError);
+
+            adi_wil_file_crc_list_t crcList = (adi_wil_file_crc_list_t)Marshal.PtrToStructure(ReadGenericCommand(function), typeof(adi_wil_file_crc_list_t));
+
+            //TODO: foreach file that exists, get crc and compare it against others (just first?) and if there's a mismatch, throw error
+           
+            string bitmapString = Convert.ToString((long)crcList.eFileExists, 2);
+            bool[] bitmap = bitmapString.Select(x => x.Equals('1')).Reverse().ToArray();
+            //bitmap = bitmap.Reverse().ToArray();
+
+            for (int i = 0; i < bitmap.Length; i++)
+            {
+                if (bitmap[i])
+                {
+                    Debug.WriteLine($"Device {i} CRC: {crcList.iCRC[i]}");
+                }
             }
         }
 
@@ -548,7 +585,7 @@ namespace CSnet
             }
 
             byte callbackError = 0;
-            CheckStatus(1, 0, function, out callbackError) ;
+            CheckStatus(function, out callbackError) ;
         }
 
         private void SetACL_Click(object sender, EventArgs e)
@@ -578,11 +615,11 @@ namespace CSnet
             fw.ShowDialog();
         }
 
-        private bool CheckStatus(byte uAPISelected, byte uInstanceSelected, byte uFunctionSelected, out byte uCallbackError)
+        private bool CheckStatus(byte uFunctionSelected, out byte uCallbackError)
         {
             int timeOutCounter = 0, result = 0;
 
-            byte uFinishedProcessing = 1, uCurrentFunction;
+            byte uFinishedProcessing = 1, uCurrentFunction, uAPISelected = 1, uInstanceSelected = 0 ;
 
             do
             {
@@ -972,7 +1009,8 @@ namespace CSnet
 
         private void Config_Click(object sender, EventArgs e)
         {
-            GetConfigFile();
+            //GetConfigFile();
+            GetFileCRC();
             //GetContextualData(0);
         }
     }

@@ -1838,6 +1838,14 @@ namespace CSnet
         public IntPtr pData;
     }
 
+    [StructLayout(LayoutKind.Sequential)]
+    public struct adi_wil_file_crc_list_t
+    {
+        public ulong eFileExists;      // Status of file existence
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 64)]
+        public uint[] iCRC;                       // Array of CRC values
+    }
+
     [StructLayout(LayoutKind.Sequential, Pack = 2)]
     public struct SFIRE3Settings
     {
