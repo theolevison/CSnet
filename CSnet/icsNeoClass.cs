@@ -1628,12 +1628,11 @@ namespace CSnet
         public SNeoMostGatewaySettings neoMostGateway;
         public UInt16 vnetBits;  //First bit enables Android Messages
     }
-    /*
+    
 
     [StructLayout(LayoutKind.Sequential, Pack = 2)]
     public struct SRADBMSSettings
-    {
-        
+    {        
         public ushort perf_en;
 
         public ulong termination_enables;
@@ -1651,25 +1650,7 @@ namespace CSnet
        
         public short iso15765_separation_time_offset;
 
-        [StructLayout(LayoutKind.Explicit)]
-        public struct FlagsUnion
-        {
-            [FieldOffset(0)]
-            public uint flagsValue;
-
-            [FieldOffset(0)]
-            public FlagsStruct flagsStruct;
-        }
-
-        public struct FlagsStruct
-        {
-            public uint disableUsbCheckOnBoot : 1;
-            public uint enableLatencyTest : 1;
-            public uint enablePcEthernetComm : 1;
-            public uint reserved : 29;
-        }
-
-        public FlagsUnion flags;
+        public uint flagReplacement;
 
         public ETHERNET_SETTINGS ethernet;
         public ETHERNET_SETTINGS2 ethernet2;
@@ -1695,6 +1676,41 @@ namespace CSnet
         public ulong network_enables_5;
     }
 
+    [StructLayout(LayoutKind.Sequential)]
+    public struct WBMSGatewaySettings
+    {
+        public byte wbms1_network;
+        public byte wbms1_canfd_enable;
+        public byte wbms2_network;
+        public byte wbms2_canfd_enable;
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 6)]
+        public ushort[] reserved;
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    public struct sWIL_FAULT_SERVICING_SETTINGS
+    {
+        public byte wBMSDeviceID;
+        public byte enabled;
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    public struct sWIL_NETWORK_DATA_CAPTURE_SETTINGS
+    {
+        public byte enabled;
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    public struct sWIL_CONNECTION_SETTINGS
+    {
+        public byte using_port_a; // 1
+        public byte using_port_b; // 1
+        public byte attemptConnect; // 1
+        public sWIL_FAULT_SERVICING_SETTINGS fault_servicing_config; // 2
+        public sWIL_NETWORK_DATA_CAPTURE_SETTINGS network_data_capture_config; // 1
+        public ushort sensor_buffer_size; // 2
+    }
+
     [StructLayout(LayoutKind.Explicit)]
     public struct sSPI_PORT_SETTING
     {
@@ -1707,10 +1723,13 @@ namespace CSnet
 
     public struct ConfigStruct
     {
+        public byte value;
+        /*
         public byte onboard_external : 1;
         public byte type : 1;
         public byte mode : 3;
         public byte reserved : 3;
+        */
     }
 
     public struct sSPI_PORT_SETTINGS
@@ -1722,11 +1741,9 @@ namespace CSnet
     [StructLayout(LayoutKind.Sequential, Pack = 2)]
     public struct SRADBMSSettingsPack
     {
-        public UInt32 uiDevice;
+        public UInt32 uiDeviceType;
         public SRADBMSSettings Settings;  //HardwareSettingsToUse with correct Struct
     }
-
-    */
 
     [StructLayout(LayoutKind.Sequential, Pack = 2)]
     public struct SFireSettingsPack
@@ -2690,6 +2707,10 @@ namespace CSnet
 
 
         //Settings
+        [DllImport("icsneo40.dll")]
+        public static extern Int32 icsneoGetDeviceSettings(IntPtr hObject, ref SRADBMSSettingsPack pSettings, Int32 iNumBytes, Int32 VnetChan);
+        [DllImport("icsneo40.dll")]
+        public static extern Int32 icsneoSetDeviceSettings(IntPtr hObject, ref SRADBMSSettingsPack pSettings, Int32 iNumBytes, Int32 bSaveToEEPROM, Int32 VnetChan);
         [DllImport("icsneo40.dll")]
         public static extern Int32 icsneoSetDeviceSettings(IntPtr hObject, ref SFireSettingsPack pSettings, Int32 iNumBytes, Int32 bSaveToEEPROM, Int32 VnetChan);
         [DllImport("icsneo40.dll")]

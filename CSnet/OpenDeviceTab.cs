@@ -207,12 +207,27 @@ namespace CSnet
             return arbId & 0xFF;
         }
 
+        private bool BET = false;
+        private bool isoSPI = false;
+
         public OpenDeviceTab(ref IntPtr obj)
         {
             m_hObject = obj;
 
+            InitializeComponent();
+
+            Setup(false, false);
+        }
+
+        public void Setup(bool BET, bool isoSPI)
+        {
+            this.BET = BET;
+            this.isoSPI = isoSPI;
+
+            ChangeADIboxSettings();
+
             managers[0] = new ManagerData();
-            managers[1] = new ManagerData();
+            managers[1] = new ManagerData(); //this manager should be ignored for single manager uses, e.g BEV
 
             //TODO: at some point check firmware versions
             //managers[0].Version = DeviceFirmwareVersion(62); //afaik, manager 0 is always the primary manager, responsible for EMS & PMS
@@ -227,36 +242,39 @@ namespace CSnet
                 modules[i].MacAddress = nodeMacAddresses[i];
             }
 
-            InitializeComponent();
-
             //find firmware versions            
             Debug.WriteLine($"module count: {nodeMacAddresses.Count}");
+
+            GetDeviceVersions();
         }
 
-        /*
-        private void test_wbms_settings()
+        private void ChangeADIboxSettings()
         {
-            CU_ASSERT_PTR_NOT_NULL_FATAL(hObject); // confirm hObject is not null
+            SRADBMSSettingsPack mysettings = new SRADBMSSettingsPack();
 
-            icsNeoDll.SDeviceSettings mysettings = new SDeviceSettings();
-            Array.Clear(mysettings.Settings.rad_bms.spi_config.port_a.config.padding, 0, mysettings.Settings.rad_bms.spi_config.port_a.config.padding.Length);
-            Array.Clear(mysettings.Settings.rad_bms.spi_config.port_b.config.padding, 0, mysettings.Settings.rad_bms.spi_config.port_b.config.padding.Length);
+            icsNeoDll.icsneoGetDeviceSettings(m_hObject, ref mysettings, Marshal.SizeOf(mysettings), 0);
 
-            icsNeoDll.icsneoGetDeviceSettings(m_hObject, ref mysettings, Marshal.SizeOf(typeof(SDeviceSettings)), PlasmaIonVnetChannelMain);  //read settings struct
+            //set managers to external or onboard
+            byte managerSetting = 0;
+            if (isoSPI)
+            {
+                managerSetting = 129;
+            }
 
-            mysettings.Settings.rad_bms.spi_config.port_a.config.onboard_external = SPI_PORT_ONBOARD;  //force to use internal spi
-            mysettings.Settings.rad_bms.spi_config.port_a.config.type = SPI_TYPE_WIL;
-            mysettings.Settings.rad_bms.spi_config.port_a.config.mode = SPI_MODE_MASTER;
+            mysettings.Settings.spi_config.port_a.config.value = managerSetting;
+            mysettings.Settings.spi_config.port_b.config.value = managerSetting;
 
-            mysettings.Settings.rad_bms.spi_config.port_b.config.onboard_external = SPI_PORT_ONBOARD;  //force to use internal spi
-            mysettings.Settings.rad_bms.spi_config.port_b.config.type = SPI_TYPE_WIL;
-            mysettings.Settings.rad_bms.spi_config.port_b.config.mode = SPI_MODE_MASTER;
+            mysettings.Settings.wbms_wil_1.using_port_a = 1;
+            if (BET || !isoSPI)
+            {
+                mysettings.Settings.wbms_wil_1.using_port_b = 1;
+            } else
+            {
+                mysettings.Settings.wbms_wil_1.using_port_b = 0;
+            }
 
-            icsNeoDll.icsneoSetDeviceSettings(hObject, ref mysettings, Marshal.SizeOf(typeof(SDeviceSettings)), 1, PlasmaIonVnetChannelMain);  //write settings struct
-
-            //Console.WriteLine("");
+            icsNeoDll.icsneoSetDeviceSettings(m_hObject, ref mysettings, Marshal.SizeOf(mysettings), 1, 0);  //write settings struct
         }
-        */
 
         private void OTAP(Stream fileStream)
         {
@@ -317,7 +335,7 @@ namespace CSnet
                 } else
                 {
                     //something went wrong
-                    
+
                     throw new Exception("error in otap");
                 }
             } else
@@ -329,7 +347,7 @@ namespace CSnet
 
         private int SendOTAPFileChunk(int offset, byte[] buffer)
         {
-            byte[] parameters = new byte[67];           
+            byte[] parameters = new byte[67];
 
             byte function = ADI_WIL_API_LOAD_FILE;
 
@@ -409,12 +427,12 @@ namespace CSnet
                 Debug.WriteLine(fileChunk.pData);
                 //Debug.WriteLine(Marshal.UnsafeAddrOfPinnedArrayElement(pReturnedData, 5));
 
-                byte[] managedArray = new byte[fileChunk.iByteCount*5];
+                byte[] managedArray = new byte[fileChunk.iByteCount * 5];
                 //Buffer.BlockCopy(pReturnedData, 5, managedArray, 0, fileChunk.iByteCount);
 
                 //Debug.WriteLine(managedArray[0]);
 
-                Marshal.Copy(fileChunk.pData, managedArray, 0, managedArray.Length-40); //for some reason, this results in an access violation exception
+                Marshal.Copy(fileChunk.pData, managedArray, 0, managedArray.Length - 40); //for some reason, this results in an access violation exception
 
                 //append file chunk
                 SourceStream.Write(managedArray, 0, managedArray.Length);
@@ -426,6 +444,28 @@ namespace CSnet
                 MessageBox.Show("Succeeded"); //Either way close the filestream
                 return false;
             }
+        }
+
+        private void Connect(bool portA, bool portB)
+        {
+            byte function = ADI_WIL_API_CONNECT;
+            ushort bufferSize = 512;
+            byte[] parameters = new byte[4];
+            parameters[0] = (byte)(portA ? 1 : 0);//portA
+            parameters[1] = (byte)(portB ? 1 : 0);//portB
+
+            //parameters[2] = BitConverter.GetBytes((ushort)512)[0];
+            //parameters[3] = BitConverter.GetBytes((ushort)512)[1];
+
+            parameters[2] = (byte)(bufferSize & 0xFF);
+            parameters[3] = (byte)((bufferSize >> 8) & 0xFF);
+
+            SendGenericCommand(function, parameters);
+
+            byte callbackError = 0;
+            CheckStatus(function, out callbackError);
+
+            ReadGenericCommand(function); //read, but we don't care about the output
         }
 
         private void GetFileCRC()
@@ -449,7 +489,7 @@ namespace CSnet
             adi_wil_file_crc_list_t crcList = (adi_wil_file_crc_list_t)Marshal.PtrToStructure(ReadGenericCommand(function), typeof(adi_wil_file_crc_list_t));
 
             //TODO: foreach file that exists, get crc and compare it against others (just first?) and if there's a mismatch, throw error
-           
+
             string bitmapString = Convert.ToString((long)crcList.eFileExists, 2);
             bool[] bitmap = bitmapString.Select(x => x.Equals('1')).Reverse().ToArray();
             //bitmap = bitmap.Reverse().ToArray();
@@ -539,7 +579,7 @@ namespace CSnet
             parameters[8] = Convert.ToByte(adi_wil_contextual_id_t.ADI_WIL_CONTEXTUAL_ID_0);
 
             SendGenericCommand(function, parameters);
-            
+
             adi_wil_contextual_data_t contextualData = (adi_wil_contextual_data_t)Marshal.PtrToStructure(ReadGenericCommand(function), typeof(adi_wil_contextual_data_t));
 
             Debug.WriteLine(contextualData.iLength);
@@ -565,7 +605,7 @@ namespace CSnet
             uInstanceSelected = 0;
 
             int iResult = icsNeoDll.icsneoGenericAPIReadData(m_hObject, uAPISelected, uInstanceSelected, out uCurrentFunction, Marshal.UnsafeAddrOfPinnedArrayElement(pReturnedData, 0), out uReturnedDataLength);
-            
+
             if (uCurrentFunction != function || iResult != 1) //1 is success
             {
                 //Handle Error Here
@@ -586,7 +626,7 @@ namespace CSnet
             }
 
             byte callbackError = 0;
-            CheckStatus(function, out callbackError) ;
+            CheckStatus(function, out callbackError);
         }
 
         private void SetACL_Click(object sender, EventArgs e)
@@ -620,7 +660,7 @@ namespace CSnet
         {
             int timeOutCounter = 0, result = 0;
 
-            byte uFinishedProcessing = 1, uCurrentFunction, uAPISelected = 1, uInstanceSelected = 0 ;
+            byte uFinishedProcessing = 1, uCurrentFunction, uAPISelected = 1, uInstanceSelected = 0;
 
             do
             {
@@ -793,13 +833,13 @@ namespace CSnet
                                         //ignore
                                         break;
                                     case BMS_PACKET_TYPE:
-                                            modules[uiDeviceSource].UpdateData(packet, uiPacketID, dTime);
+                                        modules[uiDeviceSource].UpdateData(packet, uiPacketID, dTime);
 
                                         break;
                                     case PMS_PACKET_TYPE:
-                                            //TODO: check that manager 0 is the primary manager
-                                            managers[0].UpdatePMSData(packet, uiPacketID);
-                                        
+                                        //TODO: check that manager 0 is the primary manager
+                                        managers[0].UpdatePMSData(packet, uiPacketID);
+
                                         break;
                                     case EMS_PACKET_TYPE:
                                         managers[0].UpdateEMSData(packet, uiPacketID);
@@ -861,8 +901,8 @@ namespace CSnet
 
         private byte[] ConvertPacketToManaged(icsSpyMessage message, int payloadLength)
         {
-            // wBMS Packet Payload is located in the ExtraDataPtr
-           
+            //wBMS Packet Payload is located in the ExtraDataPtr
+
             byte[] managedArray = new byte[payloadLength];
             Marshal.Copy(message.iExtraDataPtr, managedArray, 0, payloadLength);
 
@@ -898,6 +938,7 @@ namespace CSnet
                     lstMessage.Items.Add(outputText);
                     outputText = "";
 
+                    //Debug.WriteLine($"Module {module.MacAddress} rssi: {module.PeakRSSI}");
                     //Debug.WriteLine($"Module {module.MacAddress} pu: {module.PeakUpdateRate}");
                 }
             }
@@ -1002,12 +1043,27 @@ namespace CSnet
         }
         private void Version_Click(object sender, EventArgs e)
         {
+            GetDeviceVersions();
+        }
+
+        private void GetDeviceVersions()
+        {
+            WaitForModulesToConnect();
+
             for (int i = 0; i < modules.Length; i++)
             {
                 modules[i].version = DeviceFirmwareVersion(i);
             }
             managers[0].Version = DeviceFirmwareVersion(62); //afaik, manager 0 is always the primary manager, responsible for EMS & PMS
-            //managers[1].Version = DeviceFirmwareVersion(63); //this should throw an error if the pack is BEV & only has one manager
+            if (BET)
+            {
+                managers[1].Version = DeviceFirmwareVersion(63);
+            }
+        }
+
+        private void WaitForModulesToConnect()
+        {
+            //TODO: test if all modules are connected, before you try to get their versions
         }
 
         private void Config_Click(object sender, EventArgs e)

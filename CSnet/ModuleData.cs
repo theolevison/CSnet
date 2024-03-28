@@ -25,7 +25,7 @@ namespace CSnet
         public int Latency { get; set; }
         public int TotalPECErrors { get; set; }
         public double AverageUpdateRate { get; set; }
-        public double PeakUpdateRate { get; set; }
+        public double PeakUpdateRate { get; set; } = 0;
         public int AverageRSSI { get; set; }
         public int PeakRSSI { get; set; }
         public int UpdateRateCount { get; set; } = 0;
@@ -130,14 +130,16 @@ namespace CSnet
                     BMSMessageTimestamp = time;
                 }
 
+                
+
                 double difference = Math.Abs(time - BMSMessageTimestamp);
                 if (difference > PeakUpdateRate)
                 {
                     PeakUpdateRate = difference;
                 }
-                //Debug.WriteLine($"Update {MacAddress} pu: {PeakUpdateRate}");
+                Debug.WriteLine($"Update {MacAddress} pu: {PeakUpdateRate} diff: {difference} pa: {AverageUpdateRate}");
 
-                BMSMessageTimestamp = time; //time measured in seconds since device turned on
+                BMSMessageTimestamp = time; //time measured in seconds since device turned on, save for next iteration
 
                 //calculate cumulative average for time between packets
                 AverageUpdateRate = (difference + UpdateRateCount * AverageUpdateRate) / (UpdateRateCount + 1);

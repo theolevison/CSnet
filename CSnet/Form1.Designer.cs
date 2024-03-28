@@ -81,7 +81,7 @@
             this.cmdCloseDevice.Size = new System.Drawing.Size(160, 28);
             this.cmdCloseDevice.TabIndex = 1;
             this.cmdCloseDevice.Text = "Close Devices";
-            this.cmdCloseDevice.Click += new System.EventHandler(this.cmdCloseDevice_Click);
+            this.cmdCloseDevice.Click += new System.EventHandler(this.CmdCloseDevice_Click);
             // 
             // TabControl1
             // 

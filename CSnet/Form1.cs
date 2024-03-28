@@ -26,6 +26,8 @@ namespace CSnet
         public Form1()
         {
             InitializeComponent();
+
+            FindDevices();
         }
 
         private const byte ADI_WIL_MAC_SIZE = 8;
@@ -108,31 +110,21 @@ namespace CSnet
         private const int MANAGER_1_ID = 241;
         private const int byte_number = 0;
 
+        private const int MAX_DEVICES = 255;
+
         private HashSet<String> openedDevicesSerials = new HashSet<String>();
+        private int numberOfDevicesFound = MAX_DEVICES;
+        private NeoDeviceEx[] ndNeoToOpenex = new NeoDeviceEx[MAX_DEVICES]; //Struct holding detected hardware information, TODO: this is limiting us to 16 devices
+
         private void CmdOpenDevices_Click(object sender, EventArgs e)
         {
-            int iResult;
-            NeoDeviceEx[] ndNeoToOpenex = new NeoDeviceEx[16];	//Struct holding detected hardware information, TODO: this is limiting us to 16 devices
-            OptionsOpenNeoEx OptionOpenNeoEX = new OptionsOpenNeoEx();
-            byte[] bNetwork = new byte[255];    //List of hardware IDs
-            int iNumberOfDevices;   //Number of hardware devices to look for 
-            int iCount;		 //counter
-            UInt32 StringSize = 6;
-            string sConvertedSN = "      ";
-            byte[] bSN = new byte[6];
+            OpenDevices();
+        }
 
-            //File NetworkID array
-            for (iCount = 0; iCount < 255; iCount++)
-            {
-                bNetwork[iCount] = Convert.ToByte(iCount);
-            }
-
-            //Set the number of devices to find, for this example look for 16
-            iNumberOfDevices = 15;
-
+        private void FindDevices()
+        {
             //Search for connected hardware
-            //iResult = icsNeoDll.icsneoFindNeoDevices((uint)eHardwareTypes.NEODEVICE_ALL, ref ndNeoToOpen, ref iNumberOfDevices);
-            iResult = icsNeoDll.icsneoFindDevices(ref ndNeoToOpenex[0], ref iNumberOfDevices, 0, 0, ref neoDeviceOption, 0);
+            int iResult = icsNeoDll.icsneoFindDevices(ref ndNeoToOpenex[0], ref numberOfDevicesFound, 0, 0, ref neoDeviceOption, 0);
 
             if (iResult == 0)
             {
@@ -140,31 +132,48 @@ namespace CSnet
                 return;
             }
 
-            if (iNumberOfDevices < 1)
+            if (numberOfDevicesFound < 1)
             {
-                MessageBox.Show("No devices found");
+                MessageBox.Show("No devices found, connect RAD wBMS");
                 return;
             }
+        }
 
-            for (int i = 0; i < iNumberOfDevices; i++)
+        private void OpenDevices()
+        {
+            byte[] bNetwork = new byte[MAX_DEVICES];    //List of hardware IDs
+            int iCount;		 //counter
+
+            //File NetworkID array
+            for (iCount = 0; iCount < MAX_DEVICES; iCount++)
+            {
+                bNetwork[iCount] = Convert.ToByte(iCount);
+            }
+
+            UInt32 StringSize = 6;
+            byte[] bSN = new byte[6];
+
+            OptionsOpenNeoEx OptionOpenNeoEX = new OptionsOpenNeoEx();
+
+            for (int i = 0; i < numberOfDevicesFound; i++)
             {
                 //Convert the Serial number to a String
                 icsNeoDll.icsneoSerialNumberToString(Convert.ToUInt32(ndNeoToOpenex[i].neoDevice.SerialNumber), ref bSN[0], ref StringSize);
-                sConvertedSN = Encoding.ASCII.GetString(bSN);
+                string sConvertedSN = Encoding.ASCII.GetString(bSN);
 
                 //keep track of devices that have already been opened
                 if (openedDevicesSerials.Add(sConvertedSN))
                 {
                     IntPtr anonymousPointer = IntPtr.Zero;
-                    iResult = icsNeoDll.icsneoOpenDevice(ref ndNeoToOpenex[i], ref anonymousPointer, ref bNetwork[0], 1, 0, ref OptionOpenNeoEX, 0);
+                    int iResult = icsNeoDll.icsneoOpenDevice(ref ndNeoToOpenex[i], ref anonymousPointer, ref bNetwork[0], 1, 0, ref OptionOpenNeoEX, 0);
                     if (iResult == 1)
                     {
-                        MessageBox.Show("Port Opened OK!");
+                        MessageBox.Show("Device Opened OK!");
                     }
                     else
                     {
                         //MessageBox.Show("Problem Opening Port");
-                        Debug.WriteLine("Not opened");
+                        Debug.WriteLine("Device not opened");
                         return;
                     }
 
@@ -176,7 +185,7 @@ namespace CSnet
             }
         }
 
-        private void cmdCloseDevice_Click(object sender, EventArgs e)
+        private void CmdCloseDevice_Click(object sender, EventArgs e)
         {
             int iResult;
             int iNumberOfErrors = 0;
@@ -265,7 +274,7 @@ namespace CSnet
                     /*
                      * UDP request format:
                      * Serial Number from ADI box
-                     * Type of Packet, BMS 0, BMS Temperature 1, PMS 2, EMS 3
+                     * Type of Packet, BMS 0, BMS Temperature 1, PMS 2, EMS 3, Setup command 13
                      * BMS -> Module number
                      * BMS Temperature -> Module number
                      * PMS -> 0
@@ -284,9 +293,13 @@ namespace CSnet
                         OpenDeviceTab uc1 = (OpenDeviceTab)tabPage.Controls[0];
 
                         //check serial number against request                        
-                        if (uc1.Name != "")//TODO: actually parse serial number
+                        if (uc1.Name.Equals(Encoding.ASCII.GetString(data.Take(6).ToArray())))
                         {
-                            if (data[1] == BMSPACKET)
+                            if (data[6] == 13)
+                            {
+                                //Setup ADI box for BEV/BET & isoSPI/Wireless
+                                uc1.Setup(false, false);
+                            } else if (data[1] == BMSPACKET)
                             {
                                 //send raw BMS packet to UDP client
                                 server.SendTo(uc1.modules[data[2]].Packet0, remoteEnd);
