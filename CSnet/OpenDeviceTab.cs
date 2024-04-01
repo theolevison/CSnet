@@ -645,6 +645,8 @@ namespace CSnet
             SetMode(ADI_WIL_MODE_STANDBY);
 
             SendGenericCommand(ADI_WIL_API_SET_ACL, ACLList.ToArray());
+
+            Setup(BET, isoSPI);
         }
 
         private void ACLPage_Click(object sender, EventArgs e)
