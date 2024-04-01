@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Deployment.Internal;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -1048,23 +1049,69 @@ namespace CSnet
 
         private void GetDeviceVersions()
         {
-            WaitForModulesToConnect();
-
-            for (int i = 0; i < modules.Length; i++)
+            if (WaitForModulesToConnect())
             {
-                modules[i].version = DeviceFirmwareVersion(i);
-            }
-            managers[0].Version = DeviceFirmwareVersion(62); //afaik, manager 0 is always the primary manager, responsible for EMS & PMS
-            if (BET)
-            {
-                managers[1].Version = DeviceFirmwareVersion(63);
+                for (int i = 0; i < modules.Length; i++)
+                {
+                    modules[i].version = DeviceFirmwareVersion(i);
+                }
+                managers[0].Version = DeviceFirmwareVersion(62); //afaik, manager 0 is always the primary manager, responsible for EMS & PMS
+                if (BET)
+                {
+                    managers[1].Version = DeviceFirmwareVersion(63);
+                }
             }
         }
 
-        private void WaitForModulesToConnect()
+        private bool WaitForModulesToConnect()
         {
-            //TODO: test if all modules are connected, before you try to get their versions
+            int timeoutCounter = 0;
+            do
+            {
+                SendGenericCommand(ADI_WIL_API_GET_NETWORK_STATUS, new byte[0]);
+
+                byte[] output = new byte[9];
+                Marshal.Copy(ReadGenericCommand(ADI_WIL_API_GET_NETWORK_STATUS), output, 0, output.Length);
+
+                //TODO: repeat this command until timeout (to one we pick) or until all nodes are checked against the bitmap returned from 
+
+                BitArray bitArray = new BitArray(output.Skip(1).ToArray());
+
+                int connectedCount = 0;
+                foreach (bool b in bitArray)
+                {
+                    if (b)
+                    {
+                        connectedCount++;
+                    }
+                }
+
+                if (connectedCount == output[0])
+                {
+                    return true;
+                    //all modules have connected.
+                }
+                timeoutCounter++;
+                Thread.Sleep(1000);
+            } while (timeoutCounter < 5);
+            MessageBox.Show("Connecting to modules timed-out, check ACL");
+            return false;
         }
+
+        /*
+        iRetVal = WIL_RequestGetNetworkStatus(hObject, WIL_INSTANCE_0, &nwStatus);
+        CU_ASSERT_INT_EQUAL(iRetVal, ADI_WIL_RETURN_SUCCESS);
+
+        CU_ASSERT_INT_EQUAL(nwStatus.iCount, GLOBAL_TEST_CONFIG_NUMBER_NODES_UNDER_TEST); 
+        iNodesConnected = 0;
+        for (int i = 0; i < nwStatus.iCount; i++)
+        {
+            if((nwStatus.iConnectState >> i) & 0x1)
+                iNodesConnected++;
+        } 
+        pStatus->iCount= bData[ADI_WIL_GET_NETWORK_STATUS_RETURN_NODE_COUNT_OFFSET];
+        pStatus->iConnectState = *(uint64_t*)(bData + ADI_WIL_GET_NETWORK_STATUS_RETURN_NODE_CONNECTED_BITMASK_OFFSET);
+         */
 
         private void Config_Click(object sender, EventArgs e)
         {

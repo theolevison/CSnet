@@ -256,6 +256,9 @@ namespace CSnet
         private const byte PeakUpdateRate = 10;
         private const byte AverageRSSI = 11;
         private const byte PeakRSSI = 12;
+        private const byte BEV = 13;
+        private const byte BET = 14;
+        private const byte OP90 = 15;
 
         private void UDPListener()
         {
@@ -295,9 +298,15 @@ namespace CSnet
                         //check serial number against request                        
                         if (uc1.Name.Equals(Encoding.ASCII.GetString(data.Take(6).ToArray())))
                         {
-                            if (data[6] == 13)
+                            if (data[6] == BEV)
                             {
-                                //Setup ADI box for BEV/BET & isoSPI/Wireless
+                                uc1.Setup(false, true);
+                            }
+                            else if (data[6] == BET)
+                            {
+                                uc1.Setup(true, true);
+                            }else if (data[6] == OP90)
+                            {
                                 uc1.Setup(false, false);
                             } else if (data[1] == BMSPACKET)
                             {
