@@ -230,11 +230,12 @@ namespace CSnet
             managers[0] = new ManagerData();
             managers[1] = new ManagerData(); //this manager should be ignored for single manager uses, e.g BEV
 
-            //TODO: at some point check firmware versions
-            //managers[0].Version = DeviceFirmwareVersion(62); //afaik, manager 0 is always the primary manager, responsible for EMS & PMS
-            //managers[1].Version = DeviceFirmwareVersion(63); //this should throw an error if the pack is BEV & only has one manager
+            //connect to managers first
+            Connect(true, true) ;
 
             GetAclButton_Click(null, null);
+            Debug.WriteLine($"module count: {nodeMacAddresses.Count}");
+
             modules = new ModuleData[nodeMacAddresses.Count];
 
             for (int i = 0; i < nodeMacAddresses.Count; i++)
@@ -243,10 +244,7 @@ namespace CSnet
                 modules[i].MacAddress = nodeMacAddresses[i];
             }
 
-            //find firmware versions            
-            Debug.WriteLine($"module count: {nodeMacAddresses.Count}");
-
-            GetDeviceVersions();
+            GetDeviceVersions();            
         }
 
         private void ChangeADIboxSettings()
@@ -452,8 +450,8 @@ namespace CSnet
             byte function = ADI_WIL_API_CONNECT;
             ushort bufferSize = 512;
             byte[] parameters = new byte[4];
-            parameters[0] = (byte)(portA ? 1 : 0);//portA
-            parameters[1] = (byte)(portB ? 1 : 0);//portB
+            parameters[0] = (byte)(1);//portA
+            parameters[1] = (byte)(!isoSPI || BET ? 1 : 0);//portB
 
             //parameters[2] = BitConverter.GetBytes((ushort)512)[0];
             //parameters[3] = BitConverter.GetBytes((ushort)512)[1];
@@ -1085,6 +1083,7 @@ namespace CSnet
                         connectedCount++;
                     }
                 }
+                Debug.WriteLine($"running count: {connectedCount}");
 
                 if (connectedCount == output[0])
                 {
@@ -1093,7 +1092,7 @@ namespace CSnet
                 }
                 timeoutCounter++;
                 Thread.Sleep(1000);
-            } while (timeoutCounter < 5);
+            } while (timeoutCounter < 8);
             MessageBox.Show("Connecting to modules timed-out, check ACL");
             return false;
         }
