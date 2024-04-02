@@ -727,6 +727,7 @@ namespace CSnet
 
         private void GetAclButton_Click(object sender, EventArgs e)//获取ACL
         {
+            nodeMacAddresses.Clear();
             //get ACL is available in all system modes
             byte function = ADI_WIL_API_GET_ACL;
 

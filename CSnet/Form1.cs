@@ -499,55 +499,26 @@ namespace CSnet
                                 {
                                     byte[] dataAll = new byte[uc1.modules[0].Packet0.Length * 12];
 
-                                    
                                     // uc1.modules[0].Packet0.Length
 
-                                    Array.Copy(uc1.modules[0].Packet0, 0, dataAll, 0, uc1.modules[0].Packet0.Length);//复制模组1
-                                    Array.Copy(uc1.modules[1].Packet0, 0, dataAll, uc1.modules[0].Packet0.Length, uc1.modules[1].Packet0.Length);//复制模组2
-                                    Array.Copy(uc1.modules[2].Packet0, 0, dataAll, uc1.modules[0].Packet0.Length * 2, uc1.modules[2].Packet0.Length);//复制模组3
-                                    Array.Copy(uc1.modules[3].Packet0, 0, dataAll, uc1.modules[0].Packet0.Length * 3, uc1.modules[3].Packet0.Length);//复制模组4
-                                    Array.Copy(uc1.modules[4].Packet0, 0, dataAll, uc1.modules[0].Packet0.Length * 4, uc1.modules[4].Packet0.Length);//复制模组5
-                                    Array.Copy(uc1.modules[5].Packet0, 0, dataAll, uc1.modules[0].Packet0.Length * 5, uc1.modules[5].Packet0.Length);//复制模组6
-                                    Array.Copy(uc1.modules[6].Packet0, 0, dataAll, uc1.modules[0].Packet0.Length * 6, uc1.modules[6].Packet0.Length);//复制模组7
-                                    Array.Copy(uc1.modules[7].Packet0, 0, dataAll, uc1.modules[0].Packet0.Length * 7, uc1.modules[7].Packet0.Length);//复制模组8
-                                    Array.Copy(uc1.modules[8].Packet0, 0, dataAll, uc1.modules[0].Packet0.Length * 8, uc1.modules[8].Packet0.Length);//复制模组9
-                                    Array.Copy(uc1.modules[9].Packet0, 0, dataAll, uc1.modules[0].Packet0.Length * 9, uc1.modules[9].Packet0.Length);//复制模组10
-                                    Array.Copy(uc1.modules[10].Packet0, 0, dataAll, uc1.modules[0].Packet0.Length * 10, uc1.modules[10].Packet0.Length);//复制模组11
-                                    Array.Copy(uc1.modules[11].Packet0, 0, dataAll, uc1.modules[0].Packet0.Length * 11, uc1.modules[11].Packet0.Length);//复制模组12
+                                    for (int i = 0; i < 12; i++)
+                                    {
+                                        Array.Copy(uc1.modules[i].Packet0, 0, dataAll, uc1.modules[0].Packet0.Length * i, uc1.modules[i].Packet0.Length);
+                                    }
+
 
                                     //将所有的电压合在一起
                                     server1.SendTo(dataAll, remoteEnd);
                                 }
-                                else if (uc1.modules.Length >= 24)//24个模组{
+                                else if (uc1.modules.Length >= 24)//24个模组{ //TODO: why is there a difference between 12 & 24?
                                 {
                                     byte[] dataAll = new byte[uc1.modules[0].Packet0.Length * 24];
 
                                     // uc1.modules[0].Packet0.Length
-
-                                    Array.Copy(uc1.modules[0].Packet0, 0, dataAll, 0, uc1.modules[0].Packet0.Length);//复制模组1
-                                    Array.Copy(uc1.modules[1].Packet0, 0, dataAll, uc1.modules[0].Packet0.Length, uc1.modules[1].Packet0.Length);//复制模组2
-                                    Array.Copy(uc1.modules[2].Packet0, 0, dataAll, uc1.modules[0].Packet0.Length * 2, uc1.modules[2].Packet0.Length);//复制模组3
-                                    Array.Copy(uc1.modules[3].Packet0, 0, dataAll, uc1.modules[0].Packet0.Length * 3, uc1.modules[3].Packet0.Length);//复制模组4
-                                    Array.Copy(uc1.modules[4].Packet0, 0, dataAll, uc1.modules[0].Packet0.Length * 4, uc1.modules[4].Packet0.Length);//复制模组5
-                                    Array.Copy(uc1.modules[5].Packet0, 0, dataAll, uc1.modules[0].Packet0.Length * 5, uc1.modules[5].Packet0.Length);//复制模组6
-                                    Array.Copy(uc1.modules[6].Packet0, 0, dataAll, uc1.modules[0].Packet0.Length * 6, uc1.modules[6].Packet0.Length);//复制模组7
-                                    Array.Copy(uc1.modules[7].Packet0, 0, dataAll, uc1.modules[0].Packet0.Length * 7, uc1.modules[7].Packet0.Length);//复制模组8
-                                    Array.Copy(uc1.modules[8].Packet0, 0, dataAll, uc1.modules[0].Packet0.Length * 8, uc1.modules[8].Packet0.Length);//复制模组9
-                                    Array.Copy(uc1.modules[9].Packet0, 0, dataAll, uc1.modules[0].Packet0.Length * 9, uc1.modules[9].Packet0.Length);//复制模组10
-                                    Array.Copy(uc1.modules[10].Packet0, 0, dataAll, uc1.modules[0].Packet0.Length * 10, uc1.modules[10].Packet0.Length);//复制模组11
-                                    Array.Copy(uc1.modules[11].Packet0, 0, dataAll, uc1.modules[0].Packet0.Length * 11, uc1.modules[11].Packet0.Length);//复制模组12
-                                    Array.Copy(uc1.modules[12].Packet0, 0, dataAll, uc1.modules[0].Packet0.Length * 12, uc1.modules[12].Packet0.Length);//复制模组13
-                                    Array.Copy(uc1.modules[13].Packet0, 0, dataAll, uc1.modules[0].Packet0.Length * 13, uc1.modules[13].Packet0.Length);//复制模组14
-                                    Array.Copy(uc1.modules[14].Packet0, 0, dataAll, uc1.modules[0].Packet0.Length * 14, uc1.modules[14].Packet0.Length);//复制模组15
-                                    Array.Copy(uc1.modules[15].Packet0, 0, dataAll, uc1.modules[0].Packet0.Length * 15, uc1.modules[15].Packet0.Length);//复制模组16
-                                    Array.Copy(uc1.modules[16].Packet0, 0, dataAll, uc1.modules[0].Packet0.Length * 16, uc1.modules[16].Packet0.Length);//复制模组17
-                                    Array.Copy(uc1.modules[17].Packet0, 0, dataAll, uc1.modules[0].Packet0.Length * 17, uc1.modules[17].Packet0.Length);//复制模组18
-                                    Array.Copy(uc1.modules[18].Packet0, 0, dataAll, uc1.modules[0].Packet0.Length * 18, uc1.modules[18].Packet0.Length);//复制模组19
-                                    Array.Copy(uc1.modules[19].Packet0, 0, dataAll, uc1.modules[0].Packet0.Length * 19, uc1.modules[19].Packet0.Length);//复制模组20
-                                    Array.Copy(uc1.modules[20].Packet0, 0, dataAll, uc1.modules[0].Packet0.Length * 20, uc1.modules[20].Packet0.Length);//复制模组21
-                                    Array.Copy(uc1.modules[21].Packet0, 0, dataAll, uc1.modules[0].Packet0.Length * 21, uc1.modules[21].Packet0.Length);//复制模组22
-                                    Array.Copy(uc1.modules[22].Packet0, 0, dataAll, uc1.modules[0].Packet0.Length * 22, uc1.modules[22].Packet0.Length);//复制模组23
-                                    Array.Copy(uc1.modules[23].Packet0, 0, dataAll, uc1.modules[0].Packet0.Length * 23, uc1.modules[23].Packet0.Length);//复制模组24
+                                    for(int i = 0; i <24; i++)
+                                    {
+                                        Array.Copy(uc1.modules[i].Packet0, 0, dataAll, uc1.modules[0].Packet0.Length * i, uc1.modules[i].Packet0.Length);
+                                    }
 
                                     //将所有的电压合在一起
                                     server1.SendTo(dataAll, remoteEnd);
