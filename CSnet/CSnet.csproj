@@ -124,6 +124,9 @@
       <DependentUpon>OpenDeviceTab.cs</DependentUpon>
     </Compile>
     <Compile Include="uconst.cs" />
+    <Compile Include="UDP1.cs" />
+    <Compile Include="UDP0.cs" />
+    <Compile Include="UDPListener.cs" />
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
     </EmbeddedResource>
