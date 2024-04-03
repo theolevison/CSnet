@@ -26,7 +26,7 @@ namespace CSnet
         public const byte BET = 14;
         public const byte OP90 = 15;
 
-        protected Socket server;
+        protected ISocket server;
         protected EndPoint remoteEnd;
         protected OpenDeviceTab uc1;
 
@@ -34,20 +34,16 @@ namespace CSnet
         private int Port;
         private TabControl TabControl1;
 
-        public UDPListener(string IPAdd, int Port, TabControl TabControl1)
+        public UDPListener(ISocket server, TabControl TabControl1)
         {
-            this.IPAdd = IPAdd;
-            this.Port = Port;
+            this.server = server;
             this.TabControl1 = TabControl1;
         }
 
         public void Start()
         {
-            server = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
+            server = new SocketWrapper(IPAdd, Port);
 
-            server.Bind(new IPEndPoint(IPAddress.Parse(IPAdd), Port));
-
-            remoteEnd = new IPEndPoint(IPAddress.Any, 0);
             byte[] data = new byte[12];
 
             while (true)
@@ -94,10 +90,10 @@ namespace CSnet
 
         public abstract void Action(byte[] data);
 
-        public void ReturnFF()
+        protected void ReturnFF()
         {
             //request not recongised, send back FF
-            server.SendTo(new byte[] { 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255 }, remoteEnd);
+            server.Send(new byte[] { 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255 });
         }
     }
 }

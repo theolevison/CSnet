@@ -89,6 +89,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="UDP\ISocket.cs" />
     <Compile Include="ManagerData.cs" />
     <Compile Include="ModuleData.cs" />
     <Compile Include="MyINI.cs" />
@@ -123,10 +124,11 @@
     <Compile Include="OpenDeviceTab.Designer.cs">
       <DependentUpon>OpenDeviceTab.cs</DependentUpon>
     </Compile>
+    <Compile Include="UDP\SocketWrapper.cs" />
     <Compile Include="uconst.cs" />
-    <Compile Include="UDP1.cs" />
-    <Compile Include="UDP0.cs" />
-    <Compile Include="UDPListener.cs" />
+    <Compile Include="UDP\UDPOP140.cs" />
+    <Compile Include="UDP\UDPGeneric.cs" />
+    <Compile Include="UDP\UDPListener.cs" />
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
     </EmbeddedResource>

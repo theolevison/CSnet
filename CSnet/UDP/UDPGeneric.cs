@@ -4,9 +4,9 @@ using System.Windows.Forms;
 
 namespace CSnet
 {
-    public class UDP0 : UDPListener
+    public class UDPGeneric : UDPListener
     {
-        public UDP0(string IPAdd, int Port, TabControl TabControl1) : base(IPAdd, Port, TabControl1)
+        public UDPGeneric(ISocket server, TabControl TabControl1) : base(server, TabControl1)
         { }
 
         public override void Action(byte[] data)
@@ -24,7 +24,7 @@ namespace CSnet
                     break;
                 case BMSPACKET:
                     //send raw BMS packet to UDP client
-                    server.SendTo(uc1.modules[data[2]].Packet0, remoteEnd);
+                    server.Send(uc1.modules[data[2]].Packet0);
                     break;
                 case BMSTEMPPACKET:
                     {
@@ -60,7 +60,7 @@ namespace CSnet
                         tempPacket[6] = bbb[0];
                         tempPacket[7] = bbb[1];
 
-                        server.SendTo(tempPacket, remoteEnd);
+                        server.Send(tempPacket);
                         break;
                     }
                 case PMSPACKET:
@@ -79,7 +79,7 @@ namespace CSnet
                             .Concat(BitConverter.GetBytes(uc1.managers[0].AUX6))
                             .ToArray();
 
-                        server.SendTo(tempPacket, remoteEnd);
+                        server.Send(tempPacket);
                         break;
                     }
                 case EMSPACKET:
@@ -97,15 +97,15 @@ namespace CSnet
                       //.Concat(BitConverter.GetBytes(uc1.managers[0].GetBEVDCFCMinus()))
                       .ToArray();
 
-                        server.SendTo(tempPacket, remoteEnd);
+                        server.Send(tempPacket);
                         break;
                     }
                 case ModuleVersion:
                     //send raw BMS packet to UDP client
-                    byte[] modulesVersion = new byte[1];
-                    modulesVersion[0] = (byte)uc1.modules[data[2]].version;
+                    byte[] moduleVersion = new byte[1];
+                    moduleVersion[0] = (byte)uc1.modules[data[2]].version;
 
-                    server.SendTo(modulesVersion, remoteEnd);
+                    server.Send(moduleVersion);
                     break;
                 case PackVersion:
                     byte[] packVersion = new byte[1];
@@ -113,55 +113,48 @@ namespace CSnet
                     // string Addr1 = MyINI.GetIniKeyValueForStr("PACK", "version", Application.StartupPath + "\\config.ini");
 
                     packVersion[0] = byte.Parse(uconst.packVersion);
-                    server.SendTo(packVersion, remoteEnd);
+                    server.Send(packVersion);
                     break;
                 case DiagnosticVoltage:
                     {
-                        int[] data1 = uconst.DoubleArrayToIntArray(uc1.modules[data[2]].CGDV);
-                        byte[] CGDV1 = uconst.IntArrayToByteArray(data1);
-                        server.SendTo(CGDV1, remoteEnd);
+                        int[] data1 = uconst.DoubleArrayToIntArray(uc1.modules[data[2]].CGDV);                        
+                        server.Send(uconst.IntArrayToByteArray(data1));
                         break;
                     }
                 case Latency:
                     {
                         int data1 = uc1.modules[data[2]].Latency;
-                        byte[] latency = BitConverter.GetBytes(data1);
-                        server.SendTo(latency, remoteEnd);
+                        server.Send(BitConverter.GetBytes(data1));
                         break;
                     }
                 case TotalPECErrors:
                     {
                         int data1 = uc1.modules[data[2]].TotalPECErrors;
-                        byte[] latency = BitConverter.GetBytes(data1);
-                        server.SendTo(latency, remoteEnd);
+                        server.Send(BitConverter.GetBytes(data1));
                         break;
                     }
                 case AverageUpdateRate:
                     {
                         int data1 = uconst.DoubleToInt(uc1.modules[data[2]].AverageUpdateRate * 1000 * 100);
-                        byte[] latency = BitConverter.GetBytes(data1);
-                        server.SendTo(latency, remoteEnd);
+                        server.Send(BitConverter.GetBytes(data1));
                         break;
                     }
                 case PeakUpdateRate:
                     {
                         int data1 = uconst.DoubleToInt(uc1.modules[data[2]].PeakUpdateRate * 1000 * 100);
-                        byte[] latency = BitConverter.GetBytes(data1);
-                        server.SendTo(latency, remoteEnd);
+                        server.Send(BitConverter.GetBytes(data1));
                         break;
                     }
                 case AverageRSSI:
                     {
                         int data1 = uc1.modules[data[2]].AverageRSSI;
-                        byte[] latency = BitConverter.GetBytes(data1);
-                        server.SendTo(latency, remoteEnd);
+                        server.Send(BitConverter.GetBytes(data1));
                         break;
                     }
                 case PeakRSSI:
                     {
                         int data1 = uc1.modules[data[2]].PeakRSSI;
-                        byte[] latency = BitConverter.GetBytes(data1);
-                        server.SendTo(latency, remoteEnd);
+                        server.Send(BitConverter.GetBytes(data1));
                         break;
                     }
                 default:

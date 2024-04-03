@@ -5,9 +5,9 @@ using System.Windows.Forms;
 
 namespace CSnet
 {
-    public class UDP1 : UDPListener
+    public class UDPOP140 : UDPListener
     {
-        public UDP1(string IPAdd, int Port, TabControl TabControl1) : base(IPAdd, Port, TabControl1)
+        public UDPOP140(ISocket server, TabControl TabControl1) : base(server, TabControl1)
         { }
 
         public override void Action(byte[] data)
@@ -27,9 +27,8 @@ namespace CSnet
                         Array.Copy(uc1.modules[i].Packet0, 6, dataAll, 20 * i, 20);
                     }
 
-
                     //将所有的电压合在一起
-                    server.SendTo(dataAll, remoteEnd);
+                    server.Send(dataAll);
                 }
                 else if (uc1.modules.Length >= 24)//24个模组{ //TODO: why is there a difference between 12 & 24?
                 {
@@ -42,7 +41,7 @@ namespace CSnet
                     }
 
                     //将所有的电压合在一起
-                    server.SendTo(dataAll, remoteEnd);
+                    server.Send(dataAll);
                 }
                 else//没有数据
                 {
@@ -60,7 +59,7 @@ namespace CSnet
                         .Concat(BitConverter.GetBytes((Int16)uc1.modules[i].Thermistor2 * 100)).ToArray();
                     }
 
-                    server.SendTo(tempPacket, remoteEnd);
+                    server.Send(tempPacket);
                 }
                 else if (uc1.modules.Length >= 24)//24个模组 //TODO: why is this here? Why does it matter if there are 12 or 24 modules??
                 {
@@ -70,7 +69,7 @@ namespace CSnet
                         .Concat(BitConverter.GetBytes((Int16)uc1.modules[i].Thermistor2 * 100)).ToArray();
                     }
 
-                    server.SendTo(tempPacket, remoteEnd);
+                    server.Send(tempPacket);
                 }
                 else//没有连接的情况
                 {

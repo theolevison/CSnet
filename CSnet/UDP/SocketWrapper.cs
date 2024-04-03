@@ -1,0 +1,38 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net;
+using System.Net.Sockets;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace CSnet
+{
+    public class SocketWrapper : ISocket
+    {
+        private Socket server;
+        private EndPoint remoteEnd;
+
+        public SocketWrapper(string IPAdd, int Port)
+        {
+            server = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
+            server.Bind(new IPEndPoint(IPAddress.Parse(IPAdd), Port));
+            remoteEnd = new IPEndPoint(IPAddress.Any, 0);
+        }
+
+        public void Bind(IPEndPoint remoteEndPoint)
+        {
+            server.Bind(remoteEndPoint);
+        }
+
+        public int ReceiveFrom(byte[] data, ref EndPoint remoteEnd)
+        {
+            return server.ReceiveFrom(data, ref remoteEnd);
+        }
+
+        public void Send(byte[] data)
+        {
+            server.SendTo(data, remoteEnd);
+        }
+    }
+}
