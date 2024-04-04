@@ -23,18 +23,22 @@ namespace CSnet
 
         //CMU Performance
         public int Latency { get; set; }
-        public int TotalPECErrors { get; set; }
+        public int TotalPECErrors { get; set; } = 0;
         public double AverageUpdateRate { get; set; }
         public double PeakUpdateRate { get; set; } = 0;
         public int AverageRSSI { get; set; }
         public int PeakRSSI { get; set; }
         public int UpdateRateCount { get; set; } = 0;
 
-        private void CalculatePECError(byte[] packetSlice)
+
+        private void CalculatePECError(byte[] packetSlice) //TODO: implement for all data, not just READA
         {
             ushort uiReceivedPEC = (ushort)((packetSlice[6] << 8 |  packetSlice[7]) & 0x03FF);
 
-            Debug.WriteLine($"PEC bool: {adi_pec10_calc(true, 6, packetSlice) == uiReceivedPEC}");
+            if (adi_pec10_calc(true, 6, packetSlice) != uiReceivedPEC)
+            {
+                TotalPECErrors++;
+            }
         }
 
         private void CalculatePECErrorBad(byte[] packetSlice)
@@ -137,14 +141,12 @@ namespace CSnet
                     BMSMessageTimestamp = time;
                 }
 
-                
-
                 double difference = Math.Abs(time - BMSMessageTimestamp);
                 if (difference > PeakUpdateRate)
                 {
                     PeakUpdateRate = difference;
                 }
-                Debug.WriteLine($"Update {MacAddress} pu: {PeakUpdateRate} diff: {difference} pa: {AverageUpdateRate}");
+                //Debug.WriteLine($"Update {MacAddress} pu: {PeakUpdateRate} diff: {difference} pa: {AverageUpdateRate}");
 
                 BMSMessageTimestamp = time; //time measured in seconds since device turned on, save for next iteration
 

@@ -18,18 +18,16 @@ namespace CSnet
     public partial class Form1 : Form
     {
         OptionsNeoEx neoDeviceOption = new OptionsNeoEx();
-        Func<double, double> f;
+        public Dictionary<string, DeviceModel> devices = new Dictionary<string, DeviceModel>();
 
         public Form1()
         {
             InitializeComponent();
-
             FindDevices();
         }
 
         private const int MAX_DEVICES = 255;
 
-        private HashSet<String> openedDevicesSerials = new HashSet<String>();
         private int numberOfDevicesFound = MAX_DEVICES;
         private NeoDeviceEx[] ndNeoToOpenex = new NeoDeviceEx[MAX_DEVICES]; //Struct holding detected hardware information, TODO: this is limiting us to 16 devices
 
@@ -79,7 +77,7 @@ namespace CSnet
                 string sConvertedSN = Encoding.ASCII.GetString(bSN);
 
                 //keep track of devices that have already been opened
-                if (openedDevicesSerials.Add(sConvertedSN))
+                if (!devices.ContainsKey(sConvertedSN))
                 {
                     IntPtr anonymousPointer = IntPtr.Zero;
                     int iResult = icsNeoDll.icsneoOpenDevice(ref ndNeoToOpenex[i], ref anonymousPointer, ref bNetwork[0], 1, 0, ref OptionOpenNeoEX, 0);
@@ -96,53 +94,47 @@ namespace CSnet
 
                     //create new tab per device
                     TabPage tabPage = new TabPage($"Device {sConvertedSN}");
-                    tabPage.Controls.Add(new OpenDeviceTab(ref anonymousPointer) { Name = $"{sConvertedSN}" });
-                    this.TabControl1.TabPages.Add(tabPage);
+
+                    DeviceModel model = new DeviceModel(ref anonymousPointer, sConvertedSN);
+                    devices.Add(sConvertedSN, model);
+                    
+                    tabPage.Controls.Add(new OpenDeviceTab(model) { Name = $"{sConvertedSN}" });
+                    TabControl1.TabPages.Add(tabPage);
                 }
             }
         }
 
         private void CmdCloseDevice_Click(object sender, EventArgs e)
         {
-            int iResult;
-            int iNumberOfErrors = 0;
-
             if (Timer1.Enabled == true)
             {
                 Timer1.Enabled = false;
                 //chkAutoRead.Checked = false;
             }
 
+            //close tabs
             foreach (TabPage tabPage in TabControl1.TabPages)
             {
-                OpenDeviceTab uc1 = (OpenDeviceTab)tabPage.Controls[0];
-
-                //close the port
-                iResult = icsNeoDll.icsneoClosePort(uc1.m_hObject, ref iNumberOfErrors);
-                //release resources used by the object
-                icsNeoDll.icsneoFreeObject(uc1.m_hObject);
-
-                if (iResult == 1)
-                {
-                    openedDevicesSerials.Remove(uc1.Name);
-                    TabControl1.TabPages.Remove(tabPage);
-                    MessageBox.Show("Port Closed OK!");
-                }
-                else
-                {
-                    MessageBox.Show("Problem ClosingPort");
-                }
+                TabControl1.TabPages.Remove(tabPage);               
             }
+
+            //close devices
+            foreach(DeviceModel device in devices.Values)
+            {
+               device.CloseDevice();
+            }
+            devices.Clear();
         }
 
         private void Form1_Load(object sender, EventArgs e)
         {
             //开启线程
+            
             /*
-            StartUDPServer(new UDPGeneric(new SocketWrapper("127.0.0.1", 9011), TabControl1));
-            StartUDPServer(new UDPOP140(new SocketWrapper("192.168.3.100", 9020), TabControl1));
-            StartUDPServer(new UDPOP140(new SocketWrapper("192.168.3.100", 9021), TabControl1));
-            StartUDPServer(new UDPOP140(new SocketWrapper("192.168.3.100", 9022), TabControl1));
+            StartUDPServer(new UDPGeneric(new SocketWrapper("127.0.0.1", 9011), devices));
+            StartUDPServer(new UDPOP140(new SocketWrapper("192.168.3.100", 9020), devices));
+            StartUDPServer(new UDPOP140(new SocketWrapper("192.168.3.100", 9021), devices));
+            StartUDPServer(new UDPOP140(new SocketWrapper("192.168.3.100", 9022), devices));
             */
 
             //Add the version number to the title of the application.  

@@ -89,6 +89,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DeviceModel.cs" />
     <Compile Include="UDP\ISocket.cs" />
     <Compile Include="ManagerData.cs" />
     <Compile Include="ModuleData.cs" />

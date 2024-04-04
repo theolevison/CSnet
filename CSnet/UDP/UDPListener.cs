@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
@@ -28,14 +29,12 @@ namespace CSnet
 
         protected ISocket server;
         protected EndPoint remoteEnd;
-        protected OpenDeviceTab uc1;
+        protected Dictionary<string, DeviceModel> devices;
 
-        private TabControl TabControl1;
-
-        public UDPListener(ISocket server, TabControl TabControl1)//TODO: MVC this, so that I don't have to pass in a UI element & then hunt through it
+        public UDPListener(ISocket server, Dictionary<string, DeviceModel> devices)//TODO: MVC this, so that I don't have to pass in a UI element & then hunt through it
         {
             this.server = server;
-            this.TabControl1 = TabControl1;
+            this.devices = devices;
         }
 
         public void Start()
@@ -65,14 +64,12 @@ namespace CSnet
                      */
 
                     //iterate through each open device
-                    foreach (TabPage tabPage in TabControl1.TabPages)
-                    {
-                        uc1 = (OpenDeviceTab)tabPage.Controls[0];
-
+                    foreach(DeviceModel device in devices.Values)
+                    {                        
                         //check serial number against request
-                        if (uc1.Name.Equals(Encoding.ASCII.GetString(data.Take(6).ToArray())))
+                        if (device.serialNumber.Equals(Encoding.ASCII.GetString(data.Take(6).ToArray())))
                         {
-                            Action(data);
+                            Action(data, device);
                         }
                     }
                 }
@@ -84,7 +81,7 @@ namespace CSnet
             }
         }
 
-        public abstract void Action(byte[] data);
+        public abstract void Action(byte[] data, DeviceModel device);
 
         protected void ReturnFF()
         {

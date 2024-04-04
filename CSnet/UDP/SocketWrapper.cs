@@ -27,7 +27,7 @@ namespace CSnet
 
         public int ReceiveFrom(byte[] data, ref EndPoint remoteEnd)
         {
-            return server.ReceiveFrom(data, ref remoteEnd);
+            return server.ReceiveFrom(data, ref remoteEnd); //will this work without ref-ing the data??
         }
 
         public void Send(byte[] data)

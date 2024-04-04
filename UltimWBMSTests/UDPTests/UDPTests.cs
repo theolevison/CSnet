@@ -21,10 +21,11 @@ namespace UltimWBMSTests.UDPTests
         public void UDPListener_Start_ReturnsFF()
         {
             //Arrange
-            UDPListener listener = new UDPListener(server, );
+            //A.CallTo(() => {server.Send(byte[] data)});
+            UDPListener listener = new UDPGeneric(server, new Dictionary<string, DeviceModel>());
 
             //Act
-
+            listener.Start();
 
             //Assert
         }
