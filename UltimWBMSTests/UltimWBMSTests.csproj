@@ -24,4 +24,8 @@
     </PackageReference>
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\CSnet\CSnet.csproj" />
+  </ItemGroup>
+
 </Project>

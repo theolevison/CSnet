@@ -30,11 +30,9 @@ namespace CSnet
         protected EndPoint remoteEnd;
         protected OpenDeviceTab uc1;
 
-        private string IPAdd;
-        private int Port;
         private TabControl TabControl1;
 
-        public UDPListener(ISocket server, TabControl TabControl1)
+        public UDPListener(ISocket server, TabControl TabControl1)//TODO: MVC this, so that I don't have to pass in a UI element & then hunt through it
         {
             this.server = server;
             this.TabControl1 = TabControl1;
@@ -42,8 +40,6 @@ namespace CSnet
 
         public void Start()
         {
-            server = new SocketWrapper(IPAdd, Port);
-
             byte[] data = new byte[12];
 
             while (true)

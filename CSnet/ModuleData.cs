@@ -32,6 +32,13 @@ namespace CSnet
 
         private void CalculatePECError(byte[] packetSlice)
         {
+            ushort uiReceivedPEC = (ushort)((packetSlice[6] << 8 |  packetSlice[7]) & 0x03FF);
+
+            Debug.WriteLine($"PEC bool: {adi_pec10_calc(true, 6, packetSlice) == uiReceivedPEC}");
+        }
+
+        private void CalculatePECErrorBad(byte[] packetSlice)
+        {
             /*
             //little endian, so swap the first 3 sets of 2 bytes
             byte temp = packetSlice[0];
@@ -157,14 +164,14 @@ namespace CSnet
                 CGV[6] = BitConverter.ToUInt16(packet, 22) * 0.0001;
                 CGV[7] = BitConverter.ToUInt16(packet, 24) * 0.0001;
 
-                CGDV[0] = BitConverter.ToUInt16(packet, 46) * 0.0001;
-                CGDV[1] = BitConverter.ToUInt16(packet, 48) * 0.0001;
-                CGDV[2] = BitConverter.ToUInt16(packet, 50) * 0.0001;
-                CGDV[3] = BitConverter.ToUInt16(packet, 54) * 0.0001;
-                CGDV[4] = BitConverter.ToUInt16(packet, 56) * 0.0001;
-                CGDV[5] = BitConverter.ToUInt16(packet, 58) * 0.0001;
-                CGDV[6] = BitConverter.ToUInt16(packet, 62) * 0.0001;
-                CGDV[7] = BitConverter.ToUInt16(packet, 64) * 0.0001;
+                CGDV[0] = BitConverter.ToInt16(packet, 46) * 0.0002;
+                CGDV[1] = BitConverter.ToInt16(packet, 48) * 0.0002;
+                CGDV[2] = BitConverter.ToInt16(packet, 50) * 0.0002;
+                CGDV[3] = BitConverter.ToInt16(packet, 54) * 0.0002;
+                CGDV[4] = BitConverter.ToInt16(packet, 56) * 0.0002;
+                CGDV[5] = BitConverter.ToInt16(packet, 58) * 0.0002;
+                CGDV[6] = BitConverter.ToInt16(packet, 62) * 0.0002;
+                CGDV[7] = BitConverter.ToInt16(packet, 64) * 0.0002;
 
                 //Want C# 8 for packet[6..12] :(
                 CalculatePECError(packet.Skip(6).Take(8).ToArray());
@@ -223,6 +230,55 @@ namespace CSnet
             //td = -0.1862;
             //double temp1 = (ta + (tb * lnr) + (tc * (Math.Pow(lnr, 2))) + (td * (Math.Pow(lnr, 3))));
             return temp;
+        }
+
+        public static ushort adi_pec10_calc(bool rx_cmd, int len, byte[] data)
+        {
+            ushort remainder = 16; /* PEC_SEED;   0000010000 */
+            ushort polynom = 0x48F; /* x10 + x7 + x3 + x2 + x + 1 <- the CRC10 polynomial         100 1000 1111   48F */
+
+            /* Perform modulo-2 division, a byte at a time. */
+            for (int pbyte = 0; pbyte < len; ++pbyte)
+            {
+                /* Bring the next byte into the remainder. */
+                remainder ^= (ushort)(data[pbyte] << 2);
+
+                /* Perform modulo-2 division, a bit at a time.*/
+                for (int bit_ = 8; bit_ > 0; --bit_)
+                {
+                    /* Try to divide the current data bit. */
+                    if ((remainder & 0x200) > 0) /* equivalent to remainder & 2^14 simply check for MSB */
+                    {
+                        remainder = (ushort)(remainder << 1);
+                        remainder = (ushort)(remainder ^ polynom);
+                    }
+                    else
+                    {
+                        remainder = (ushort)(remainder << 1);
+                    }
+                }
+            }
+
+            if (rx_cmd == true)
+            {
+                remainder ^= (ushort)((data[len] & 0xFC) << 2);
+
+                /* Perform modulo-2 division, a bit at a time */
+                for (int bit_ = 6; bit_ > 0; --bit_)
+                {
+                    /* Try to divide the current data bit */
+                    if ((remainder & 0x200) > 0) /* equivalent to remainder & 2^14 simply check for MSB */
+                    {
+                        remainder = (ushort)(remainder << 1);
+                        remainder = (ushort)(remainder ^ polynom);
+                    }
+                    else
+                    {
+                        remainder = (ushort)(remainder << 1);
+                    }
+                }
+            }
+            return (ushort)(remainder & 0x3FF);
         }
     }
 }

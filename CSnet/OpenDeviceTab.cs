@@ -244,7 +244,7 @@ namespace CSnet
                 modules[i].MacAddress = nodeMacAddresses[i];
             }
 
-            GetDeviceVersions();            
+            //GetDeviceVersions();            
         }
 
         private void ChangeADIboxSettings()
@@ -667,12 +667,12 @@ namespace CSnet
             {
                 result = icsNeoDll.icsneoGenericAPIGetStatus(m_hObject, uAPISelected, uInstanceSelected, out uCurrentFunction, out uCallbackError, out uFinishedProcessing);
 
-                if (timeOutCounter == 2000)
+                if (timeOutCounter == 20)
                 {
                     throw new Exception($"Timeout whilst sending command to device {uCallbackError}");
                 }
                 timeOutCounter++;
-                Thread.Sleep(1);
+                Thread.Sleep(100);
                 //only breaks if command has been successfully sent, or timesout
             } while (uFinishedProcessing == 0);
 

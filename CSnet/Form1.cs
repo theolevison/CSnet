@@ -138,10 +138,12 @@ namespace CSnet
         private void Form1_Load(object sender, EventArgs e)
         {
             //开启线程
+            /*
             StartUDPServer(new UDPGeneric(new SocketWrapper("127.0.0.1", 9011), TabControl1));
             StartUDPServer(new UDPOP140(new SocketWrapper("192.168.3.100", 9020), TabControl1));
             StartUDPServer(new UDPOP140(new SocketWrapper("192.168.3.100", 9021), TabControl1));
             StartUDPServer(new UDPOP140(new SocketWrapper("192.168.3.100", 9022), TabControl1));
+            */
 
             //Add the version number to the title of the application.  
             try
