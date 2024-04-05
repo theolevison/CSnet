@@ -228,7 +228,7 @@ namespace CSnet
             icsNeoDll.icsneoFreeObject(m_hObject);
         }
 
-        public void Setup(bool BET, bool isoSPI)
+        public bool Setup(bool BET, bool isoSPI)
         {
             this.BET = BET;
             this.isoSPI = isoSPI;
@@ -251,9 +251,10 @@ namespace CSnet
                 modules[i] = new ModuleData();
                 modules[i].MacAddress = nodeMacAddresses[i];
             }
-
             
-            GetDeviceVersions();            
+            GetDeviceVersions();
+
+            return true;
         }
 
         private void ChangeADIboxSettings()

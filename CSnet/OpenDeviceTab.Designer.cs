@@ -178,6 +178,7 @@
             this.chkAutoRead.TabIndex = 34;
             this.chkAutoRead.Text = "AutoRead";
             this.chkAutoRead.CheckedChanged += new System.EventHandler(this.chkAutoRead_CheckedChanged);
+            this.chkAutoRead.Checked = true;
             // 
             // ButtonSetACL
             // 
@@ -296,7 +297,8 @@
             // 
             // Timer1
             // 
-            this.Timer1.Interval = 1000;
+            this.Timer1.Interval = 500;
+            this.Timer1.Enabled = true;
             this.Timer1.Tick += new System.EventHandler(this.Timer1_Tick);
             // 
             // OpenDeviceTab
@@ -308,7 +310,6 @@
             this.Size = new System.Drawing.Size(1249, 645);
             this.GroupBox4.ResumeLayout(false);
             this.ResumeLayout(false);
-
         }
 
         #endregion

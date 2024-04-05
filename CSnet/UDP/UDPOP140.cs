@@ -11,7 +11,7 @@ namespace CSnet
         public UDPOP140(ISocket server, Dictionary<string, DeviceModel> devices) : base(server, devices)
         { }
 
-        public override void Action(byte[] data, DeviceModel device)
+        public override byte[] Action(byte[] data, DeviceModel device)
         {
             if (data[6] == BMSPACKET)
             {
@@ -29,7 +29,7 @@ namespace CSnet
                     }
 
                     //将所有的电压合在一起
-                    server.Send(dataAll);
+                    return dataAll;
                 }
                 else if (device.modules.Length >= 24)//24个模组{ //TODO: why is there a difference between 12 & 24?
                 {
@@ -42,11 +42,11 @@ namespace CSnet
                     }
 
                     //将所有的电压合在一起
-                    server.Send(dataAll);
+                    return dataAll;
                 }
                 else//没有数据
                 {
-                    ReturnFF();
+                    return ReturnFF();
                 }
             }
             if (data[6] == BMSTEMPPACKET)
@@ -60,7 +60,7 @@ namespace CSnet
                         .Concat(BitConverter.GetBytes((Int16)device.modules[i].Thermistor2 * 100)).ToArray();
                     }
 
-                    server.Send(tempPacket);
+                    return tempPacket;
                 }
                 else if (device.modules.Length >= 24)//24个模组 //TODO: why is this here? Why does it matter if there are 12 or 24 modules??
                 {
@@ -70,17 +70,16 @@ namespace CSnet
                         .Concat(BitConverter.GetBytes((Int16)device.modules[i].Thermistor2 * 100)).ToArray();
                     }
 
-                    server.Send(tempPacket);
+                    return tempPacket;
                 }
                 else//没有连接的情况
                 {
-                    ReturnFF();
+                    return ReturnFF();
                 }
             }
-
             else
             {
-                ReturnFF();
+                return ReturnFF();
             }
         }
     }

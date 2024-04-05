@@ -23,9 +23,10 @@ namespace CSnet
         public const byte PeakUpdateRate = 10;
         public const byte AverageRSSI = 11;
         public const byte PeakRSSI = 12;
-        public const byte BEV = 13;
-        public const byte BET = 14;
-        public const byte OP90 = 15;
+        public const byte SetACL = 13;
+        public const byte BEV = 14;
+        public const byte BET = 15;
+        public const byte OP90 = 16;
 
         protected ISocket server;
         protected EndPoint remoteEnd;
@@ -69,7 +70,7 @@ namespace CSnet
                         //check serial number against request
                         if (device.serialNumber.Equals(Encoding.ASCII.GetString(data.Take(6).ToArray())))
                         {
-                            Action(data, device);
+                            server.Send(Action(data, device));
                         }
                     }
                 }
@@ -81,12 +82,12 @@ namespace CSnet
             }
         }
 
-        public abstract void Action(byte[] data, DeviceModel device);
+        public abstract byte[] Action(byte[] data, DeviceModel device);
 
-        protected void ReturnFF()
+        protected byte[] ReturnFF()
         {
             //request not recongised, send back FF
-            server.Send(new byte[] { 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255 });
+            return new byte[] { 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255 };
         }
     }
 }

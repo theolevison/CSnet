@@ -25,7 +25,7 @@ namespace UltimWBMSTests.UDPTests
             UDPListener listener = new UDPGeneric(server, new Dictionary<string, DeviceModel>());
 
             //Act
-            listener.Start();
+            listener.Action({0x55});
 
             //Assert
         }

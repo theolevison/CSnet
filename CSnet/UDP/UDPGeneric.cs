@@ -10,23 +10,19 @@ namespace CSnet
         public UDPGeneric(ISocket server, Dictionary<string, DeviceModel> devices) : base(server, devices)
         { }
 
-        public override void Action(byte[] data, DeviceModel device)
+        public override byte[] Action(byte[] data, DeviceModel device)
         {
             switch (data[6])
             {
                 case BEV:
-                    device.Setup(false, true);
-                    break;
+                    return device.Setup(false, true) ? new byte[] { } : ReturnFF();
                 case BET:
-                    device.Setup(true, true);
-                    break;
+                    return device.Setup(true, true) ? new byte[] { } : ReturnFF();
                 case OP90:
-                    device.Setup(false, false);
-                    break;
+                    return device.Setup(false, false) ? new byte[] {} : ReturnFF();
                 case BMSPACKET:
                     //send raw BMS packet to UDP client
-                    server.Send(device.modules[data[2]].Packet0);
-                    break;
+                    return device.modules[data[2]].Packet0;
                 case BMSTEMPPACKET:
                     {
                         //send temperature data to UDP client
@@ -61,8 +57,7 @@ namespace CSnet
                         tempPacket[6] = bbb[0];
                         tempPacket[7] = bbb[1];
 
-                        server.Send(tempPacket);
-                        break;
+                        return tempPacket;
                     }
                 case PMSPACKET:
                     {
@@ -80,8 +75,7 @@ namespace CSnet
                             .Concat(BitConverter.GetBytes(device.managers[0].AUX6))
                             .ToArray();
 
-                        server.Send(tempPacket);
-                        break;
+                        return tempPacket;
                     }
                 case EMSPACKET:
                     {
@@ -98,70 +92,62 @@ namespace CSnet
                       //.Concat(BitConverter.GetBytes(uc1.managers[0].GetBEVDCFCMinus()))
                       .ToArray();
 
-                        server.Send(tempPacket);
-                        break;
+                       return tempPacket;
                     }
                 case ModuleVersion:
                     //send raw BMS packet to UDP client
                     byte[] moduleVersion = new byte[1];
                     moduleVersion[0] = (byte)device.modules[data[2]].version;
 
-                    server.Send(moduleVersion);
-                    break;
+                    return moduleVersion;
                 case PackVersion:
                     byte[] packVersion = new byte[1];
                     //firmwareLabel.Text
                     // string Addr1 = MyINI.GetIniKeyValueForStr("PACK", "version", Application.StartupPath + "\\config.ini");
 
                     packVersion[0] = byte.Parse(uconst.packVersion);
-                    server.Send(packVersion);
-                    break;
+                    return packVersion;
                 case DiagnosticVoltage:
                     {
                         int[] data1 = uconst.DoubleArrayToIntArray(device.modules[data[2]].CGDV);
-                        server.Send(uconst.IntArrayToByteArray(data1));
-                        break;
+                        return uconst.IntArrayToByteArray(data1);
                     }
                 case Latency:
                     {
                         int data1 = device.modules[data[2]].Latency;
-                        server.Send(BitConverter.GetBytes(data1));
-                        break;
+                        return BitConverter.GetBytes(data1);
                     }
                 case TotalPECErrors:
                     {
                         int data1 = device.modules[data[2]].TotalPECErrors;
-                        server.Send(BitConverter.GetBytes(data1));
-                        break;
+                        return BitConverter.GetBytes(data1);
                     }
                 case AverageUpdateRate:
                     {
                         int data1 = uconst.DoubleToInt(device.modules[data[2]].AverageUpdateRate * 1000 * 100);
-                        server.Send(BitConverter.GetBytes(data1));
-                        break;
+                        return BitConverter.GetBytes(data1);
                     }
                 case PeakUpdateRate:
                     {
                         int data1 = uconst.DoubleToInt(device.modules[data[2]].PeakUpdateRate * 1000 * 100);
-                        server.Send(BitConverter.GetBytes(data1));
-                        break;
+                        return BitConverter.GetBytes(data1);
                     }
                 case AverageRSSI:
                     {
                         int data1 = device.modules[data[2]].AverageRSSI;
-                        server.Send(BitConverter.GetBytes(data1));
-                        break;
+                        return BitConverter.GetBytes(data1);
                     }
                 case PeakRSSI:
                     {
                         int data1 = device.modules[data[2]].PeakRSSI;
-                        server.Send(BitConverter.GetBytes(data1));
-                        break;
+                        return BitConverter.GetBytes(data1);
                     }
+                case SetACL:
+                    device.SetACL();
+                    return new byte[0];
                 default:
                     {
-                        ReturnFF();
-                        break;
+                        return ReturnFF();
                     }
             }
         }

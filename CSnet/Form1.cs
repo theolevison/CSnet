@@ -109,7 +109,6 @@ namespace CSnet
             if (Timer1.Enabled == true)
             {
                 Timer1.Enabled = false;
-                //chkAutoRead.Checked = false;
             }
 
             //close tabs

@@ -2305,7 +2305,9 @@ namespace CSnet
     [StructLayout(LayoutKind.Sequential, Pack = 2)]
     public struct SRADJupiterSwitchSettings
     {
-        public byte phyMode0;//0-Auto 1-Commander 2-Responder
+        public byte phyMode0;//0-
+                             //
+                             //1-Commander 2-Responder
         public byte phyMode1;
         public byte phyMode2;
         public byte phyMode3;
