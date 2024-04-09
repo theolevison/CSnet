@@ -32,7 +32,7 @@
             this.Timer1 = new System.Windows.Forms.Timer(this.components);
             this.GroupBox1 = new System.Windows.Forms.GroupBox();
             this.chkHexFormat = new System.Windows.Forms.CheckBox();
-            this.CmdOpenFirstDevice = new System.Windows.Forms.Button();
+            this.OpenDevicesButton = new System.Windows.Forms.Button();
             this.cmdCloseDevice = new System.Windows.Forms.Button();
             this.TabControl1 = new System.Windows.Forms.TabControl();
             this.tabPage5 = new System.Windows.Forms.TabPage();
@@ -42,7 +42,7 @@
             // GroupBox1
             // 
             this.GroupBox1.Controls.Add(this.chkHexFormat);
-            this.GroupBox1.Controls.Add(this.CmdOpenFirstDevice);
+            this.GroupBox1.Controls.Add(this.OpenDevicesButton);
             this.GroupBox1.Controls.Add(this.cmdCloseDevice);
             this.GroupBox1.Location = new System.Drawing.Point(1, -1);
             this.GroupBox1.Margin = new System.Windows.Forms.Padding(4);
@@ -55,7 +55,7 @@
             // 
             // chkHexFormat
             // 
-            this.chkHexFormat.Location = new System.Drawing.Point(205, 26);
+            this.chkHexFormat.Location = new System.Drawing.Point(197, 65);
             this.chkHexFormat.Margin = new System.Windows.Forms.Padding(4);
             this.chkHexFormat.Name = "chkHexFormat";
             this.chkHexFormat.Size = new System.Drawing.Size(133, 21);
@@ -63,15 +63,15 @@
             this.chkHexFormat.Text = "Raw Packet";
             this.chkHexFormat.CheckedChanged += new System.EventHandler(this.chkHexFormat_CheckedChanged);
             // 
-            // CmdOpenFirstDevice
+            // OpenDevicesButton
             // 
-            this.CmdOpenFirstDevice.Location = new System.Drawing.Point(20, 21);
-            this.CmdOpenFirstDevice.Margin = new System.Windows.Forms.Padding(4);
-            this.CmdOpenFirstDevice.Name = "CmdOpenFirstDevice";
-            this.CmdOpenFirstDevice.Size = new System.Drawing.Size(160, 28);
-            this.CmdOpenFirstDevice.TabIndex = 0;
-            this.CmdOpenFirstDevice.Text = "Open Devices";
-            this.CmdOpenFirstDevice.Click += new System.EventHandler(this.CmdOpenDevices_Click);
+            this.OpenDevicesButton.Location = new System.Drawing.Point(20, 21);
+            this.OpenDevicesButton.Margin = new System.Windows.Forms.Padding(4);
+            this.OpenDevicesButton.Name = "OpenDevicesButton";
+            this.OpenDevicesButton.Size = new System.Drawing.Size(160, 28);
+            this.OpenDevicesButton.TabIndex = 0;
+            this.OpenDevicesButton.Text = "Open Devices";
+            this.OpenDevicesButton.Click += new System.EventHandler(this.CmdOpenDevices_Click);
             // 
             // cmdCloseDevice
             // 
@@ -120,7 +120,7 @@
         #endregion
         public System.Windows.Forms.Timer Timer1;
         internal System.Windows.Forms.GroupBox GroupBox1;
-        internal System.Windows.Forms.Button CmdOpenFirstDevice;
+        internal System.Windows.Forms.Button OpenDevicesButton;
         internal System.Windows.Forms.Button cmdCloseDevice;
         internal System.Windows.Forms.TabControl TabControl1;
         private System.Windows.Forms.TabPage tabPage5;

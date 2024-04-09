@@ -22,7 +22,7 @@ namespace CSnet
                     return device.Setup(false, false) ? new byte[] {} : ReturnFF();
                 case BMSPACKET:
                     //send raw BMS packet to UDP client
-                    return device.modules[data[2]].Packet0;
+                    return device.modules[data[7]].Packet0;
                 case BMSTEMPPACKET:
                     {
                         //send temperature data to UDP client

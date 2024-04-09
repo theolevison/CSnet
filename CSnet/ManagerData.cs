@@ -16,29 +16,29 @@ namespace CSnet
         public int Version { get; set; }
         public byte[] PMSPacket0 { get; set; } = new byte[0];
         public byte[] EMSPacket0 { get; set; } = new byte[0];
-        public UInt16 I1 { get; set; }
-        public UInt16 I2 { get; set; }
-        public UInt16 VBAT { get; set; }
-        public UInt16 AUX1 { get; set; } //BEV: FC+ Chassis, BETA: HVDC- Chassis, BETB: HVDC- Chassis
-        public UInt16 AUX2 { get; set; } //BEV: FC- Chassis, BETA: Isolation switch monitoring, BETB:DCFC+ Chassis
-        public UInt16 AUX3 { get; set; } //BEV: Shunt Thermistor, BETA: Shunt A temperature, BETB: DCFC differential
-        public UInt16 AUX4 { get; set; } //BEV: DCFC relay Thermistor, BETA: SA1 temperature, BETB: DCFC- Chassis
-        public UInt16 AUX5 { get; set; } //BEV: Main relay Thermistor, BETA: SA4 temperature, BETB: Isolation switch monitoring
-        public UInt16 AUX6 { get; set; } //BEV: Vref external, BETA: SA3 temperature, BETB:Shunt B temperature
-        public UInt16 AUX7 { get; set; } //BEV: 5V reference, BETA: input 12V sensing, BETB: SB1 temperature
+        public double I1 { get; set; }
+        public double I2 { get; set; }
+        public double VBAT { get; set; }
+        public double AUX1 { get; set; } //BEV: FC+ Chassis, BETA: HVDC- Chassis, BETB: HVDC- Chassis
+        public double AUX2 { get; set; } //BEV: FC- Chassis, BETA: Isolation switch monitoring, BETB:DCFC+ Chassis
+        public double AUX3 { get; set; } //BEV: Shunt Thermistor, BETA: Shunt A temperature, BETB: DCFC differential
+        public double AUX4 { get; set; } //BEV: DCFC relay Thermistor, BETA: SA1 temperature, BETB: DCFC- Chassis
+        public double AUX5 { get; set; } //BEV: Main relay Thermistor, BETA: SA4 temperature, BETB: Isolation switch monitoring
+        public double AUX6 { get; set; } //BEV: Vref external, BETA: SA3 temperature, BETB:Shunt B temperature
+        public double AUX7 { get; set; } //BEV: 5V reference, BETA: input 12V sensing, BETB: SB1 temperature
 
 
-        public UInt16 G1V { get; set; }
-        public UInt16 G2V { get; set; }
-        public UInt16 G3V { get; set; }
-        public UInt16 G4V { get; set; }
-        public UInt16 G5V { get; set; }
-        public UInt16 G6V { get; set; }
-        public UInt16 G7V { get; set; }
-
-        public UInt16 C1V { get; set; }
-
-        public UInt16 CD1V { get; set; }
+        public double G1V { get; set; }
+        public double G2V { get; set; }
+        public double G3V { get; set; }
+        public double G4V { get; set; }
+        public double G5V { get; set; }
+        public double G6V { get; set; }
+        public double G7V { get; set; }
+               
+        public double C1V { get; set; }
+               
+        public double CD1V { get; set; }
 
         public string Timestamp { get; set; }
         public string PacketTimestamp { get; set; }
@@ -49,19 +49,19 @@ namespace CSnet
             {
                 PMSPacket0 = packet;
 
-                I1 = BitConverter.ToUInt16(packet, 11);
-                I2 = BitConverter.ToUInt16(packet, 13);
-                VBAT = BitConverter.ToUInt16(packet, 15);
-                AUX1 = BitConverter.ToUInt16(packet, 19);
-                AUX2 = BitConverter.ToUInt16(packet, 27);
-                AUX3 = BitConverter.ToUInt16(packet, 40);
-                AUX4 = BitConverter.ToUInt16(packet, 48);
-                AUX5 = BitConverter.ToUInt16(packet, 61);
-                AUX6 = BitConverter.ToUInt16(packet, 69);
+                I1 = BitConverter.ToUInt16(packet, 11) * 0.00000760371;
+                I2 = BitConverter.ToUInt16(packet, 13) * 0.00000760371;
+                VBAT = BitConverter.ToUInt16(packet, 15) * 0.000375183;
+                AUX1 = BitConverter.ToUInt16(packet, 19) * 0.000375183;
+                AUX2 = BitConverter.ToUInt16(packet, 27) * 0.000375183;
+                AUX3 = BitConverter.ToUInt16(packet, 40) * 0.000375183;
+                AUX4 = BitConverter.ToUInt16(packet, 48) * 0.000375183;
+                AUX5 = BitConverter.ToUInt16(packet, 61) * 0.000375183;
+                AUX6 = BitConverter.ToUInt16(packet, 69) * 0.000375183;
             }
             else if (packetID == 2)
             {
-                AUX7 = BitConverter.ToUInt16(packet, 69); //TODO: check if we can look in a different packet for AUX values? They are different sometimes
+                AUX7 = BitConverter.ToUInt16(packet, 69) * 0.000375183; //TODO: check if we can look in a different packet for AUX values? They are different sometimes
             }
         }
 
@@ -69,25 +69,25 @@ namespace CSnet
         {
             if (packetID == 0)
             {
-                C1V = BitConverter.ToUInt16(packet, 6);
-                G1V = BitConverter.ToUInt16(packet, 24);
-                G2V = BitConverter.ToUInt16(packet, 26);
-                G3V = BitConverter.ToUInt16(packet, 30);
-                G4V = BitConverter.ToUInt16(packet, 32);
-                G5V = BitConverter.ToUInt16(packet, 34);
-                G6V = BitConverter.ToUInt16(packet, 38);
-                G7V = BitConverter.ToUInt16(packet, 40);
+                C1V = BitConverter.ToUInt16(packet, 6) * 0.0001;
+                G1V = BitConverter.ToUInt16(packet, 24) * 0.0001;
+                G2V = BitConverter.ToUInt16(packet, 26) * 0.0001;
+                G3V = BitConverter.ToUInt16(packet, 30) * 0.0001;
+                G4V = BitConverter.ToUInt16(packet, 32) * 0.0001;
+                G5V = BitConverter.ToUInt16(packet, 34) * 0.0001;
+                G6V = BitConverter.ToUInt16(packet, 38) * 0.0001;
+                G7V = BitConverter.ToUInt16(packet, 40) * 0.0001;
 
                 EMSPacket0 = packet;
 
-                CD1V = BitConverter.ToUInt16(packet, 14);
+                CD1V = BitConverter.ToUInt16(packet, 14) * 0.0002;
             }
         }
 
         //BEV measurements
         private double BEVTemp(double a)
         {
-            double b = a * 0.001;//convert to correct decimal places
+            double b = a * 0.001;//convert to correct decimal places TODO: check this is correct
 
             //put voltage against graph to find thermistor temperature
             return (Math.Pow(b, 3) * -4.0721) + (Math.Pow(b, 2) * 32.822) - b * 104.43 + 179.58;
@@ -96,7 +96,6 @@ namespace CSnet
         {
             //Debug.WriteLine($"aux1 {AUX1}, aux2 {AUX2}, aux3 {AUX3}, aux4 {AUX4}, aux5 {AUX5}, aux6 {AUX6}, aux7 {AUX7}");
             return AUX1 * 284.006; //TODO: confirm this is AUX 1, not AUX 0. Check VREF (AUX6) which should always be 3V
-
         }
         public double GetBEVDCFCMinus()
         {
@@ -122,7 +121,7 @@ namespace CSnet
         //BET A
         public double GetBETAHVCDMinus()
         {
-            return -((double)AUX1 * 701 + 3);
+            return -(AUX1 * 701 + 3);
         }
         public double GetBETAIsolationSwitch()//not used in test
         {
@@ -206,16 +205,16 @@ namespace CSnet
         private double NTC_COEF_C = 0.0000005413360154836909;
         public double EMSBDSBVoltage()
         {
-            return CD1V * 0.0001;
+            return CD1V;
         }
         public double EMSPressure1()
         {
             //Debug.WriteLine($"G1 {G1V}, G2 {G2V}, G3 {G3V}, G4 {G4V}, G5 {G5V}, G6 {G6V}, G7 {G7V}");
-            return 10.0 + 250.0 * (G1V/ (double)C1V);
+            return 10.0 + 250.0 * (G1V/ C1V);
         }
         public double EMSPressure2()
         {
-            return 10.0 + 250.0 * (G3V/ (double)G7V); //TODO: do we need to * 0.0001? To convert Voltage?
+            return 10.0 + 250.0 * (G3V/ G7V);
         }
         private double EMSThermistorTransferFunction(double thermistorVoltage, double referenceVoltage)
         {
@@ -244,9 +243,10 @@ namespace CSnet
         {
             return EMSGasTransferFunction(G6V, G7V);
         }
-        private double EMSGasTransferFunction(double thermistorVoltage, double referenceVoltage)
+        private double EMSGasTransferFunction(double sensorVoltage, double referenceVoltage)
         {
-            return (thermistorVoltage / referenceVoltage - 0.1) / 0.05;
+            double temp = (sensorVoltage / referenceVoltage - 0.1) / 0.05; ;
+            return (sensorVoltage / referenceVoltage - 0.1) / 0.05;
         }
         public double EMSReferenceVoltage1()
         {

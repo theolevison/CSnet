@@ -29,7 +29,6 @@ namespace CSnet
         public const byte OP90 = 16;
 
         protected ISocket server;
-        protected EndPoint remoteEnd;
         protected Dictionary<string, DeviceModel> devices;
 
         public UDPListener(ISocket server, Dictionary<string, DeviceModel> devices)//TODO: MVC this, so that I don't have to pass in a UI element & then hunt through it
@@ -46,7 +45,7 @@ namespace CSnet
             {
                 try
                 {
-                    server.ReceiveFrom(data, ref remoteEnd);
+                    server.ReceiveFrom(data);
 
                     /*
                      * UDP request format:
@@ -62,16 +61,25 @@ namespace CSnet
                      *  
                      * e.g request for bms data from module 24
                      * BS0232 0 24
+                     * 
+                     * Set settings, then set ACL. Then you can request whatever data you need                     * 
+                     * 
+                     * Turn Serial number from ascii -> byte
+                     * It's case sensitive
+                     * 
+                     * e.g BS0232 00 01 = 4253303233320001
                      */
 
                     //iterate through each open device
-                    foreach(DeviceModel device in devices.Values)
-                    {                        
+                    foreach (DeviceModel device in devices.Values)
+                    {
                         //check serial number against request
+                        string tmy = (Encoding.ASCII.GetString(data.Take(6).ToArray()));
                         if (device.serialNumber.Equals(Encoding.ASCII.GetString(data.Take(6).ToArray())))
                         {
                             server.Send(Action(data, device));
                         }
+                        
                     }
                 }
                 catch (Exception ex)

@@ -81,11 +81,7 @@ namespace CSnet
                 {
                     IntPtr anonymousPointer = IntPtr.Zero;
                     int iResult = icsNeoDll.icsneoOpenDevice(ref ndNeoToOpenex[i], ref anonymousPointer, ref bNetwork[0], 1, 0, ref OptionOpenNeoEX, 0);
-                    if (iResult == 1)
-                    {
-                        MessageBox.Show("Device Opened OK!");
-                    }
-                    else
+                    if (iResult != 1)
                     {
                         //MessageBox.Show("Problem Opening Port");
                         Debug.WriteLine("Device not opened");
@@ -97,6 +93,7 @@ namespace CSnet
 
                     DeviceModel model = new DeviceModel(ref anonymousPointer, sConvertedSN);
                     devices.Add(sConvertedSN, model);
+                    
                     
                     tabPage.Controls.Add(new OpenDeviceTab(model) { Name = $"{sConvertedSN}" });
                     TabControl1.TabPages.Add(tabPage);
@@ -129,8 +126,9 @@ namespace CSnet
         {
             //开启线程
             
-            /*
+            
             StartUDPServer(new UDPGeneric(new SocketWrapper("127.0.0.1", 9011), devices));
+            /*
             StartUDPServer(new UDPOP140(new SocketWrapper("192.168.3.100", 9020), devices));
             StartUDPServer(new UDPOP140(new SocketWrapper("192.168.3.100", 9021), devices));
             StartUDPServer(new UDPOP140(new SocketWrapper("192.168.3.100", 9022), devices));

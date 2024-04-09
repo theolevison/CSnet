@@ -20,12 +20,7 @@ namespace CSnet
             remoteEnd = new IPEndPoint(IPAddress.Any, 0);
         }
 
-        public void Bind(IPEndPoint remoteEndPoint)
-        {
-            server.Bind(remoteEndPoint);
-        }
-
-        public int ReceiveFrom(byte[] data, ref EndPoint remoteEnd)
+        public int ReceiveFrom(byte[] data)
         {
             return server.ReceiveFrom(data, ref remoteEnd); //will this work without ref-ing the data??
         }

@@ -30,13 +30,15 @@
         {
             this.components = new System.ComponentModel.Container();
             this.GroupBox4 = new System.Windows.Forms.GroupBox();
+            this.label3 = new System.Windows.Forms.Label();
+            this.SetupBEV = new System.Windows.Forms.Button();
+            this.SetupOP90 = new System.Windows.Forms.Button();
+            this.SetupBET = new System.Windows.Forms.Button();
             this.ButtonGetConfig = new System.Windows.Forms.Button();
-            this.ButtonVersion = new System.Windows.Forms.Button();
             this.label2 = new System.Windows.Forms.Label();
             this.EMSBox = new System.Windows.Forms.ListBox();
             this.label1 = new System.Windows.Forms.Label();
             this.PMSBox = new System.Windows.Forms.ListBox();
-            this.ButtonGPIO = new System.Windows.Forms.Button();
             this.firmwareLabel = new System.Windows.Forms.Label();
             this.chkAutoRead = new System.Windows.Forms.CheckBox();
             this.ButtonSetACL = new System.Windows.Forms.Button();
@@ -56,13 +58,15 @@
             // 
             // GroupBox4
             // 
+            this.GroupBox4.Controls.Add(this.label3);
+            this.GroupBox4.Controls.Add(this.SetupBEV);
+            this.GroupBox4.Controls.Add(this.SetupOP90);
+            this.GroupBox4.Controls.Add(this.SetupBET);
             this.GroupBox4.Controls.Add(this.ButtonGetConfig);
-            this.GroupBox4.Controls.Add(this.ButtonVersion);
             this.GroupBox4.Controls.Add(this.label2);
             this.GroupBox4.Controls.Add(this.EMSBox);
             this.GroupBox4.Controls.Add(this.label1);
             this.GroupBox4.Controls.Add(this.PMSBox);
-            this.GroupBox4.Controls.Add(this.ButtonGPIO);
             this.GroupBox4.Controls.Add(this.firmwareLabel);
             this.GroupBox4.Controls.Add(this.chkAutoRead);
             this.GroupBox4.Controls.Add(this.ButtonSetACL);
@@ -85,9 +89,49 @@
             this.GroupBox4.TabStop = false;
             this.GroupBox4.Text = "Receive Message";
             // 
+            // label3
+            // 
+            this.label3.Font = new System.Drawing.Font("Microsoft Sans Serif", 13.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label3.Location = new System.Drawing.Point(570, 10);
+            this.label3.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(169, 29);
+            this.label3.TabIndex = 46;
+            this.label3.Text = "Select mode";
+            // 
+            // SetupBEV
+            // 
+            this.SetupBEV.Location = new System.Drawing.Point(570, 40);
+            this.SetupBEV.Margin = new System.Windows.Forms.Padding(4);
+            this.SetupBEV.Name = "SetupBEV";
+            this.SetupBEV.Size = new System.Drawing.Size(51, 26);
+            this.SetupBEV.TabIndex = 45;
+            this.SetupBEV.Text = "BEV";
+            this.SetupBEV.Click += new System.EventHandler(this.SetupBEV_Click);
+            // 
+            // SetupOP90
+            // 
+            this.SetupOP90.Location = new System.Drawing.Point(688, 40);
+            this.SetupOP90.Margin = new System.Windows.Forms.Padding(4);
+            this.SetupOP90.Name = "SetupOP90";
+            this.SetupOP90.Size = new System.Drawing.Size(51, 26);
+            this.SetupOP90.TabIndex = 44;
+            this.SetupOP90.Text = "OP90";
+            this.SetupOP90.Click += new System.EventHandler(this.SetupOP90_Click);
+            // 
+            // SetupBET
+            // 
+            this.SetupBET.Location = new System.Drawing.Point(629, 40);
+            this.SetupBET.Margin = new System.Windows.Forms.Padding(4);
+            this.SetupBET.Name = "SetupBET";
+            this.SetupBET.Size = new System.Drawing.Size(51, 26);
+            this.SetupBET.TabIndex = 43;
+            this.SetupBET.Text = "BET";
+            this.SetupBET.Click += new System.EventHandler(this.SetupBET_Click);
+            // 
             // ButtonGetConfig
             // 
-            this.ButtonGetConfig.Location = new System.Drawing.Point(688, 41);
+            this.ButtonGetConfig.Location = new System.Drawing.Point(904, 41);
             this.ButtonGetConfig.Margin = new System.Windows.Forms.Padding(4);
             this.ButtonGetConfig.Name = "ButtonGetConfig";
             this.ButtonGetConfig.Size = new System.Drawing.Size(100, 31);
@@ -95,17 +139,6 @@
             this.ButtonGetConfig.Text = "GET CONFIG";
             this.ButtonGetConfig.UseVisualStyleBackColor = true;
             this.ButtonGetConfig.Click += new System.EventHandler(this.Config_Click);
-            // 
-            // ButtonVersion
-            // 
-            this.ButtonVersion.Location = new System.Drawing.Point(1015, 43);
-            this.ButtonVersion.Margin = new System.Windows.Forms.Padding(4);
-            this.ButtonVersion.Name = "ButtonVersion";
-            this.ButtonVersion.Size = new System.Drawing.Size(100, 32);
-            this.ButtonVersion.TabIndex = 40;
-            this.ButtonVersion.Text = "VERSIONS";
-            this.ButtonVersion.UseVisualStyleBackColor = true;
-            this.ButtonVersion.Click += new System.EventHandler(this.Version_Click);
             // 
             // label2
             // 
@@ -149,17 +182,6 @@
             this.PMSBox.Size = new System.Drawing.Size(1209, 89);
             this.PMSBox.TabIndex = 37;
             // 
-            // ButtonGPIO
-            // 
-            this.ButtonGPIO.Location = new System.Drawing.Point(904, 43);
-            this.ButtonGPIO.Margin = new System.Windows.Forms.Padding(4);
-            this.ButtonGPIO.Name = "ButtonGPIO";
-            this.ButtonGPIO.Size = new System.Drawing.Size(100, 32);
-            this.ButtonGPIO.TabIndex = 36;
-            this.ButtonGPIO.Text = "GPIO 9 HIGH";
-            this.ButtonGPIO.UseVisualStyleBackColor = true;
-            this.ButtonGPIO.Click += new System.EventHandler(this.GPIO_Click);
-            // 
             // firmwareLabel
             // 
             this.firmwareLabel.Location = new System.Drawing.Point(1012, 11);
@@ -171,6 +193,8 @@
             // 
             // chkAutoRead
             // 
+            this.chkAutoRead.Checked = true;
+            this.chkAutoRead.CheckState = System.Windows.Forms.CheckState.Checked;
             this.chkAutoRead.Location = new System.Drawing.Point(160, 39);
             this.chkAutoRead.Margin = new System.Windows.Forms.Padding(4);
             this.chkAutoRead.Name = "chkAutoRead";
@@ -178,7 +202,6 @@
             this.chkAutoRead.TabIndex = 34;
             this.chkAutoRead.Text = "AutoRead";
             this.chkAutoRead.CheckedChanged += new System.EventHandler(this.chkAutoRead_CheckedChanged);
-            this.chkAutoRead.Checked = true;
             // 
             // ButtonSetACL
             // 
@@ -215,7 +238,7 @@
             // 
             // lblWaitForRxMessageWithTimeOutResult
             // 
-            this.lblWaitForRxMessageWithTimeOutResult.Location = new System.Drawing.Point(587, 20);
+            this.lblWaitForRxMessageWithTimeOutResult.Location = new System.Drawing.Point(456, 19);
             this.lblWaitForRxMessageWithTimeOutResult.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.lblWaitForRxMessageWithTimeOutResult.Name = "lblWaitForRxMessageWithTimeOutResult";
             this.lblWaitForRxMessageWithTimeOutResult.Size = new System.Drawing.Size(117, 49);
@@ -224,10 +247,10 @@
             // 
             // ButtonOTAP
             // 
-            this.ButtonOTAP.Location = new System.Drawing.Point(396, 21);
+            this.ButtonOTAP.Location = new System.Drawing.Point(1015, 42);
             this.ButtonOTAP.Margin = new System.Windows.Forms.Padding(4);
             this.ButtonOTAP.Name = "ButtonOTAP";
-            this.ButtonOTAP.Size = new System.Drawing.Size(139, 49);
+            this.ButtonOTAP.Size = new System.Drawing.Size(66, 29);
             this.ButtonOTAP.TabIndex = 26;
             this.ButtonOTAP.Text = "OTAP";
             this.ButtonOTAP.Click += new System.EventHandler(this.OTAP_Click);
@@ -297,8 +320,8 @@
             // 
             // Timer1
             // 
-            this.Timer1.Interval = 500;
             this.Timer1.Enabled = true;
+            this.Timer1.Interval = 500;
             this.Timer1.Tick += new System.EventHandler(this.Timer1_Tick);
             // 
             // OpenDeviceTab
@@ -310,6 +333,7 @@
             this.Size = new System.Drawing.Size(1249, 645);
             this.GroupBox4.ResumeLayout(false);
             this.ResumeLayout(false);
+
         }
 
         #endregion
@@ -329,12 +353,14 @@
         internal System.Windows.Forms.CheckBox chkAutoRead;
         public System.Windows.Forms.Timer Timer1;
         internal System.Windows.Forms.Label firmwareLabel;
-        private System.Windows.Forms.Button ButtonGPIO;
         internal System.Windows.Forms.ListBox PMSBox;
         internal System.Windows.Forms.ListBox EMSBox;
         internal System.Windows.Forms.Label label1;
         internal System.Windows.Forms.Label label2;
-        private System.Windows.Forms.Button ButtonVersion;
         private System.Windows.Forms.Button ButtonGetConfig;
+        internal System.Windows.Forms.Button SetupBEV;
+        internal System.Windows.Forms.Button SetupOP90;
+        internal System.Windows.Forms.Button SetupBET;
+        internal System.Windows.Forms.Label label3;
     }
 }

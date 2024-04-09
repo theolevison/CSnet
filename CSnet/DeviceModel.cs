@@ -194,6 +194,8 @@ namespace CSnet
 
         public List<string> errors = new List<string>();
 
+        public bool IsSetup = false;
+
         private uint GetPacketTypeFromArbId(uint arbId)
         {
             return (arbId >> 16) & 0xFF;
@@ -216,12 +218,11 @@ namespace CSnet
         {
             this.serialNumber = serialNumber;
             m_hObject = obj;
-
-            Setup(false, false);
         }
 
         public void CloseDevice()
         {
+            IsSetup = false;
             int iNumberOfErrors = 0;            //close the port
             int iResult = icsNeoDll.icsneoClosePort(m_hObject, ref iNumberOfErrors);
             //release resources used by the object
@@ -254,6 +255,7 @@ namespace CSnet
             
             GetDeviceVersions();
 
+            IsSetup = true;
             return true;
         }
 

@@ -10,7 +10,6 @@ namespace CSnet
     public interface ISocket
     {
         void Send(byte[] data);
-        int ReceiveFrom(byte[] data, ref EndPoint remoteEnd);
-        void Bind(IPEndPoint remoteEndPoint);
+        int ReceiveFrom(byte[] data);
     }
 }

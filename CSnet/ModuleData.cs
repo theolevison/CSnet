@@ -166,8 +166,8 @@ namespace CSnet
                 CGV[6] = BitConverter.ToUInt16(packet, 22) * 0.0001;
                 CGV[7] = BitConverter.ToUInt16(packet, 24) * 0.0001;
 
-                CGDV[0] = BitConverter.ToInt16(packet, 46) * 0.0002;
-                CGDV[1] = BitConverter.ToInt16(packet, 48) * 0.0002;
+                CGDV[0] = BitConverter.ToInt16(packet, 46) * 0.0002; //cell diagnostic registers are storing the result of ADSC command (see ADI datasheet)
+                CGDV[1] = BitConverter.ToInt16(packet, 48) * 0.0002; //Vadsc = 0.5 * Vcell
                 CGDV[2] = BitConverter.ToInt16(packet, 50) * 0.0002;
                 CGDV[3] = BitConverter.ToInt16(packet, 54) * 0.0002;
                 CGDV[4] = BitConverter.ToInt16(packet, 56) * 0.0002;
