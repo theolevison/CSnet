@@ -85,7 +85,5 @@ namespace CSnet
 
             return numbers;
         }
-
-        public static string packVersion = "";
     }
 }

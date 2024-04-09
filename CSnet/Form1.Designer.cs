@@ -89,7 +89,7 @@
             this.TabControl1.Margin = new System.Windows.Forms.Padding(4);
             this.TabControl1.Name = "TabControl1";
             this.TabControl1.SelectedIndex = 0;
-            this.TabControl1.Size = new System.Drawing.Size(1248, 704);
+            this.TabControl1.Size = new System.Drawing.Size(1368, 725);
             this.TabControl1.TabIndex = 51;
             // 
             // tabPage5
@@ -105,7 +105,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1256, 779);
+            this.ClientSize = new System.Drawing.Size(1382, 853);
             this.Controls.Add(this.GroupBox1);
             this.Controls.Add(this.TabControl1);
             this.Margin = new System.Windows.Forms.Padding(4);

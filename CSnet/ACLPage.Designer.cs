@@ -1,7 +1,7 @@
 ﻿
 namespace CSnet
 {
-    partial class Form2
+    partial class ACLPage
     {
         /// <summary>
         /// Required designer variable.

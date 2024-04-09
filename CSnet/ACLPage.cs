@@ -14,10 +14,10 @@ using System.Windows.Forms;
 
 namespace CSnet
 {
-    public partial class Form2 : Form
+    public partial class ACLPage : Form
     {
         // IntPtr m_hObject;
-        public Form2()
+        public ACLPage()
         {
             InitializeComponent();
         }

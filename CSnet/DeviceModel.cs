@@ -211,7 +211,7 @@ namespace CSnet
             return arbId & 0xFF;
         }
 
-        private bool BET = false;
+        public bool BET = false;
         private bool isoSPI = false;
 
         public DeviceModel(ref IntPtr obj, string serialNumber)
@@ -237,7 +237,10 @@ namespace CSnet
             ChangeADIboxSettings();
 
             managers[0] = new ManagerData();
-            managers[1] = new ManagerData(); //this manager should be ignored for single manager uses, e.g BEV
+            if (BET || isoSPI)
+            {
+                managers[1] = new ManagerData(); //this manager should be ignored for single manager uses, e.g BEV
+            }
 
             //connect to managers first
             Connect(true, true);
@@ -523,9 +526,8 @@ namespace CSnet
 
         public void GPIO()
         {
-            //WilFirmwareVersion(); //don't need to check this
             PMSGPIO(ADI_WIL_DEV_MANAGER_0, 1);
-            //PMSGPIO(ADI_WIL_DEV_MANAGER_1, 1); //TODO: make this BET specific
+            PMSGPIO(ADI_WIL_DEV_MANAGER_1, 1); //TODO: make this BET specific
         }
 
         private void PMSGPIO(ulong manager, byte highLow)
@@ -652,7 +654,7 @@ namespace CSnet
 
         public void SetACL()
         {
-            List<string> macAddresses = Form2.GetStoredMacAddresses();
+            List<string> macAddresses = ACLPage.GetStoredMacAddresses();
 
             List<byte> ACLList = new List<byte>
             {
@@ -851,8 +853,7 @@ namespace CSnet
                                         modules[uiDeviceSource].UpdateData(packet, uiPacketID, dTime);
 
                                         break;
-                                    case PMS_PACKET_TYPE:
-                                        //TODO: check that manager 0 is the primary manager
+                                    case PMS_PACKET_TYPE:                              
                                         managers[0].UpdatePMSData(packet, uiPacketID);
 
                                         break;
@@ -893,7 +894,6 @@ namespace CSnet
                                         break;
                                 }
                             }
-
                             break;
 
                         case (int)ePROTOCOL.SPY_PROTOCOL_CAN:
@@ -971,12 +971,25 @@ namespace CSnet
                     modules[i].version = DeviceFirmwareVersion(i);
                 }
                 managers[0].Version = DeviceFirmwareVersion(62); //afaik, manager 0 is always the primary manager, responsible for EMS & PMS
-                if (BET)
+                if (BET || isoSPI)
                 {
                     managers[1].Version = DeviceFirmwareVersion(63);
                 }
             }
         }
+
+        
+        public byte[] GetPMS()
+        {
+            if (!BET && isoSPI)
+            {
+                return managers[0].GetBEVPMS();
+            } else
+            {
+                return managers[0].GetBETAPMS().Concat(managers[1].GetBETBPMS()).ToArray();
+            }
+        }
+        
 
         public bool WaitForModulesToConnect()
         {

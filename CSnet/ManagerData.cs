@@ -116,10 +116,23 @@ namespace CSnet
         public double GetBEVVREF()
         {
             return AUX6;
+        }        
+        public byte[] GetBEVPMS()
+        {            
+            return BitConverter.GetBytes(I1)
+                            .Concat(BitConverter.GetBytes(I2))
+                            .Concat(BitConverter.GetBytes(VBAT))
+                            .Concat(BitConverter.GetBytes(GetBEVDCFCPlus()))
+                            .Concat(BitConverter.GetBytes(GetBEVDCFCMinus()))
+                            .Concat(BitConverter.GetBytes(GetBEVShuntTemp()))
+                            .Concat(BitConverter.GetBytes(GetBEVDCFCContactorTemp()))
+                            .Concat(BitConverter.GetBytes(GetBEVMainContactorTemp()))
+                            .Concat(BitConverter.GetBytes(GetBEVVREF()))
+                            .ToArray();
         }
-
+        
         //BET A
-        public double GetBETAHVCDMinus()
+        public double GetBETAHVDCMinus()
         {
             return -(AUX1 * 701 + 3);
         }
@@ -162,6 +175,18 @@ namespace CSnet
             return (Math.Pow(x, 6) * 8.2901) + (Math.Pow(x, 5) * -88.588) + (Math.Pow(x, 4) * 365.45) + (Math.Pow(x, 3) * -741.33) + (Math.Pow(x, 2) * 778.02) + (x * -436.16) + 162.46;
         }
 
+        public byte[] GetBETAPMS()
+        {
+            return BitConverter.GetBytes(GetBETAHVDCMinus()) //Div says, there is no HVDC plus
+                .Concat(BitConverter.GetBytes(GetBETAIsolationSwitch()))
+                .Concat(BitConverter.GetBytes(GetBETAShuntTemperature()))
+                .Concat(BitConverter.GetBytes(GetBETASA1Temp()))
+                .Concat(BitConverter.GetBytes(GetBETASA3Temp()))
+                .Concat(BitConverter.GetBytes(GetBETASA4Temp()))
+                .ToArray();
+        }
+
+
         //BET B
         public double GetBETBHVDCMinus()
         {
@@ -198,7 +223,20 @@ namespace CSnet
         {
             return LittleFuseTransferFunction(AUX7); //TODO: transfer function
         }
-    
+
+        public byte[] GetBETBPMS()
+        {
+            return BitConverter.GetBytes(GetBETBHVDCMinus())
+                .Concat(BitConverter.GetBytes(GetBETBDCFCPlus()))
+                .Concat(BitConverter.GetBytes(GetBETBDCFCMinus()))
+                .Concat(BitConverter.GetBytes(GetBETBDCFCDifferential()))
+                .Concat(BitConverter.GetBytes(GetBETBIsolationSwitch()))
+                .Concat(BitConverter.GetBytes(GetBETBShuntTemp()))
+                .Concat(BitConverter.GetBytes(GetBETBSB1Temp()))
+                .ToArray();
+        }
+
+
         //EMS measurements
         private double NTC_COEF_A = 0.0026859917508292143;
         private double NTC_COEF_B = 0.0002879825290119797;
@@ -255,6 +293,20 @@ namespace CSnet
         public double EMSReferenceVoltage2()
         {
             return G7V;
+        }
+
+        public byte[] GetEMS()
+        {
+            return BitConverter.GetBytes(CD1V)
+                     .Concat(BitConverter.GetBytes(uconst.DoubleToInt(EMSReferenceVoltage1())))
+                     .Concat(BitConverter.GetBytes(uconst.DoubleToInt(EMSReferenceVoltage2())))
+                     .Concat(BitConverter.GetBytes(uconst.DoubleToInt(EMSTemperature1())))
+                     .Concat(BitConverter.GetBytes(uconst.DoubleToInt(EMSTemperature2())))
+                     .Concat(BitConverter.GetBytes(uconst.DoubleToInt(EMSPressure1())))
+                     .Concat(BitConverter.GetBytes(uconst.DoubleToInt(EMSPressure2())))
+                     .Concat(BitConverter.GetBytes(uconst.DoubleToInt(EMSGas1())))
+                     .Concat(BitConverter.GetBytes(uconst.DoubleToInt(EMSGas2())))
+                     .ToArray();
         }
     }
 }

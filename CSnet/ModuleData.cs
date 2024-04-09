@@ -157,7 +157,7 @@ namespace CSnet
                 //modules[uiDeviceSource].AverageUpdateRate;
                 //modules[uiDeviceSource].PeakUpdateRate;
 
-                CGV[0] = BitConverter.ToUInt16(packet, 6) * 0.0001; //TODO: decide if we want to multiply the raw value on set, or on get
+                CGV[0] = BitConverter.ToUInt16(packet, 6) * 0.0001;
                 CGV[1] = BitConverter.ToUInt16(packet, 8) * 0.0001;
                 CGV[2] = BitConverter.ToUInt16(packet, 10) * 0.0001;
                 CGV[3] = BitConverter.ToUInt16(packet, 14) * 0.0001;

@@ -53,11 +53,13 @@
             this.lstErrorHolder = new System.Windows.Forms.ListBox();
             this.cmdGetErrors = new System.Windows.Forms.Button();
             this.Timer1 = new System.Windows.Forms.Timer(this.components);
+            this.GPIOHigh = new System.Windows.Forms.Button();
             this.GroupBox4.SuspendLayout();
             this.SuspendLayout();
             // 
             // GroupBox4
             // 
+            this.GroupBox4.Controls.Add(this.GPIOHigh);
             this.GroupBox4.Controls.Add(this.label3);
             this.GroupBox4.Controls.Add(this.SetupBEV);
             this.GroupBox4.Controls.Add(this.SetupOP90);
@@ -84,7 +86,7 @@
             this.GroupBox4.Margin = new System.Windows.Forms.Padding(4);
             this.GroupBox4.Name = "GroupBox4";
             this.GroupBox4.Padding = new System.Windows.Forms.Padding(4);
-            this.GroupBox4.Size = new System.Drawing.Size(1229, 637);
+            this.GroupBox4.Size = new System.Drawing.Size(1295, 706);
             this.GroupBox4.TabIndex = 48;
             this.GroupBox4.TabStop = false;
             this.GroupBox4.Text = "Receive Message";
@@ -142,7 +144,7 @@
             // 
             // label2
             // 
-            this.label2.Location = new System.Drawing.Point(10, 509);
+            this.label2.Location = new System.Drawing.Point(8, 563);
             this.label2.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(181, 20);
@@ -154,11 +156,11 @@
             this.EMSBox.Font = new System.Drawing.Font("Courier New", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.EMSBox.HorizontalScrollbar = true;
             this.EMSBox.ItemHeight = 17;
-            this.EMSBox.Location = new System.Drawing.Point(11, 529);
+            this.EMSBox.Location = new System.Drawing.Point(13, 587);
             this.EMSBox.Margin = new System.Windows.Forms.Padding(4);
             this.EMSBox.Name = "EMSBox";
             this.EMSBox.ScrollAlwaysVisible = true;
-            this.EMSBox.Size = new System.Drawing.Size(1209, 89);
+            this.EMSBox.Size = new System.Drawing.Size(1274, 89);
             this.EMSBox.TabIndex = 38;
             // 
             // label1
@@ -179,7 +181,7 @@
             this.PMSBox.Margin = new System.Windows.Forms.Padding(4);
             this.PMSBox.Name = "PMSBox";
             this.PMSBox.ScrollAlwaysVisible = true;
-            this.PMSBox.Size = new System.Drawing.Size(1209, 89);
+            this.PMSBox.Size = new System.Drawing.Size(1276, 140);
             this.PMSBox.TabIndex = 37;
             // 
             // firmwareLabel
@@ -324,13 +326,23 @@
             this.Timer1.Interval = 500;
             this.Timer1.Tick += new System.EventHandler(this.Timer1_Tick);
             // 
+            // GPIOHigh
+            // 
+            this.GPIOHigh.Location = new System.Drawing.Point(1089, 41);
+            this.GPIOHigh.Margin = new System.Windows.Forms.Padding(4);
+            this.GPIOHigh.Name = "GPIOHigh";
+            this.GPIOHigh.Size = new System.Drawing.Size(66, 29);
+            this.GPIOHigh.TabIndex = 47;
+            this.GPIOHigh.Text = "GPIO";
+            this.GPIOHigh.Click += new System.EventHandler(this.GPIOHigh_Click);
+            // 
             // OpenDeviceTab
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(this.GroupBox4);
             this.Name = "OpenDeviceTab";
-            this.Size = new System.Drawing.Size(1249, 645);
+            this.Size = new System.Drawing.Size(1321, 752);
             this.GroupBox4.ResumeLayout(false);
             this.ResumeLayout(false);
 
@@ -362,5 +374,6 @@
         internal System.Windows.Forms.Button SetupOP90;
         internal System.Windows.Forms.Button SetupBET;
         internal System.Windows.Forms.Label label3;
+        internal System.Windows.Forms.Button GPIOHigh;
     }
 }

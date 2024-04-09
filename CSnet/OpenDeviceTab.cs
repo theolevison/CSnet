@@ -31,7 +31,7 @@ namespace CSnet
 
         private void ACLPage_Click(object sender, EventArgs e)
         {
-            Form2 fw = new Form2();
+            ACLPage fw = new ACLPage();
             fw.WindowState = FormWindowState.Normal;
             fw.StartPosition = FormStartPosition.CenterScreen;
             fw.ShowDialog();
@@ -110,21 +110,29 @@ namespace CSnet
             else //TODO: this is pretty tightly coupled, make it better
             {
                 //PMS data
-                outputText = $"Manager 0 BEV {deviceModel.managers[0].I1:0.00}A {deviceModel.managers[0].I2:0.00}A {deviceModel.managers[0].GetBEVDCFCPlus():0.00} {deviceModel.managers[0].GetBEVDCFCMinus():0.00} {deviceModel.managers[0].GetBEVShuntTemp():0.00} {deviceModel.managers[0].GetBEVDCFCContactorTemp():0.00} {deviceModel.managers[0].GetBEVMainContactorTemp():0.00} {deviceModel.managers[0].GetBEVVREF():0.00}";
+                outputText = $"Manager 0 BEV I1{deviceModel.managers[0].I1:0.00}A I2{deviceModel.managers[0].I2:0.00}A DCFC+{deviceModel.managers[0].GetBEVDCFCPlus():0.00}V DCFC-{deviceModel.managers[0].GetBEVDCFCMinus():0.00}V ShuntTemp{deviceModel.managers[0].GetBEVShuntTemp():0.00}C ContactorTemp{deviceModel.managers[0].GetBEVDCFCContactorTemp():0.00}C MainContactorTemp{deviceModel.managers[0].GetBEVMainContactorTemp():0.00}C VRef{deviceModel.managers[0].GetBEVVREF():0.00}V";
                 PMSBox.Items.Add(outputText);
-                outputText = $"Manager 0 BETA {deviceModel.managers[0].GetBETAHVCDMinus()} {deviceModel.managers[0].GetBETASA1Temp()} {deviceModel.managers[0].GetBETASA4Temp()} {deviceModel.managers[0].GetBETASA3Temp()} {deviceModel.managers[0].GetBETAShuntTemperature()}";
-                PMSBox.Items.Add(outputText);
-                outputText = $"Manager 0 BETB {deviceModel.managers[0].GetBETBDCFCDifferential()} DCFC-:{deviceModel.managers[0].GetBETBDCFCMinus()} DCFC+:{deviceModel.managers[0].GetBETBDCFCPlus()} {deviceModel.managers[0].GetBETBSB1Temp()} {deviceModel.managers[0].GetBETBShuntTemp()} {deviceModel.managers[0].GetBETBHVDCMinus()}";
-                PMSBox.Items.Add(outputText);
-                //Debug.WriteLine(managers[0].PMSPacket0);
-                //Debug.WriteLine(managers[0].AUX1);
-                //Debug.WriteLine(managers[0].AUX2);
+
+
+                if (deviceModel.BET)
+                {
+                    AddPMSData(0);
+                    AddPMSData(1);
+                }
 
                 //EMS data
                 outputText = $"Manager 0 BDSB:{deviceModel.managers[0].EMSBDSBVoltage():0.00V} VREF1:{deviceModel.managers[0].EMSReferenceVoltage1():0.00}V VREF2:{deviceModel.managers[0].EMSReferenceVoltage2():0.00}V Temp1:{deviceModel.managers[0].EMSTemperature1():0.00}C Temp2:{deviceModel.managers[0].EMSTemperature2():0.00}C Pressure1:{deviceModel.managers[0].EMSPressure1():0.00}kPa Pressure2:{deviceModel.managers[0].EMSPressure2():0.00}kPa Gas1:{deviceModel.managers[0].EMSGas1():0.00}% Gas2:{deviceModel.managers[0].EMSGas2():0.00}%";
 
                 EMSBox.Items.Add(outputText);
             }
+        }
+
+        private void AddPMSData(int m)
+        {
+            string outputText = $"Manager {m} BETA HVDC-{deviceModel.managers[m].GetBETAHVDCMinus()} SA1Temp{deviceModel.managers[m].GetBETASA1Temp()} SA4Temp{deviceModel.managers[m].GetBETASA4Temp()} SA3Temp{deviceModel.managers[m].GetBETASA3Temp()} ShuntTemp{deviceModel.managers[m].GetBETAShuntTemperature()}";
+            PMSBox.Items.Add(outputText);
+            outputText = $"Manager {m} BETB Diff{deviceModel.managers[m].GetBETBDCFCDifferential()}V DCFC-:{deviceModel.managers[m].GetBETBDCFCMinus()} DCFC+:{deviceModel.managers[m].GetBETBDCFCPlus()} SB1Temp{deviceModel.managers[m].GetBETBSB1Temp()} ShuntTemp{deviceModel.managers[m].GetBETBShuntTemp()} HVDC-{deviceModel.managers[m].GetBETBHVDCMinus()}";
+            PMSBox.Items.Add(outputText);
         }
 
         private void GetErrors_Click(object sender, EventArgs e)
@@ -144,16 +152,6 @@ namespace CSnet
             {
                 Timer1.Enabled = false;
             }
-        }
-
-        private void GPIO_Click(object sender, EventArgs e)
-        {
-            deviceModel.GPIO();
-            
-        }
-        private void Version_Click(object sender, EventArgs e)
-        {
-            deviceModel.GetDeviceVersions();
         }
 
         private void Config_Click(object sender, EventArgs e)
@@ -176,6 +174,11 @@ namespace CSnet
         private void SetupOP90_Click(object sender, EventArgs e)
         {
             deviceModel.Setup(false, false);
+        }
+
+        private void GPIOHigh_Click(object sender, EventArgs e)
+        {
+            deviceModel.GPIO();
         }
     }
 }
