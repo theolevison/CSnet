@@ -15,13 +15,13 @@ namespace CSnet
             switch (data[6])
             {
                 case BEV:
-                    return device.Setup(0) ? new byte[] { } : ReturnFF();
+                    return device.SetupBEV() ? new byte[] { } : ReturnFF();
                 case BET:
-                    return device.Setup(1) ? new byte[] { } : ReturnFF();
+                    return device.SetupBET() ? new byte[] { } : ReturnFF();
                 case OP90:
-                    return device.Setup(3) ? new byte[] {} : ReturnFF();
+                    return device.SetupOP90() ? new byte[] {} : ReturnFF();
                 case BETLower:
-                    return device.Setup(2) ? new byte[] { } : ReturnFF();
+                    return device.SetupBETLower() ? new byte[] { } : ReturnFF();
                 case BMSPACKET:
                     //send raw BMS packet to UDP client
                     return device.modules[data[7]].Packet0; //TODO: change this to translate CGV to byte s -> packet

@@ -5,13 +5,14 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Runtime.InteropServices.WindowsRuntime;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace CSnet
-{    
+{
     public class DeviceModel
     {
         private const byte ADI_WIL_MAC_SIZE = 8;
@@ -211,10 +212,10 @@ namespace CSnet
             return arbId & 0xFF;
         }
 
-        public bool BETLower = false;
-        public bool BET = false;
-        private bool isoSPI = false;
-        
+        private bool BETLower = false;
+        private bool BET = false;
+        private bool BEV = false;
+
 
         public DeviceModel(ref IntPtr obj, string serialNumber)
         {
@@ -231,42 +232,14 @@ namespace CSnet
             icsNeoDll.icsneoFreeObject(m_hObject);
         }
 
-        public bool Setup(int num)
+        private bool Reset()
         {
-            switch (num)
-            {
-                case 0:
-                    //BEV
-                    BET = false;
-                    isoSPI = true;
-                    BETLower = false; //TODO: refactor all this, it's horrible
-                    break;
-                case 1:
-                    //BET
-                    BET = true;
-                    isoSPI = true;
-                    BETLower = false;
-                    break;
-                case 2:
-                    //BETLower
-                    BET = false;
-                    isoSPI = true;
-                    BETLower = true;
-                    break;
-                case 3:
-                    //OP90/100
-                    BET = false;
-                    isoSPI = false;
-                    BETLower = false;
-                    break;
-            }
-
             ChangeADIboxSettings();
 
-            managers[0] = new ManagerData(); //Pack B in BET
-            if (BET || isoSPI)
+            managers[0] = new ManagerData();
+            if (BET || BEV)
             {
-                managers[1] = new ManagerData(); //this manager should be ignored for single manager uses, e.g BEV. Pack A in BET
+                managers[1] = new ManagerData(); //this manager should be ignored for single manager uses, BEV & BETLower
             }
 
             //connect to managers first
@@ -282,12 +255,43 @@ namespace CSnet
                 modules[i] = new ModuleData();
                 modules[i].MacAddress = nodeMacAddresses[i];
             }
-            
+
             GetDeviceVersions();
             GPIO();
 
             IsSetup = true;
             return true;
+        }
+
+        public bool SetupBEV()
+        {
+            BET = false;
+            BEV = true;
+            BETLower = false;
+            return Reset();
+        }
+
+        public bool SetupBET()
+        {
+            BET = true;
+            BEV = false;
+            BETLower = false;
+            return Reset();
+        }
+
+        public bool SetupBETLower()
+        {
+            BET = false;
+            BEV = false;
+            BETLower = true;
+            return Reset();
+        }
+        public bool SetupOP90()
+        {
+            BET = false;
+            BEV = false;
+            BETLower = false;
+            return Reset();
         }
 
         private void ChangeADIboxSettings()
@@ -298,7 +302,7 @@ namespace CSnet
 
             //set managers to external or onboard
             byte managerSetting = 0;
-            if (isoSPI)
+            if (BEV || BET || BETLower)
             {
                 managerSetting = 129;
             }
@@ -307,7 +311,7 @@ namespace CSnet
             mysettings.Settings.spi_config.port_b.config.value = managerSetting;
 
             mysettings.Settings.wbms_wil_1.using_port_a = 1;
-            if (BET || !isoSPI)
+            if (BET)
             {
                 mysettings.Settings.wbms_wil_1.using_port_b = 1;
             }
@@ -498,7 +502,7 @@ namespace CSnet
             ushort bufferSize = 512;
             byte[] parameters = new byte[4];
             parameters[0] = 1;//portA
-            parameters[1] = (byte)(!isoSPI || BET ? 1 : 0);//portB
+            parameters[1] = (byte)(!BEV || BET ? 1 : 0);//portB
 
             //parameters[2] = BitConverter.GetBytes((ushort)512)[0];
             //parameters[3] = BitConverter.GetBytes((ushort)512)[1];
@@ -554,14 +558,16 @@ namespace CSnet
 
         public void GPIO()
         {
-            if (isoSPI)
+            if (BEV || BETLower)
             {
                 PMSGPIO(ADI_WIL_DEV_MANAGER_0, 1);
-                if (BET)
-                {
-                    PMSGPIO(ADI_WIL_DEV_MANAGER_1, 1);
-                }
             }
+            else if (BET)
+            {
+                PMSGPIO(ADI_WIL_DEV_MANAGER_0, 1);
+                PMSGPIO(ADI_WIL_DEV_MANAGER_1, 1);
+            }
+                
         }
 
         private void PMSGPIO(ulong manager, byte highLow)
@@ -704,7 +710,7 @@ namespace CSnet
 
             SendGenericCommand(ADI_WIL_API_SET_ACL, ACLList.ToArray());
 
-            Setup(BET, isoSPI);
+            Reset();
         }
 
         private bool CheckStatus(byte uFunctionSelected, out byte uCallbackError)
@@ -1006,17 +1012,16 @@ namespace CSnet
                     modules[i].version = DeviceFirmwareVersion(i);
                 }
                 managers[0].Version = DeviceFirmwareVersion(62); //afaik, manager 0 is always the primary manager, responsible for EMS & PMS
-                if (BET || isoSPI)
+                if (BET)
                 {
                     managers[1].Version = DeviceFirmwareVersion(63);
                 }
             }
         }
 
-        
         public byte[] GetPMS()
         {
-            if (!BET && isoSPI)
+            if (BEV)
             {
                 return managers[0].GetBEVPMS();
             } else if (BETLower)
@@ -1027,8 +1032,22 @@ namespace CSnet
                 return managers[0].GetBETAPMS().Concat(managers[1].GetBETBPMS()).ToArray();
             }
         }
-        
-
+        public string PrettyPrintPMS()
+        {
+            string outputText = "";
+            if (BEV)
+            {
+                outputText = $"BEV I1:{managers[0].I1:0.00}A I2:{managers[0].I2:0.00}A DCFC+:{managers[0].GetBEVDCFCPlus():0.00}V DCFC-:{managers[0].GetBEVDCFCMinus():0.00}V ShuntTemp:{managers[0].GetBEVShuntTemp():0.00}C ContactorTemp:{managers[0].GetBEVDCFCContactorTemp():0.00}C MainContactorTemp:{managers[0].GetBEVMainContactorTemp():0.00}C VRef:{managers[0].GetBEVVREF():0.00}V";
+            } else if (BETLower)
+            {
+                outputText = $"BETLower HVDC-:{managers[0].GetBETAHVDCMinus():0.00} SA1Temp:{managers[0].GetBETASA1Temp():0.00}C SA4Temp:{managers[0].GetBETASA4Temp():0.00}C SA3Temp:{managers[0].GetBETASA3Temp():0.00}C ShuntTemp:{managers[0].GetBETAShuntTemperature():0.00}C";
+            } else
+            {
+                outputText = $"BETB HVDC-:{managers[1].GetBETBHVDCMinus():0.00}V Diff:{managers[1].GetBETBDCFCDifferential():0.00}V DCFC-:{managers[1].GetBETBDCFCMinus():0.00}V DCFC+:{managers[1].GetBETBDCFCPlus():0.00}V SB1Temp:{managers[1].GetBETBSB1Temp():0.00}C ShuntTemp:{managers[1].GetBETBShuntTemp():0.00}C";
+                outputText += $"\nBETA HVDC-:{managers[0].GetBETAHVDCMinus():0.00}V SA1Temp:{managers[0].GetBETASA1Temp():0.00}C SA4Temp:{managers[0].GetBETASA4Temp():0.00}C SA3Temp:{managers[0].GetBETASA3Temp():0.00}C ShuntTemp:{managers[0].GetBETAShuntTemperature():0.00}C";
+            }
+            return outputText;
+        }
         public bool WaitForModulesToConnect()
         {
             int timeoutCounter = 0;

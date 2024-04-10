@@ -40,9 +40,9 @@ namespace CSnet
         public double G6V { get; set; }
         public double G7V { get; set; }
                
-        public double C1V { get; set; }
+        public double C1V { get; set; } //Reference voltage
                
-        public double CD1V { get; set; }
+        public double CD1V { get; set; } //BDSB power output
 
         public string Timestamp { get; set; }
         public string PacketTimestamp { get; set; }
@@ -99,8 +99,6 @@ namespace CSnet
         //BEV measurements
         private double BEVTemp(double a)
         {
-            double b = a * 0.001;//convert to correct decimal places TODO: check this is correct
-
             //put voltage against graph to find thermistor temperature
             return (Math.Pow(b, 3) * -4.0721) + (Math.Pow(b, 2) * 32.822) - b * 104.43 + 179.58;
         }
@@ -128,7 +126,7 @@ namespace CSnet
         public double GetBEVVREF()
         {
             return AUX6;
-        }        
+        }
         public byte[] GetBEVPMS()
         {            
             return BitConverter.GetBytes(I1)
@@ -195,7 +193,6 @@ namespace CSnet
                 .ToArray();
         }
 
-
         //BET B
         public double GetBETBHVDCMinus()
         {
@@ -256,7 +253,6 @@ namespace CSnet
         }
         public double EMSPressure1()
         {
-            //Debug.WriteLine($"G1 {G1V}, G2 {G2V}, G3 {G3V}, G4 {G4V}, G5 {G5V}, G6 {G6V}, G7 {G7V}");
             return 10.0 + 250.0 * (G1V/ C1V);
         }
         public double EMSPressure2()

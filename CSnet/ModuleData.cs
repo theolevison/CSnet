@@ -30,7 +30,6 @@ namespace CSnet
         public int PeakRSSI { get; set; }
         public int UpdateRateCount { get; set; } = 0;
 
-
         private void CalculatePECError(byte[] packetSlice) //TODO: implement for all data, not just READA
         {
             ushort uiReceivedPEC = (ushort)((packetSlice[6] << 8 |  packetSlice[7]) & 0x03FF);
@@ -39,94 +38,6 @@ namespace CSnet
             {
                 TotalPECErrors++;
             }
-        }
-
-        private void CalculatePECErrorBad(byte[] packetSlice)
-        {
-            /*
-            //little endian, so swap the first 3 sets of 2 bytes
-            byte temp = packetSlice[0];
-            packetSlice[0] = packetSlice[1];
-            packetSlice[1] = temp;
-
-            temp = packetSlice[2];
-            packetSlice[2] = packetSlice[3];
-            packetSlice[3] = temp;
-
-            temp = packetSlice[4];
-            packetSlice[4] = packetSlice[6];
-            packetSlice[6] = temp;
-            */
-
-            //go through each packet, taking PEC for each read group. Compare to the version that I have calculated. Increment PEC error counter
-            //initialise PEC 
-            BitArray bitArray = new BitArray(packetSlice);
-            
-            //TODO: do the bytes/bits need to be ordered re little endian etc??
-            BitArray PEC = new BitArray(10);
-            PEC[5] = true; //make 6th bit true
-
-            BitArray buffer = new BitArray(8);
-
-            for (int i = 0; i < 48; i++)
-            {            
-                //step 2, as described in ADBMS6815 datasheet
-                buffer[0] = bitArray[i] ^ PEC[9];
-                buffer[1] = buffer[0] ^ PEC[0];
-                buffer[2] = buffer[0] ^ PEC[1];
-                buffer[3] = buffer[0] ^ PEC[2];
-                buffer[7] = buffer[0] ^ PEC[6];
-
-                //step 3, update the PEC
-                PEC[9] = PEC[8];
-                PEC[8] = PEC[7];
-                PEC[7] = buffer[7];
-                PEC[6] = PEC[5];
-                PEC[5] = PEC[4];
-                PEC[4] = PEC[3];
-                PEC[3] = buffer[3];
-                PEC[2] = buffer[2];
-                PEC[1] = buffer[1];
-                PEC[0] = buffer[0];
-            }
-
-            //process command bits in reverse order, LSB is stored at the beginning of the sequence
-            for (int i = 53; i > 47; i--)
-            {
-                //step 2, as described in ADBMS6815 datasheet
-                buffer[0] = bitArray[i] ^ PEC[9];
-                buffer[1] = buffer[0] ^ PEC[0];
-                buffer[2] = buffer[0] ^ PEC[1];
-                buffer[3] = buffer[0] ^ PEC[2];
-                buffer[7] = buffer[0] ^ PEC[6];
-
-                //step 3, update the PEC
-                PEC[9] = PEC[8];
-                PEC[8] = PEC[7];
-                PEC[7] = buffer[7];
-                PEC[6] = PEC[5];
-                PEC[5] = PEC[4];
-                PEC[4] = PEC[3];
-                PEC[3] = buffer[3];
-                PEC[2] = buffer[2];
-                PEC[1] = buffer[1];
-                PEC[0] = buffer[0];
-            }
-
-            string stringPEC = "";
-            //iterate in reverse order
-            for (int i = 63; i > 53; i--)
-            {
-                stringPEC += bitArray[i] ? "1" : "0";
-            }
-
-            string stringCalcPEC = "";
-            foreach(bool bit in PEC)
-            {
-                stringCalcPEC += bit ? "1" : "0";
-            }
-
-            //Debug.WriteLine($"Original PEC: {stringPEC} \nCalculat PEC: {stringCalcPEC}");
         }
 
         public void UpdateData(byte[] packet, uint packetID, double time)
