@@ -30,6 +30,7 @@
         {
             this.components = new System.ComponentModel.Container();
             this.GroupBox4 = new System.Windows.Forms.GroupBox();
+            this.GPIOHigh = new System.Windows.Forms.Button();
             this.label3 = new System.Windows.Forms.Label();
             this.SetupBEV = new System.Windows.Forms.Button();
             this.SetupOP90 = new System.Windows.Forms.Button();
@@ -53,12 +54,13 @@
             this.lstErrorHolder = new System.Windows.Forms.ListBox();
             this.cmdGetErrors = new System.Windows.Forms.Button();
             this.Timer1 = new System.Windows.Forms.Timer(this.components);
-            this.GPIOHigh = new System.Windows.Forms.Button();
+            this.BETLowerButton = new System.Windows.Forms.Button();
             this.GroupBox4.SuspendLayout();
             this.SuspendLayout();
             // 
             // GroupBox4
             // 
+            this.GroupBox4.Controls.Add(this.BETLowerButton);
             this.GroupBox4.Controls.Add(this.GPIOHigh);
             this.GroupBox4.Controls.Add(this.label3);
             this.GroupBox4.Controls.Add(this.SetupBEV);
@@ -90,6 +92,16 @@
             this.GroupBox4.TabIndex = 48;
             this.GroupBox4.TabStop = false;
             this.GroupBox4.Text = "Receive Message";
+            // 
+            // GPIOHigh
+            // 
+            this.GPIOHigh.Location = new System.Drawing.Point(1089, 41);
+            this.GPIOHigh.Margin = new System.Windows.Forms.Padding(4);
+            this.GPIOHigh.Name = "GPIOHigh";
+            this.GPIOHigh.Size = new System.Drawing.Size(66, 29);
+            this.GPIOHigh.TabIndex = 47;
+            this.GPIOHigh.Text = "GPIO";
+            this.GPIOHigh.Click += new System.EventHandler(this.GPIOHigh_Click);
             // 
             // label3
             // 
@@ -326,15 +338,15 @@
             this.Timer1.Interval = 500;
             this.Timer1.Tick += new System.EventHandler(this.Timer1_Tick);
             // 
-            // GPIOHigh
+            // BETLowerButton
             // 
-            this.GPIOHigh.Location = new System.Drawing.Point(1089, 41);
-            this.GPIOHigh.Margin = new System.Windows.Forms.Padding(4);
-            this.GPIOHigh.Name = "GPIOHigh";
-            this.GPIOHigh.Size = new System.Drawing.Size(66, 29);
-            this.GPIOHigh.TabIndex = 47;
-            this.GPIOHigh.Text = "GPIO";
-            this.GPIOHigh.Click += new System.EventHandler(this.GPIOHigh_Click);
+            this.BETLowerButton.Location = new System.Drawing.Point(511, 40);
+            this.BETLowerButton.Margin = new System.Windows.Forms.Padding(4);
+            this.BETLowerButton.Name = "BETLowerButton";
+            this.BETLowerButton.Size = new System.Drawing.Size(51, 26);
+            this.BETLowerButton.TabIndex = 48;
+            this.BETLowerButton.Text = "Lower";
+            this.BETLowerButton.Click += new System.EventHandler(this.BETLowerButton_Click);
             // 
             // OpenDeviceTab
             // 
@@ -375,5 +387,6 @@
         internal System.Windows.Forms.Button SetupBET;
         internal System.Windows.Forms.Label label3;
         internal System.Windows.Forms.Button GPIOHigh;
+        internal System.Windows.Forms.Button BETLowerButton;
     }
 }

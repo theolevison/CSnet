@@ -161,10 +161,8 @@ namespace CSnet
         }
         public double GetBETAShuntTemperature()
         {
-            double b = AUX3 * 0.0001;//convert to correct decimal places TODO: check this is correct to do
-
             //put voltage against graph to find thermistor temperature
-            return ShuntNTCTransferFunction(b);
+            return ShuntNTCTransferFunction(AUX3);
         }
         public double ShuntNTCTransferFunction(double x)
         {
@@ -186,7 +184,6 @@ namespace CSnet
         {
             return (Math.Pow(x, 6) * 8.2901) + (Math.Pow(x, 5) * -88.588) + (Math.Pow(x, 4) * 365.45) + (Math.Pow(x, 3) * -741.33) + (Math.Pow(x, 2) * 778.02) + (x * -436.16) + 162.46;
         }
-
         public byte[] GetBETAPMS()
         {
             return BitConverter.GetBytes(GetBETAHVDCMinus()) //Div says, there is no HVDC plus

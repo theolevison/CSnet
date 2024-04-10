@@ -109,15 +109,18 @@ namespace CSnet
             }
             else //TODO: this is pretty tightly coupled, make it better
             {
-                //PMS data
-                outputText = $"Manager 0 BEV I1:{deviceModel.managers[0].I1:0.00}A I2:{deviceModel.managers[0].I2:0.00}A DCFC+:{deviceModel.managers[0].GetBEVDCFCPlus():0.00}V DCFC-:{deviceModel.managers[0].GetBEVDCFCMinus():0.00}V ShuntTemp:{deviceModel.managers[0].GetBEVShuntTemp():0.00}C ContactorTemp:{deviceModel.managers[0].GetBEVDCFCContactorTemp():0.00}C MainContactorTemp:{deviceModel.managers[0].GetBEVMainContactorTemp():0.00}C VRef:{deviceModel.managers[0].GetBEVVREF():0.00}V";
-                PMSBox.Items.Add(outputText);
-
-
                 if (deviceModel.BET)
                 {
-                    AddPMSData(0);
-                    AddPMSData(1);
+                    AddPMSData(0, true);
+                    AddPMSData(1, false);
+                } else if (deviceModel.BETLower)
+                {
+                    AddPMSData(0, false);
+                } else
+                {
+                    //PMS data
+                    outputText = $"Manager 0 BEV I1:{deviceModel.managers[0].I1:0.00}A I2:{deviceModel.managers[0].I2:0.00}A DCFC+:{deviceModel.managers[0].GetBEVDCFCPlus():0.00}V DCFC-:{deviceModel.managers[0].GetBEVDCFCMinus():0.00}V ShuntTemp:{deviceModel.managers[0].GetBEVShuntTemp():0.00}C ContactorTemp:{deviceModel.managers[0].GetBEVDCFCContactorTemp():0.00}C MainContactorTemp:{deviceModel.managers[0].GetBEVMainContactorTemp():0.00}C VRef:{deviceModel.managers[0].GetBEVVREF():0.00}V";
+                    PMSBox.Items.Add(outputText);
                 }
 
                 //EMS data
@@ -127,12 +130,18 @@ namespace CSnet
             }
         }
 
-        private void AddPMSData(int m)
+        private void AddPMSData(int m, bool A)
         {
-            string outputText = $"Manager {m} BETA HVDC-:{deviceModel.managers[m].GetBETAHVDCMinus():0.00} SA1Temp:{deviceModel.managers[m].GetBETASA1Temp():0.00}C SA4Temp:{deviceModel.managers[m].GetBETASA4Temp():0.00}C SA3Temp:{deviceModel.managers[m].GetBETASA3Temp():0.00}C ShuntTemp:{deviceModel.managers[m].GetBETAShuntTemperature():0.00}C";
-            PMSBox.Items.Add(outputText);
-            outputText = $"Manager {m} BETB Diff:{deviceModel.managers[m].GetBETBDCFCDifferential():0.00}V DCFC-:{deviceModel.managers[m].GetBETBDCFCMinus():0.00} DCFC+:{deviceModel.managers[m].GetBETBDCFCPlus():0.00} SB1Temp:{deviceModel.managers[m].GetBETBSB1Temp():0.00} ShuntTemp:{deviceModel.managers[m].GetBETBShuntTemp():0.00} HVDC-:{deviceModel.managers[m].GetBETBHVDCMinus():0.00}";
-            PMSBox.Items.Add(outputText);
+            string outputText = "";
+            if (A)
+            {
+                outputText = $"Manager {m} BETA HVDC-:{deviceModel.managers[m].GetBETAHVDCMinus():0.00} SA1Temp:{deviceModel.managers[m].GetBETASA1Temp():0.00}C SA4Temp:{deviceModel.managers[m].GetBETASA4Temp():0.00}C SA3Temp:{deviceModel.managers[m].GetBETASA3Temp():0.00}C ShuntTemp:{deviceModel.managers[m].GetBETAShuntTemperature():0.00}C";
+                PMSBox.Items.Add(outputText);
+            } else
+            {
+                outputText = $"Manager {m} BETB Diff:{deviceModel.managers[m].GetBETBDCFCDifferential():0.00}V DCFC-:{deviceModel.managers[m].GetBETBDCFCMinus():0.00} DCFC+:{deviceModel.managers[m].GetBETBDCFCPlus():0.00} SB1Temp:{deviceModel.managers[m].GetBETBSB1Temp():0.00} ShuntTemp:{deviceModel.managers[m].GetBETBShuntTemp():0.00} HVDC-:{deviceModel.managers[m].GetBETBHVDCMinus():0.00}";
+                PMSBox.Items.Add(outputText);
+            }
         }
 
         private void GetErrors_Click(object sender, EventArgs e)
@@ -179,6 +188,12 @@ namespace CSnet
         private void GPIOHigh_Click(object sender, EventArgs e)
         {
             deviceModel.GPIO();
+        }
+
+        private void BETLowerButton_Click(object sender, EventArgs e)
+        {
+            deviceModel.BETLower = true;
+            deviceModel.Setup(false, true);
         }
     }
 }

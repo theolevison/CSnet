@@ -27,6 +27,7 @@ namespace CSnet
         public const byte BEV = 14;
         public const byte BET = 15;
         public const byte OP90 = 16;
+        public const byte BETLower = 17;
 
         protected ISocket server;
         protected Dictionary<string, DeviceModel> devices;

@@ -211,8 +211,10 @@ namespace CSnet
             return arbId & 0xFF;
         }
 
+        public bool BETLower = false;
         public bool BET = false;
         private bool isoSPI = false;
+        
 
         public DeviceModel(ref IntPtr obj, string serialNumber)
         {
@@ -229,10 +231,35 @@ namespace CSnet
             icsNeoDll.icsneoFreeObject(m_hObject);
         }
 
-        public bool Setup(bool BET, bool isoSPI)
+        public bool Setup(int num)
         {
-            this.BET = BET;
-            this.isoSPI = isoSPI;
+            switch (num)
+            {
+                case 0:
+                    //BEV
+                    BET = false;
+                    isoSPI = true;
+                    BETLower = false; //TODO: refactor all this, it's horrible
+                    break;
+                case 1:
+                    //BET
+                    BET = true;
+                    isoSPI = true;
+                    BETLower = false;
+                    break;
+                case 2:
+                    //BETLower
+                    BET = false;
+                    isoSPI = true;
+                    BETLower = true;
+                    break;
+                case 3:
+                    //OP90/100
+                    BET = false;
+                    isoSPI = false;
+                    BETLower = false;
+                    break;
+            }
 
             ChangeADIboxSettings();
 
@@ -470,7 +497,7 @@ namespace CSnet
             byte function = ADI_WIL_API_CONNECT;
             ushort bufferSize = 512;
             byte[] parameters = new byte[4];
-            parameters[0] = (byte)(1);//portA
+            parameters[0] = 1;//portA
             parameters[1] = (byte)(!isoSPI || BET ? 1 : 0);//portB
 
             //parameters[2] = BitConverter.GetBytes((ushort)512)[0];
@@ -992,6 +1019,9 @@ namespace CSnet
             if (!BET && isoSPI)
             {
                 return managers[0].GetBEVPMS();
+            } else if (BETLower)
+            {
+                return managers[0].GetBETBPMS();
             } else
             {
                 return managers[0].GetBETAPMS().Concat(managers[1].GetBETBPMS()).ToArray();
