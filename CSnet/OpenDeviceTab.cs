@@ -110,7 +110,7 @@ namespace CSnet
             else //TODO: this is pretty tightly coupled, make it better
             {
                 //PMS data
-                outputText = $"Manager 0 BEV I1{deviceModel.managers[0].I1:0.00}A I2{deviceModel.managers[0].I2:0.00}A DCFC+{deviceModel.managers[0].GetBEVDCFCPlus():0.00}V DCFC-{deviceModel.managers[0].GetBEVDCFCMinus():0.00}V ShuntTemp{deviceModel.managers[0].GetBEVShuntTemp():0.00}C ContactorTemp{deviceModel.managers[0].GetBEVDCFCContactorTemp():0.00}C MainContactorTemp{deviceModel.managers[0].GetBEVMainContactorTemp():0.00}C VRef{deviceModel.managers[0].GetBEVVREF():0.00}V";
+                outputText = $"Manager 0 BEV I1:{deviceModel.managers[0].I1:0.00}A I2:{deviceModel.managers[0].I2:0.00}A DCFC+:{deviceModel.managers[0].GetBEVDCFCPlus():0.00}V DCFC-:{deviceModel.managers[0].GetBEVDCFCMinus():0.00}V ShuntTemp:{deviceModel.managers[0].GetBEVShuntTemp():0.00}C ContactorTemp:{deviceModel.managers[0].GetBEVDCFCContactorTemp():0.00}C MainContactorTemp:{deviceModel.managers[0].GetBEVMainContactorTemp():0.00}C VRef:{deviceModel.managers[0].GetBEVVREF():0.00}V";
                 PMSBox.Items.Add(outputText);
 
 
@@ -129,9 +129,9 @@ namespace CSnet
 
         private void AddPMSData(int m)
         {
-            string outputText = $"Manager {m} BETA HVDC-{deviceModel.managers[m].GetBETAHVDCMinus()} SA1Temp{deviceModel.managers[m].GetBETASA1Temp()} SA4Temp{deviceModel.managers[m].GetBETASA4Temp()} SA3Temp{deviceModel.managers[m].GetBETASA3Temp()} ShuntTemp{deviceModel.managers[m].GetBETAShuntTemperature()}";
+            string outputText = $"Manager {m} BETA HVDC-:{deviceModel.managers[m].GetBETAHVDCMinus():0.00} SA1Temp:{deviceModel.managers[m].GetBETASA1Temp():0.00}C SA4Temp:{deviceModel.managers[m].GetBETASA4Temp():0.00}C SA3Temp:{deviceModel.managers[m].GetBETASA3Temp():0.00}C ShuntTemp:{deviceModel.managers[m].GetBETAShuntTemperature():0.00}C";
             PMSBox.Items.Add(outputText);
-            outputText = $"Manager {m} BETB Diff{deviceModel.managers[m].GetBETBDCFCDifferential()}V DCFC-:{deviceModel.managers[m].GetBETBDCFCMinus()} DCFC+:{deviceModel.managers[m].GetBETBDCFCPlus()} SB1Temp{deviceModel.managers[m].GetBETBSB1Temp()} ShuntTemp{deviceModel.managers[m].GetBETBShuntTemp()} HVDC-{deviceModel.managers[m].GetBETBHVDCMinus()}";
+            outputText = $"Manager {m} BETB Diff:{deviceModel.managers[m].GetBETBDCFCDifferential():0.00}V DCFC-:{deviceModel.managers[m].GetBETBDCFCMinus():0.00} DCFC+:{deviceModel.managers[m].GetBETBDCFCPlus():0.00} SB1Temp:{deviceModel.managers[m].GetBETBSB1Temp():0.00} ShuntTemp:{deviceModel.managers[m].GetBETBShuntTemp():0.00} HVDC-:{deviceModel.managers[m].GetBETBHVDCMinus():0.00}";
             PMSBox.Items.Add(outputText);
         }
 

@@ -26,6 +26,10 @@ namespace CSnet
         public double AUX5 { get; set; } //BEV: Main relay Thermistor, BETA: SA4 temperature, BETB: Isolation switch monitoring
         public double AUX6 { get; set; } //BEV: Vref external, BETA: SA3 temperature, BETB:Shunt B temperature
         public double AUX7 { get; set; } //BEV: 5V reference, BETA: input 12V sensing, BETB: SB1 temperature
+        public double AUX8 { get; set; } //BEV: VREF2, BETA: VREF2, BETB: VREF2
+        public double AUX9 { get; set; } //BEV: Dummy measurement, BETA: VREFA, BETB: VREFB
+        public double AUX10 { get; set; } //BEV: Dummy measurement, BETA: Balance measure, BETB: Fast Charge CH
+        public double AUX11 { get; set; } //BEV: Dummy measurement, BETA: Balance measure, BETB: Fast Charge FC
 
 
         public double G1V { get; set; }
@@ -45,23 +49,31 @@ namespace CSnet
 
         public void UpdatePMSData(byte[] packet, uint packetID)
         {
-            if (packetID == 0)
+            switch (packetID)
             {
-                PMSPacket0 = packet;
+                case 0:
+                    I1 = BitConverter.ToUInt16(packet, 11) * 0.00000760371;
+                    I2 = BitConverter.ToUInt16(packet, 13) * 0.00000760371;
+                    VBAT = BitConverter.ToUInt16(packet, 15) * 0.000375183;
+                    AUX1 = BitConverter.ToUInt16(packet, 19) * 0.000375183;
+                    AUX2 = BitConverter.ToUInt16(packet, 40) * 0.000375183;
+                    AUX3 = BitConverter.ToUInt16(packet, 61) * 0.000375183;
 
-                I1 = BitConverter.ToUInt16(packet, 11) * 0.00000760371;
-                I2 = BitConverter.ToUInt16(packet, 13) * 0.00000760371;
-                VBAT = BitConverter.ToUInt16(packet, 15) * 0.000375183;
-                AUX1 = BitConverter.ToUInt16(packet, 19) * 0.000375183;
-                AUX2 = BitConverter.ToUInt16(packet, 27) * 0.000375183;
-                AUX3 = BitConverter.ToUInt16(packet, 40) * 0.000375183;
-                AUX4 = BitConverter.ToUInt16(packet, 48) * 0.000375183;
-                AUX5 = BitConverter.ToUInt16(packet, 61) * 0.000375183;
-                AUX6 = BitConverter.ToUInt16(packet, 69) * 0.000375183;
-            }
-            else if (packetID == 2)
-            {
-                AUX7 = BitConverter.ToUInt16(packet, 69) * 0.000375183; //TODO: check if we can look in a different packet for AUX values? They are different sometimes
+                    break;
+                case 1:
+                    AUX4 = BitConverter.ToUInt16(packet, 11) * 0.000375183; //TODO: to check which manager is which, do a sanity check on the SAx thermistors, they should all be similar
+                    AUX5 = BitConverter.ToUInt16(packet, 32) * 0.000375183;
+                    AUX6 = BitConverter.ToUInt16(packet, 53) * 0.000375183;
+                    break;
+                case 2:
+                    AUX7 = BitConverter.ToUInt16(packet, 6) * 0.000375183;
+                    AUX8 = BitConverter.ToUInt16(packet, 27) * 0.000375183;
+                    AUX9 = BitConverter.ToUInt16(packet, 48) * 0.000375183;
+                    AUX10 = BitConverter.ToUInt16(packet, 68) * 0.000375183;
+                    break;
+                case 3:
+                    AUX11 = BitConverter.ToUInt16(packet, 19) * 0.000375183;
+                    break;
             }
         }
 

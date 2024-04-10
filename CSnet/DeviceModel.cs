@@ -236,10 +236,10 @@ namespace CSnet
 
             ChangeADIboxSettings();
 
-            managers[0] = new ManagerData();
+            managers[0] = new ManagerData(); //Pack B in BET
             if (BET || isoSPI)
             {
-                managers[1] = new ManagerData(); //this manager should be ignored for single manager uses, e.g BEV
+                managers[1] = new ManagerData(); //this manager should be ignored for single manager uses, e.g BEV. Pack A in BET
             }
 
             //connect to managers first
@@ -257,6 +257,7 @@ namespace CSnet
             }
             
             GetDeviceVersions();
+            GPIO();
 
             IsSetup = true;
             return true;
@@ -526,8 +527,14 @@ namespace CSnet
 
         public void GPIO()
         {
-            PMSGPIO(ADI_WIL_DEV_MANAGER_0, 1);
-            PMSGPIO(ADI_WIL_DEV_MANAGER_1, 1); //TODO: make this BET specific
+            if (isoSPI)
+            {
+                PMSGPIO(ADI_WIL_DEV_MANAGER_0, 1);
+                if (BET)
+                {
+                    PMSGPIO(ADI_WIL_DEV_MANAGER_1, 1);
+                }
+            }
         }
 
         private void PMSGPIO(ulong manager, byte highLow)
@@ -853,8 +860,9 @@ namespace CSnet
                                         modules[uiDeviceSource].UpdateData(packet, uiPacketID, dTime);
 
                                         break;
-                                    case PMS_PACKET_TYPE:                              
-                                        managers[0].UpdatePMSData(packet, uiPacketID);
+                                    case PMS_PACKET_TYPE:
+                                        Console.WriteLine($"PMS {uiDeviceSource}");
+                                        managers[uiDeviceSource-240].UpdatePMSData(packet, uiPacketID);
 
                                         break;
                                     case EMS_PACKET_TYPE:
