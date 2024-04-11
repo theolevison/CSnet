@@ -1041,7 +1041,7 @@ namespace CSnet
             } else if (BETLower)
             {
                 outputText = $"BETLower HVDC-:{managers[0].GetBETAHVDCMinus():0.00} SA1Temp:{managers[0].GetBETASA1Temp():0.00}C SA4Temp:{managers[0].GetBETASA4Temp():0.00}C SA3Temp:{managers[0].GetBETASA3Temp():0.00}C ShuntTemp:{managers[0].GetBETAShuntTemperature():0.00}C";
-            } else
+            } else if (BET)
             {
                 outputText = $"BETB HVDC-:{managers[1].GetBETBHVDCMinus():0.00}V Diff:{managers[1].GetBETBDCFCDifferential():0.00}V DCFC-:{managers[1].GetBETBDCFCMinus():0.00}V DCFC+:{managers[1].GetBETBDCFCPlus():0.00}V SB1Temp:{managers[1].GetBETBSB1Temp():0.00}C ShuntTemp:{managers[1].GetBETBShuntTemp():0.00}C";
                 outputText += $"\nBETA HVDC-:{managers[0].GetBETAHVDCMinus():0.00}V SA1Temp:{managers[0].GetBETASA1Temp():0.00}C SA4Temp:{managers[0].GetBETASA4Temp():0.00}C SA3Temp:{managers[0].GetBETASA3Temp():0.00}C ShuntTemp:{managers[0].GetBETAShuntTemperature():0.00}C";

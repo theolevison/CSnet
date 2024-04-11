@@ -97,7 +97,7 @@ namespace CSnet
         }
 
         //BEV measurements
-        private double BEVTemp(double a)
+        private double BEVTemp(double b)
         {
             //put voltage against graph to find thermistor temperature
             return (Math.Pow(b, 3) * -4.0721) + (Math.Pow(b, 2) * 32.822) - b * 104.43 + 179.58;
