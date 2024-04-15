@@ -99,24 +99,15 @@ namespace CSnet
 
         public byte[] GetCGDV()
         {
-            return DoubleArrayToBytes(CGDV);
+            return Converter.DoubleArrayToBytes(CGDV);
         }
 
         public byte[] GetCGV()
         {
-            return DoubleArrayToBytes(CGV);
+            return Converter.DoubleArrayToBytes(CGV);
         }
 
-        private byte[] DoubleArrayToBytes(double[] array)
-        {
-            List<byte> byteList = new List<byte>();
-            foreach (double d in array)
-            {
-                byteList.AddRange(Converter.DoubleToInt16Byte(d));
-            }
-
-            return byteList.ToArray();
-        }
+        
 
         public void UpdateMetadata(byte[] packet, uint packetID)
         {

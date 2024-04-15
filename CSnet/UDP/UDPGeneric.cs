@@ -69,17 +69,17 @@ namespace CSnet
                 case ModuleVersion:
                     return BitConverter.GetBytes(device.modules[data[7]].version);
                 case PackVersion:
-                    return BitConverter.GetBytes(device.managers[0].Version);
+                    return BitConverter.GetBytes(device.managers[data[7]].Version);
                 case DiagnosticVoltage:
                         return device.modules[data[7]].GetCGDV();
                 case Latency:
                     {
-                        int data1 = device.modules[data[2]].Latency;
+                        int data1 = device.modules[data[7]].Latency;
                         return BitConverter.GetBytes(data1);
                     }
                 case TotalPECErrors:
                     {
-                        int data1 = device.modules[data[2]].TotalPECErrors;
+                        int data1 = device.modules[data[7]].TotalPECErrors;
                         return BitConverter.GetBytes(data1);
                     }
                 case AverageUpdateRate:

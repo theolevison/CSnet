@@ -201,6 +201,8 @@ namespace CSnet
                 .Concat(Converter.DoubleToInt16Byte(GetBETASA1Temp()))
                 .Concat(Converter.DoubleToInt16Byte(GetBETASA3Temp()))
                 .Concat(Converter.DoubleToInt16Byte(GetBETASA4Temp()))
+                .Concat(Converter.DoubleToInt16Byte(I1))
+                .Concat(Converter.DoubleToInt16Byte(I2))
                 .Concat(Converter.DoubleToInt16Byte(GetBETA12VInputSensing()))
                 .Concat(Converter.DoubleToInt16Byte(GetBETAIsolationSwitch()))
                 .ToArray();
@@ -209,7 +211,7 @@ namespace CSnet
         //BET B
         public double GetBETBHVDCMinus()
         {
-            return -(AUX1 * 701 +3);
+            return -(AUX1 * 701 + 3);
         }
         public double GetBETBDCFCPlus()
         {
@@ -256,10 +258,11 @@ namespace CSnet
                 .Concat(Converter.DoubleToInt16Byte(GetBETBIsolationSwitch()))
                 .Concat(Converter.DoubleToInt16Byte(GetBETBShuntTemp()))
                 .Concat(Converter.DoubleToInt16Byte(GetBETBSB1Temp()))
+                .Concat(Converter.DoubleToInt16Byte(I1))
+                .Concat(Converter.DoubleToInt16Byte(I2))
                 .Concat(Converter.DoubleToInt16Byte(GetBETBIsolationSwitch()))
                 .ToArray();
         }
-
 
         //EMS measurements
         private double NTC_COEF_A = 0.0026859917508292143;
@@ -271,11 +274,11 @@ namespace CSnet
         }
         public double EMSPressure1()
         {
-            return 10.0 + 250.0 * (G1V/ C1V);
+            return 10.0 + 250.0 * (G1V / C1V);
         }
         public double EMSPressure2()
         {
-            return 10.0 + 250.0 * (G3V/ G7V);
+            return 10.0 + 250.0 * (G3V / G7V);
         }
         private double EMSThermistorTransferFunction(double thermistorVoltage, double referenceVoltage)
         {
@@ -283,7 +286,8 @@ namespace CSnet
             {
                 double NTCResistance = ((10.0) / (thermistorVoltage / referenceVoltage - 1.0));
                 return (1.0 / (NTC_COEF_A + (NTC_COEF_B * Math.Log(NTCResistance)) + (NTC_COEF_C * Math.Pow(Math.Log(NTCResistance), 3)))) - 273.0;
-            } else
+            }
+            else
             {
                 return 0;
             }
@@ -322,7 +326,7 @@ namespace CSnet
         {
             return Converter.DoubleToInt16Byte(EMSBDSBVoltage())
                      .Concat(Converter.DoubleToInt16Byte(EMSReferenceVoltage1()))
-                     .Concat(Converter.DoubleToInt16Byte(EMSReferenceVoltage2()))//TODO: decide if we want to send data as int32 or int16? And agree a standard for doubles
+                     .Concat(Converter.DoubleToInt16Byte(EMSReferenceVoltage2()))
                      .Concat(Converter.DoubleToInt16Byte(EMSTemperature1()))
                      .Concat(Converter.DoubleToInt16Byte(EMSTemperature2()))
                      .Concat(Converter.DoubleToInt16Byte(EMSPressure1()))
