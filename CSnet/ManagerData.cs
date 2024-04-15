@@ -149,16 +149,20 @@ namespace CSnet
         {
             return -(AUX1 * 701 + 3);
         }
-        public double GetBETAIsolationSwitch()//not used in test
+        public double GetBETAIsolationSwitch()
         {
             if (AUX2 < 25.51)
             {
                 //Switch open
+                return 0;
             } else if (AUX2 > 46.52)
             {
                 //Switch closed
+                return 1;
+            } else
+            {
+                return 2; //Between thresholds
             }
-            return 0;
         }
         public double GetBETAShuntTemperature()
         {
@@ -187,7 +191,7 @@ namespace CSnet
         }
         public double GetBETA12VInputSensing()
         {
-            return AUX7;
+            return AUX7 * 5.83 + 0.5;
         }
         public byte[] GetBETAPMS()
         {
@@ -198,6 +202,7 @@ namespace CSnet
                 .Concat(Converter.DoubleToInt16Byte(GetBETASA3Temp()))
                 .Concat(Converter.DoubleToInt16Byte(GetBETASA4Temp()))
                 .Concat(Converter.DoubleToInt16Byte(GetBETA12VInputSensing()))
+                .Concat(Converter.DoubleToInt16Byte(GetBETAIsolationSwitch()))
                 .ToArray();
         }
 
@@ -223,11 +228,15 @@ namespace CSnet
             if (AUX5 < 25.51)
             {
                 //Switch is open
+                return 0;
             } else if (AUX5 > 46.52)
             {
                 //Switch is closed
+                return 1;
+            } else
+            {
+                return 2; //Between thresholds
             }
-            return 0;//TODO: make this actually work
         }
         public double GetBETBShuntTemp()
         {
@@ -247,6 +256,7 @@ namespace CSnet
                 .Concat(Converter.DoubleToInt16Byte(GetBETBIsolationSwitch()))
                 .Concat(Converter.DoubleToInt16Byte(GetBETBShuntTemp()))
                 .Concat(Converter.DoubleToInt16Byte(GetBETBSB1Temp()))
+                .Concat(Converter.DoubleToInt16Byte(GetBETBIsolationSwitch()))
                 .ToArray();
         }
 
