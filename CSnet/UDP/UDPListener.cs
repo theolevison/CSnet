@@ -28,6 +28,9 @@ namespace CSnet
         public const byte BET = 15;
         public const byte OP90 = 16;
         public const byte BETLower = 17;
+        protected const byte Timings = 18;
+        protected const byte VoltAndCurrent = 19;
+        protected const byte HVDC = 20;
 
         protected ISocket server;
         protected Dictionary<string, DeviceModel> devices;

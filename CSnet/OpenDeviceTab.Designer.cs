@@ -49,17 +49,19 @@
             this.lblReadCount = new System.Windows.Forms.Label();
             this.ButtonGetMessages = new System.Windows.Forms.Button();
             this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
-            this.EMSBox = new System.Windows.Forms.ListBox();
+            this.lstMessage = new System.Windows.Forms.ListBox();
             this.label1 = new System.Windows.Forms.Label();
             this.PMSBox = new System.Windows.Forms.ListBox();
-            this.lstMessage = new System.Windows.Forms.ListBox();
-            this.lstErrorHolder = new System.Windows.Forms.ListBox();
-            this.cmdGetErrors = new System.Windows.Forms.Button();
             this.label2 = new System.Windows.Forms.Label();
+            this.EMSBox = new System.Windows.Forms.ListBox();
+            this.cmdGetErrors = new System.Windows.Forms.Button();
+            this.lstErrorHolder = new System.Windows.Forms.ListBox();
             this.Timer1 = new System.Windows.Forms.Timer(this.components);
+            this.panel1 = new System.Windows.Forms.Panel();
             this.tableLayoutPanel1.SuspendLayout();
             this.ButtonPanel.SuspendLayout();
             this.tableLayoutPanel2.SuspendLayout();
+            this.panel1.SuspendLayout();
             this.SuspendLayout();
             // 
             // tableLayoutPanel1
@@ -80,12 +82,8 @@
             // 
             // ButtonPanel
             // 
-            this.ButtonPanel.Controls.Add(this.BETLowerButton);
+            this.ButtonPanel.Controls.Add(this.panel1);
             this.ButtonPanel.Controls.Add(this.GPIOHigh);
-            this.ButtonPanel.Controls.Add(this.label3);
-            this.ButtonPanel.Controls.Add(this.SetupBEV);
-            this.ButtonPanel.Controls.Add(this.SetupOP90);
-            this.ButtonPanel.Controls.Add(this.SetupBET);
             this.ButtonPanel.Controls.Add(this.ButtonGetConfig);
             this.ButtonPanel.Controls.Add(this.firmwareLabel);
             this.ButtonPanel.Controls.Add(this.chkAutoRead);
@@ -105,7 +103,7 @@
             // 
             // BETLowerButton
             // 
-            this.BETLowerButton.Location = new System.Drawing.Point(494, 52);
+            this.BETLowerButton.Location = new System.Drawing.Point(8, 44);
             this.BETLowerButton.Margin = new System.Windows.Forms.Padding(4);
             this.BETLowerButton.Name = "BETLowerButton";
             this.BETLowerButton.Size = new System.Drawing.Size(62, 29);
@@ -115,18 +113,20 @@
             // 
             // GPIOHigh
             // 
-            this.GPIOHigh.Location = new System.Drawing.Point(1087, 77);
+            this.GPIOHigh.Location = new System.Drawing.Point(1161, 34);
             this.GPIOHigh.Margin = new System.Windows.Forms.Padding(4);
             this.GPIOHigh.Name = "GPIOHigh";
-            this.GPIOHigh.Size = new System.Drawing.Size(66, 29);
+            this.GPIOHigh.Size = new System.Drawing.Size(136, 64);
             this.GPIOHigh.TabIndex = 47;
-            this.GPIOHigh.Text = "GPIO";
+            this.GPIOHigh.Text = "Turn on BDSB";
             this.GPIOHigh.Click += new System.EventHandler(this.GPIOHigh_Click);
             // 
             // label3
             // 
+            this.label3.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.label3.Font = new System.Drawing.Font("Microsoft Sans Serif", 13.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label3.Location = new System.Drawing.Point(566, 5);
+            this.label3.Location = new System.Drawing.Point(61, 2);
             this.label3.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(169, 29);
@@ -135,7 +135,7 @@
             // 
             // SetupBEV
             // 
-            this.SetupBEV.Location = new System.Drawing.Point(564, 55);
+            this.SetupBEV.Location = new System.Drawing.Point(78, 47);
             this.SetupBEV.Margin = new System.Windows.Forms.Padding(4);
             this.SetupBEV.Name = "SetupBEV";
             this.SetupBEV.Size = new System.Drawing.Size(51, 26);
@@ -145,7 +145,7 @@
             // 
             // SetupOP90
             // 
-            this.SetupOP90.Location = new System.Drawing.Point(682, 52);
+            this.SetupOP90.Location = new System.Drawing.Point(196, 44);
             this.SetupOP90.Margin = new System.Windows.Forms.Padding(4);
             this.SetupOP90.Name = "SetupOP90";
             this.SetupOP90.Size = new System.Drawing.Size(67, 33);
@@ -155,7 +155,7 @@
             // 
             // SetupBET
             // 
-            this.SetupBET.Location = new System.Drawing.Point(623, 55);
+            this.SetupBET.Location = new System.Drawing.Point(137, 47);
             this.SetupBET.Margin = new System.Windows.Forms.Padding(4);
             this.SetupBET.Name = "SetupBET";
             this.SetupBET.Size = new System.Drawing.Size(51, 26);
@@ -165,7 +165,7 @@
             // 
             // ButtonGetConfig
             // 
-            this.ButtonGetConfig.Location = new System.Drawing.Point(903, 77);
+            this.ButtonGetConfig.Location = new System.Drawing.Point(903, 72);
             this.ButtonGetConfig.Margin = new System.Windows.Forms.Padding(4);
             this.ButtonGetConfig.Name = "ButtonGetConfig";
             this.ButtonGetConfig.Size = new System.Drawing.Size(100, 31);
@@ -208,7 +208,7 @@
             // 
             // ButtonACLPage
             // 
-            this.ButtonACLPage.Location = new System.Drawing.Point(792, 74);
+            this.ButtonACLPage.Location = new System.Drawing.Point(792, 72);
             this.ButtonACLPage.Margin = new System.Windows.Forms.Padding(4);
             this.ButtonACLPage.Name = "ButtonACLPage";
             this.ButtonACLPage.Size = new System.Drawing.Size(100, 32);
@@ -239,7 +239,7 @@
             // 
             // ButtonOTAP
             // 
-            this.ButtonOTAP.Location = new System.Drawing.Point(1011, 77);
+            this.ButtonOTAP.Location = new System.Drawing.Point(1011, 72);
             this.ButtonOTAP.Margin = new System.Windows.Forms.Padding(4);
             this.ButtonOTAP.Name = "ButtonOTAP";
             this.ButtonOTAP.Size = new System.Drawing.Size(66, 29);
@@ -279,7 +279,6 @@
             // 
             this.tableLayoutPanel2.ColumnCount = 1;
             this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            
             this.tableLayoutPanel2.Controls.Add(this.lstMessage, 0, 0);
             this.tableLayoutPanel2.Controls.Add(this.label1, 0, 1);
             this.tableLayoutPanel2.Controls.Add(this.PMSBox, 0, 2);
@@ -287,11 +286,8 @@
             this.tableLayoutPanel2.Controls.Add(this.EMSBox, 0, 4);
             this.tableLayoutPanel2.Controls.Add(this.cmdGetErrors, 0, 5);
             this.tableLayoutPanel2.Controls.Add(this.lstErrorHolder, 0, 6);
-            
-            
             this.tableLayoutPanel2.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanel2.Location = new System.Drawing.Point(13, 126);
-            this.tableLayoutPanel2.MaximumSize = new System.Drawing.Size(0, 1000);
             this.tableLayoutPanel2.Name = "tableLayoutPanel2";
             this.tableLayoutPanel2.Padding = new System.Windows.Forms.Padding(10);
             this.tableLayoutPanel2.RowCount = 7;
@@ -300,23 +296,24 @@
             this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 25F));
             this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 5F));
             this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 15F));
-            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 10F));
-            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 10F));
+            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 5F));
+            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 15F));
             this.tableLayoutPanel2.Size = new System.Drawing.Size(1355, 635);
             this.tableLayoutPanel2.TabIndex = 50;
             // 
-            // EMSBox
+            // lstMessage
             // 
-            this.EMSBox.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.EMSBox.Font = new System.Drawing.Font("Courier New", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.EMSBox.HorizontalScrollbar = true;
-            this.EMSBox.ItemHeight = 17;
-            this.EMSBox.Location = new System.Drawing.Point(14, 411);
-            this.EMSBox.Margin = new System.Windows.Forms.Padding(4);
-            this.EMSBox.Name = "EMSBox";
-            this.EMSBox.ScrollAlwaysVisible = true;
-            this.EMSBox.Size = new System.Drawing.Size(1327, 84);
-            this.EMSBox.TabIndex = 38;
+            this.lstMessage.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.lstMessage.Font = new System.Drawing.Font("Courier New", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lstMessage.HorizontalScrollbar = true;
+            this.lstMessage.IntegralHeight = false;
+            this.lstMessage.ItemHeight = 17;
+            this.lstMessage.Location = new System.Drawing.Point(14, 14);
+            this.lstMessage.Margin = new System.Windows.Forms.Padding(4);
+            this.lstMessage.Name = "lstMessage";
+            this.lstMessage.ScrollAlwaysVisible = true;
+            this.lstMessage.Size = new System.Drawing.Size(1327, 176);
+            this.lstMessage.TabIndex = 19;
             // 
             // label1
             // 
@@ -341,44 +338,6 @@
             this.PMSBox.Size = new System.Drawing.Size(1327, 145);
             this.PMSBox.TabIndex = 37;
             // 
-            // lstMessage
-            // 
-            this.lstMessage.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.lstMessage.Font = new System.Drawing.Font("Courier New", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lstMessage.HorizontalScrollbar = true;
-            this.lstMessage.IntegralHeight = false;
-            this.lstMessage.ItemHeight = 17;
-            this.lstMessage.Location = new System.Drawing.Point(14, 14);
-            this.lstMessage.Margin = new System.Windows.Forms.Padding(4);
-            this.lstMessage.Name = "lstMessage";
-            this.lstMessage.ScrollAlwaysVisible = true;
-            this.lstMessage.Size = new System.Drawing.Size(1327, 176);
-            this.lstMessage.TabIndex = 19;
-            // 
-            // lstErrorHolder
-            // 
-            this.lstErrorHolder.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.lstErrorHolder.Font = new System.Drawing.Font("Courier New", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lstErrorHolder.HorizontalScrollbar = true;
-            this.lstErrorHolder.ItemHeight = 17;
-            this.lstErrorHolder.Location = new System.Drawing.Point(14, 564);
-            this.lstErrorHolder.Margin = new System.Windows.Forms.Padding(4);
-            this.lstErrorHolder.Name = "lstErrorHolder";
-            this.lstErrorHolder.ScrollAlwaysVisible = true;
-            this.lstErrorHolder.Size = new System.Drawing.Size(1327, 57);
-            this.lstErrorHolder.TabIndex = 21;
-            // 
-            // cmdGetErrors
-            // 
-            this.cmdGetErrors.Location = new System.Drawing.Point(14, 503);
-            this.cmdGetErrors.Margin = new System.Windows.Forms.Padding(4);
-            this.cmdGetErrors.Name = "cmdGetErrors";
-            this.cmdGetErrors.Size = new System.Drawing.Size(947, 1);
-            this.cmdGetErrors.TabIndex = 22;
-            this.cmdGetErrors.Text = "Get Errors";
-            this.cmdGetErrors.Click += new System.EventHandler(this.GetErrors_Click);
-            this.cmdGetErrors.Dock = System.Windows.Forms.DockStyle.Fill;
-            // 
             // label2
             // 
             this.label2.Anchor = System.Windows.Forms.AnchorStyles.None;
@@ -389,11 +348,61 @@
             this.label2.TabIndex = 39;
             this.label2.Text = "EMS data";
             // 
+            // EMSBox
+            // 
+            this.EMSBox.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.EMSBox.Font = new System.Drawing.Font("Courier New", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.EMSBox.HorizontalScrollbar = true;
+            this.EMSBox.ItemHeight = 17;
+            this.EMSBox.Location = new System.Drawing.Point(14, 411);
+            this.EMSBox.Margin = new System.Windows.Forms.Padding(4);
+            this.EMSBox.Name = "EMSBox";
+            this.EMSBox.ScrollAlwaysVisible = true;
+            this.EMSBox.Size = new System.Drawing.Size(1327, 84);
+            this.EMSBox.TabIndex = 38;
+            // 
+            // cmdGetErrors
+            // 
+            this.cmdGetErrors.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.cmdGetErrors.Location = new System.Drawing.Point(14, 503);
+            this.cmdGetErrors.Margin = new System.Windows.Forms.Padding(4);
+            this.cmdGetErrors.Name = "cmdGetErrors";
+            this.cmdGetErrors.Size = new System.Drawing.Size(1327, 22);
+            this.cmdGetErrors.TabIndex = 22;
+            this.cmdGetErrors.Text = "Get Errors";
+            this.cmdGetErrors.Click += new System.EventHandler(this.GetErrors_Click);
+            // 
+            // lstErrorHolder
+            // 
+            this.lstErrorHolder.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.lstErrorHolder.Font = new System.Drawing.Font("Courier New", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lstErrorHolder.HorizontalScrollbar = true;
+            this.lstErrorHolder.ItemHeight = 17;
+            this.lstErrorHolder.Location = new System.Drawing.Point(14, 533);
+            this.lstErrorHolder.Margin = new System.Windows.Forms.Padding(4);
+            this.lstErrorHolder.Name = "lstErrorHolder";
+            this.lstErrorHolder.ScrollAlwaysVisible = true;
+            this.lstErrorHolder.Size = new System.Drawing.Size(1327, 88);
+            this.lstErrorHolder.TabIndex = 21;
+            // 
             // Timer1
             // 
             this.Timer1.Enabled = true;
             this.Timer1.Interval = 500;
             this.Timer1.Tick += new System.EventHandler(this.Timer1_Tick);
+            // 
+            // panel1
+            // 
+            this.panel1.BackColor = System.Drawing.SystemColors.Info;
+            this.panel1.Controls.Add(this.BETLowerButton);
+            this.panel1.Controls.Add(this.label3);
+            this.panel1.Controls.Add(this.SetupBEV);
+            this.panel1.Controls.Add(this.SetupOP90);
+            this.panel1.Controls.Add(this.SetupBET);
+            this.panel1.Location = new System.Drawing.Point(486, 8);
+            this.panel1.Name = "panel1";
+            this.panel1.Size = new System.Drawing.Size(285, 89);
+            this.panel1.TabIndex = 49;
             // 
             // OpenDeviceTab
             // 
@@ -405,6 +414,7 @@
             this.tableLayoutPanel1.ResumeLayout(false);
             this.ButtonPanel.ResumeLayout(false);
             this.tableLayoutPanel2.ResumeLayout(false);
+            this.panel1.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -440,5 +450,6 @@
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
 
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel2;
+        private System.Windows.Forms.Panel panel1;
     }
 }

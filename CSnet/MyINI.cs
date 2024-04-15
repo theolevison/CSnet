@@ -135,6 +135,19 @@ namespace LiuQF.Common
             return strTemp.ToString().Trim();
         }
         /// <summary>
+        /// 读取指定节点下的指定key的value返回string
+        /// </summary>
+        /// <param name="section">section名称</param>
+        /// <param name="key">key名称</param>
+        /// <returns>value值</returns>
+        public static string GetIniKeyValueForStr1(string section, string key, string FilePath)
+        {
+            if (section.Trim().Length <= 0 || key.Trim().Length <= 0) return string.Empty;
+            StringBuilder strTemp = new StringBuilder(512);
+            GetPrivateProfileString(section, key, string.Empty, strTemp, 512, FilePath);
+            return strTemp.ToString().Trim();
+        }
+        /// <summary>
         /// 从指定的节点中获取一个整数值( Long，找到的key的值；如指定的key未找到，就返回默认值。
         /// 如找到的数字不是一个合法的整数，函数会返回其中合法的一部分。如，对于“xyz=55zz”这个条目，函数返回55。)
         /// </summary>

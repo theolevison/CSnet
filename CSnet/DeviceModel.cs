@@ -10,6 +10,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using LiuQF.Common;
 
 namespace CSnet
 {
@@ -197,6 +198,26 @@ namespace CSnet
 
         public bool IsSetup = false;
 
+        public double secondsToConnectToManagers = 0;
+        public double secondsToAllCMUConnecting = 0;
+
+        
+        private bool BETLower = false;
+        private bool BET = false;
+        private bool BEV = false;
+
+
+        public DeviceModel(ref IntPtr obj, string serialNumber)
+        {
+            this.serialNumber = serialNumber;
+            m_hObject = obj;
+        }
+
+        public byte[] GetTimings()
+        {
+            return Converter.DoubleToInt16Byte(secondsToAllCMUConnecting).Concat(Converter.DoubleToInt16Byte(secondsToConnectToManagers)).ToArray();
+        }
+
         private uint GetPacketTypeFromArbId(uint arbId)
         {
             return (arbId >> 16) & 0xFF;
@@ -212,16 +233,6 @@ namespace CSnet
             return arbId & 0xFF;
         }
 
-        private bool BETLower = false;
-        private bool BET = false;
-        private bool BEV = false;
-
-
-        public DeviceModel(ref IntPtr obj, string serialNumber)
-        {
-            this.serialNumber = serialNumber;
-            m_hObject = obj;
-        }
 
         public void CloseDevice()
         {
@@ -232,7 +243,7 @@ namespace CSnet
             icsNeoDll.icsneoFreeObject(m_hObject);
         }
 
-        private bool Reset()
+        public bool Reset()
         {
             ChangeADIboxSettings();
 
@@ -242,8 +253,11 @@ namespace CSnet
                 managers[1] = new ManagerData(); //this manager should be ignored for single manager uses, BEV & BETLower
             }
 
+            var managerWatch = Stopwatch.StartNew();
             //connect to managers first
             Connect(true, true);
+            managerWatch.Stop();
+            secondsToConnectToManagers = managerWatch.ElapsedMilliseconds * 0.001;
 
             GetAcl();
             Debug.WriteLine($"module count: {nodeMacAddresses.Count}");
@@ -256,8 +270,11 @@ namespace CSnet
                 modules[i].MacAddress = nodeMacAddresses[i];
             }
 
-            GetDeviceVersions();
             GPIO();
+            var CMUWatch = Stopwatch.StartNew();
+            GetDeviceVersions();
+            CMUWatch.Stop();
+            secondsToAllCMUConnecting = CMUWatch.ElapsedMilliseconds * 0.001;
 
             IsSetup = true;
             return true;
@@ -692,18 +709,51 @@ namespace CSnet
             CheckStatus(function, out callbackError);
         }
 
-        public void SetACL()
+        public void SetMESACL()
         {
-            List<string> macAddresses = ACLPage.GetStoredMacAddresses();
+            List<string> macAddresses = new List<string>();
 
+            string address = MyINI.GetIniKeyValueForStr1("MACAddress", "MACAddress", Application.StartupPath + "\\MESCFG.ini");
+            string[] addressArray = address.Split('|');
+
+            for (int i = 0; i < addressArray.Count(); i++)
+            {
+                macAddresses.Add(addressArray[i]);
+            }
+
+            SetACL(macAddresses);
+        }
+
+        public void SetUserACL()
+        {
+            List<string> macAddresses = new List<string>();
+
+            for (int i = 0; i < 16; i++)
+            {
+                //read mac addresses from user input (Form 2)
+                string address = MyINI.GetIniKeyValueForStr("macAddress", $"{i + 1}", Application.StartupPath + "\\config.ini");
+                if (address != "000000") // TODO: do some more input validation
+                {
+                    macAddresses.Add("64F9C00000"+address);
+                }
+            }
+
+            SetACL(macAddresses);
+        }
+
+        private void SetACL(List<string> macAddresses)
+        {
             List<byte> ACLList = new List<byte>
             {
                 (byte)macAddresses.Count
             };
 
-            for (int i = 0; i < macAddresses.Count; i++)
+            foreach (string macAddress in macAddresses)
             {
-                ACLList.AddRange(new byte[] { 0x64, 0xF9, 0xC0, 0x00, 0x00, Convert.ToByte(macAddresses[i].Substring(0, 2), 16), Convert.ToByte(macAddresses[i].Substring(2, 2), 16), Convert.ToByte(macAddresses[i].Substring(4, 2), 16) });
+                for (int i = 0; i < macAddress.Length; i+=2)
+                {
+                    ACLList.Add(Convert.ToByte(macAddress.Substring(i, 2), 16));
+                }
             }
 
             SetMode(ADI_WIL_MODE_STANDBY);
@@ -725,12 +775,19 @@ namespace CSnet
 
                 if (timeOutCounter == 200)
                 {
-                    throw new Exception($"Timeout whilst sending command to device {uCallbackError}");
+                    throw new Exception($"Timeout whilst sending command to device. Check pack connections.");
                 }
                 timeOutCounter++;
-                Thread.Sleep(100);
+                if (uFinishedProcessing == 1)
+                {
+                    break;
+                }
+                else
+                {
+                    Thread.Sleep(100);
+                }
                 //only breaks if command has been successfully sent, or timesout
-            } while (uFinishedProcessing == 0);
+            } while (true);
 
             if (result == 1)
             {
@@ -894,7 +951,6 @@ namespace CSnet
 
                                         break;
                                     case PMS_PACKET_TYPE:
-                                        Console.WriteLine($"PMS {uiDeviceSource}");
                                         managers[uiDeviceSource-240].UpdatePMSData(packet, uiPacketID);
 
                                         break;
@@ -950,7 +1006,8 @@ namespace CSnet
             }
             else
             {
-                MessageBox.Show("Problem Reading Messages");
+                IsSetup = false;
+                MessageBox.Show("Problem Reading Messages");                
             }
         }
 
@@ -1009,12 +1066,12 @@ namespace CSnet
                 Debug.WriteLine($"Getting versions");
                 for (int i = 0; i < modules.Length; i++)
                 {
-                    modules[i].version = DeviceFirmwareVersion(i);
+                    modules[i].version = (short)DeviceFirmwareVersion(i);
                 }
-                managers[0].Version = DeviceFirmwareVersion(62); //afaik, manager 0 is always the primary manager, responsible for EMS & PMS
+                managers[0].Version = (short)DeviceFirmwareVersion(62); //afaik, manager 0 is always the primary manager, responsible for EMS & PMS
                 if (BET)
                 {
-                    managers[1].Version = DeviceFirmwareVersion(63);
+                    managers[1].Version = (short)DeviceFirmwareVersion(63);
                 }
             }
         }
@@ -1032,21 +1089,25 @@ namespace CSnet
                 return managers[0].GetBETAPMS().Concat(managers[1].GetBETBPMS()).ToArray();
             }
         }
-        public string PrettyPrintPMS()
+        public void PrettyPrintPMS(ListBox box)
         {
-            string outputText = "";
-            if (BEV)
+            if (managers[0].AUX1 == managers[0].AUX2 && managers[0].AUX3 == managers[0].AUX7)
             {
-                outputText = $"BEV I1:{managers[0].I1:0.00}A I2:{managers[0].I2:0.00}A DCFC+:{managers[0].GetBEVDCFCPlus():0.00}V DCFC-:{managers[0].GetBEVDCFCMinus():0.00}V ShuntTemp:{managers[0].GetBEVShuntTemp():0.00}C ContactorTemp:{managers[0].GetBEVDCFCContactorTemp():0.00}C MainContactorTemp:{managers[0].GetBEVMainContactorTemp():0.00}C VRef:{managers[0].GetBEVVREF():0.00}V";
+                //Sanity check, to see if BDSB is return FFFFFFFFF
+                box.Items.Add("Turn on BDSB");
+            } else if (BEV)
+            {
+                box.Items.Add($"BEV I1:{managers[0].I1:0.00}A I2:{managers[0].I2:0.00}A DCFC+:{managers[0].GetBEVDCFCPlus():0.00}V DCFC-:{managers[0].GetBEVDCFCMinus():0.00}V ShuntTemp:{managers[0].GetBEVShuntTemp():0.00}C ContactorTemp:{managers[0].GetBEVDCFCContactorTemp():0.00}C MainContactorTemp:{managers[0].GetBEVMainContactorTemp():0.00}C VRef:{managers[0].GetBEVVREF():0.00}V");
             } else if (BETLower)
             {
-                outputText = $"BETLower HVDC-:{managers[0].GetBETAHVDCMinus():0.00} SA1Temp:{managers[0].GetBETASA1Temp():0.00}C SA4Temp:{managers[0].GetBETASA4Temp():0.00}C SA3Temp:{managers[0].GetBETASA3Temp():0.00}C ShuntTemp:{managers[0].GetBETAShuntTemperature():0.00}C";
-            } else if (BET)
-            {
-                outputText = $"BETB HVDC-:{managers[1].GetBETBHVDCMinus():0.00}V Diff:{managers[1].GetBETBDCFCDifferential():0.00}V DCFC-:{managers[1].GetBETBDCFCMinus():0.00}V DCFC+:{managers[1].GetBETBDCFCPlus():0.00}V SB1Temp:{managers[1].GetBETBSB1Temp():0.00}C ShuntTemp:{managers[1].GetBETBShuntTemp():0.00}C";
-                outputText += $"\nBETA HVDC-:{managers[0].GetBETAHVDCMinus():0.00}V SA1Temp:{managers[0].GetBETASA1Temp():0.00}C SA4Temp:{managers[0].GetBETASA4Temp():0.00}C SA3Temp:{managers[0].GetBETASA3Temp():0.00}C ShuntTemp:{managers[0].GetBETAShuntTemperature():0.00}C";
+                box.Items.Add($"BETB HVDC-:{managers[0].GetBETBHVDCMinus():0.00}V Diff:{managers[0].GetBETBDCFCDifferential():0.00}V DCFC-:{managers[0].GetBETBDCFCMinus():0.00}V DCFC+:{managers[0].GetBETBDCFCPlus():0.00}V SB1Temp:{managers[0].GetBETBSB1Temp():0.00}C ShuntTemp:{managers[0].GetBETBShuntTemp():0.00}C");
+                box.Items.Add($"BETA HVDC-:{managers[0].GetBETAHVDCMinus():0.00}V SA1Temp:{managers[0].GetBETASA1Temp():0.00}C SA4Temp:{managers[0].GetBETASA4Temp():0.00}C SA3Temp:{managers[0].GetBETASA3Temp():0.00}C ShuntTemp:{managers[0].GetBETAShuntTemperature():0.00}C");
             }
-            return outputText;
+            else if (BET)
+            {
+                box.Items.Add($"VBat:{managers[1].VBAT} BETB HVDC-:{managers[1].GetBETBHVDCMinus():0.00}V Diff:{managers[1].GetBETBDCFCDifferential():0.00}V DCFC-:{managers[1].GetBETBDCFCMinus():0.00}V DCFC+:{managers[1].GetBETBDCFCPlus():0.00}V SB1Temp:{managers[1].GetBETBSB1Temp():0.00}C ShuntTemp:{managers[1].GetBETBShuntTemp():0.00}C");
+                box.Items.Add($"VBat:{managers[0].VBAT} BETA HVDC-:{managers[0].GetBETAHVDCMinus():0.00}V SA1Temp:{managers[0].GetBETASA1Temp():0.00}C SA4Temp:{managers[0].GetBETASA4Temp():0.00}C SA3Temp:{managers[0].GetBETASA3Temp():0.00}C ShuntTemp:{managers[0].GetBETAShuntTemperature():0.00}C");
+            }
         }
         public bool WaitForModulesToConnect()
         {
@@ -1079,8 +1140,8 @@ namespace CSnet
                 }
                 timeoutCounter++;
                 Thread.Sleep(1000);
-            } while (timeoutCounter < 8);
-            MessageBox.Show("Connecting to modules timed-out, check ACL");
+            } while (timeoutCounter < 10);
+            MessageBox.Show("Connecting to modules took a long time, check ACL is correct");
             return false;
         }
 

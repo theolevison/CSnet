@@ -13,7 +13,7 @@ namespace CSnet
     public class ManagerData
     {
         public string MacAddress { get; set; }
-        public int Version { get; set; }
+        public Int16 Version { get; set; }
         public byte[] PMSPacket0 { get; set; } = new byte[0];
         public byte[] EMSPacket0 { get; set; } = new byte[0];
         public double I1 { get; set; }
@@ -49,6 +49,8 @@ namespace CSnet
 
         public void UpdatePMSData(byte[] packet, uint packetID)
         {
+            PMSPacket0 = packet;
+            Debug.WriteLine($"Is little endian: {BitConverter.IsLittleEndian}");
             switch (packetID)
             {
                 case 0:
@@ -74,6 +76,7 @@ namespace CSnet
                 case 3:
                     AUX11 = BitConverter.ToUInt16(packet, 19) * 0.000375183;
                     break;
+               
             }
         }
 
@@ -129,15 +132,15 @@ namespace CSnet
         }
         public byte[] GetBEVPMS()
         {            
-            return BitConverter.GetBytes(I1)
-                            .Concat(BitConverter.GetBytes(I2))
-                            .Concat(BitConverter.GetBytes(VBAT))
-                            .Concat(BitConverter.GetBytes(GetBEVDCFCPlus()))
-                            .Concat(BitConverter.GetBytes(GetBEVDCFCMinus()))
-                            .Concat(BitConverter.GetBytes(GetBEVShuntTemp()))
-                            .Concat(BitConverter.GetBytes(GetBEVDCFCContactorTemp()))
-                            .Concat(BitConverter.GetBytes(GetBEVMainContactorTemp()))
-                            .Concat(BitConverter.GetBytes(GetBEVVREF()))
+            return Converter.DoubleToInt16Byte(I1)
+                            .Concat(Converter.DoubleToInt16Byte(I2))
+                            .Concat(Converter.DoubleToInt16Byte(VBAT))
+                            .Concat(Converter.DoubleToInt16Byte(GetBEVDCFCPlus()))
+                            .Concat(Converter.DoubleToInt16Byte(GetBEVDCFCMinus()))
+                            .Concat(Converter.DoubleToInt16Byte(GetBEVShuntTemp()))
+                            .Concat(Converter.DoubleToInt16Byte(GetBEVDCFCContactorTemp()))
+                            .Concat(Converter.DoubleToInt16Byte(GetBEVMainContactorTemp()))
+                            .Concat(Converter.DoubleToInt16Byte(GetBEVVREF()))
                             .ToArray();
         }
         
@@ -182,14 +185,19 @@ namespace CSnet
         {
             return (Math.Pow(x, 6) * 8.2901) + (Math.Pow(x, 5) * -88.588) + (Math.Pow(x, 4) * 365.45) + (Math.Pow(x, 3) * -741.33) + (Math.Pow(x, 2) * 778.02) + (x * -436.16) + 162.46;
         }
+        public double GetBETA12VInputSensing()
+        {
+            return AUX7;
+        }
         public byte[] GetBETAPMS()
         {
-            return BitConverter.GetBytes(GetBETAHVDCMinus()) //Div says, there is no HVDC plus
-                .Concat(BitConverter.GetBytes(GetBETAIsolationSwitch()))
-                .Concat(BitConverter.GetBytes(GetBETAShuntTemperature()))
-                .Concat(BitConverter.GetBytes(GetBETASA1Temp()))
-                .Concat(BitConverter.GetBytes(GetBETASA3Temp()))
-                .Concat(BitConverter.GetBytes(GetBETASA4Temp()))
+            return Converter.DoubleToInt16Byte(GetBETAHVDCMinus()) //Div says, there is no HVDC plus
+                .Concat(Converter.DoubleToInt16Byte(GetBETAIsolationSwitch()))
+                .Concat(Converter.DoubleToInt16Byte(GetBETAShuntTemperature()))
+                .Concat(Converter.DoubleToInt16Byte(GetBETASA1Temp()))
+                .Concat(Converter.DoubleToInt16Byte(GetBETASA3Temp()))
+                .Concat(Converter.DoubleToInt16Byte(GetBETASA4Temp()))
+                .Concat(Converter.DoubleToInt16Byte(GetBETA12VInputSensing()))
                 .ToArray();
         }
 
@@ -232,13 +240,13 @@ namespace CSnet
 
         public byte[] GetBETBPMS()
         {
-            return BitConverter.GetBytes(GetBETBHVDCMinus())
-                .Concat(BitConverter.GetBytes(GetBETBDCFCPlus()))
-                .Concat(BitConverter.GetBytes(GetBETBDCFCMinus()))
-                .Concat(BitConverter.GetBytes(GetBETBDCFCDifferential()))
-                .Concat(BitConverter.GetBytes(GetBETBIsolationSwitch()))
-                .Concat(BitConverter.GetBytes(GetBETBShuntTemp()))
-                .Concat(BitConverter.GetBytes(GetBETBSB1Temp()))
+            return Converter.DoubleToInt16Byte(GetBETBHVDCMinus())
+                .Concat(Converter.DoubleToInt16Byte(GetBETBDCFCPlus()))
+                .Concat(Converter.DoubleToInt16Byte(GetBETBDCFCMinus()))
+                .Concat(Converter.DoubleToInt16Byte(GetBETBDCFCDifferential()))
+                .Concat(Converter.DoubleToInt16Byte(GetBETBIsolationSwitch()))
+                .Concat(Converter.DoubleToInt16Byte(GetBETBShuntTemp()))
+                .Concat(Converter.DoubleToInt16Byte(GetBETBSB1Temp()))
                 .ToArray();
         }
 
@@ -302,15 +310,15 @@ namespace CSnet
 
         public byte[] GetEMS()
         {
-            return BitConverter.GetBytes(CD1V)
-                     .Concat(BitConverter.GetBytes(uconst.DoubleToInt(EMSReferenceVoltage1())))
-                     .Concat(BitConverter.GetBytes(uconst.DoubleToInt(EMSReferenceVoltage2())))
-                     .Concat(BitConverter.GetBytes(uconst.DoubleToInt(EMSTemperature1())))
-                     .Concat(BitConverter.GetBytes(uconst.DoubleToInt(EMSTemperature2())))
-                     .Concat(BitConverter.GetBytes(uconst.DoubleToInt(EMSPressure1())))
-                     .Concat(BitConverter.GetBytes(uconst.DoubleToInt(EMSPressure2())))
-                     .Concat(BitConverter.GetBytes(uconst.DoubleToInt(EMSGas1())))
-                     .Concat(BitConverter.GetBytes(uconst.DoubleToInt(EMSGas2())))
+            return Converter.DoubleToInt16Byte(EMSBDSBVoltage())
+                     .Concat(Converter.DoubleToInt16Byte(EMSReferenceVoltage1()))
+                     .Concat(Converter.DoubleToInt16Byte(EMSReferenceVoltage2()))//TODO: decide if we want to send data as int32 or int16? And agree a standard for doubles
+                     .Concat(Converter.DoubleToInt16Byte(EMSTemperature1()))
+                     .Concat(Converter.DoubleToInt16Byte(EMSTemperature2()))
+                     .Concat(Converter.DoubleToInt16Byte(EMSPressure1()))
+                     .Concat(Converter.DoubleToInt16Byte(EMSPressure2()))
+                     .Concat(Converter.DoubleToInt16Byte(EMSGas1()))
+                     .Concat(Converter.DoubleToInt16Byte(EMSGas2()))
                      .ToArray();
         }
     }

@@ -89,6 +89,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Converter.cs" />
     <Compile Include="DeviceModel.cs" />
     <Compile Include="UDP\ISocket.cs" />
     <Compile Include="ManagerData.cs" />
@@ -126,7 +127,6 @@
       <DependentUpon>OpenDeviceTab.cs</DependentUpon>
     </Compile>
     <Compile Include="UDP\SocketWrapper.cs" />
-    <Compile Include="uconst.cs" />
     <Compile Include="UDP\UDPOP140.cs" />
     <Compile Include="UDP\UDPGeneric.cs" />
     <Compile Include="UDP\UDPListener.cs" />

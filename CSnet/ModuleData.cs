@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -8,7 +9,7 @@ namespace CSnet
 {
     public class ModuleData
     {
-        public int version {  get; set; }
+        public Int16 version { get; set; }
         public string MacAddress { get; set; }
         public byte[] Packet0 { get; set; } = new byte[0];
         public byte[] Packet1 { get; set; } = new byte[0];
@@ -19,20 +20,20 @@ namespace CSnet
         public double Thermistor2 { get; set; }
         public byte[] Thermistor2Raw { get; set; } = new byte[2];
         public double BMSMessageTimestamp { get; set; } = 0;
-        
+
 
         //CMU Performance
-        public int Latency { get; set; }
-        public int TotalPECErrors { get; set; } = 0;
+        public Int16 Latency { get; set; }
+        public Int16 TotalPECErrors { get; set; } = 0;
         public double AverageUpdateRate { get; set; }
         public double PeakUpdateRate { get; set; } = 0;
-        public int AverageRSSI { get; set; }
-        public int PeakRSSI { get; set; }
-        public int UpdateRateCount { get; set; } = 0;
+        public Int16 AverageRSSI { get; set; }
+        public Int16 PeakRSSI { get; set; }
+        public Int16 UpdateRateCount { get; set; } = 0;
 
         private void CalculatePECError(byte[] packetSlice) //TODO: implement for all data, not just READA
         {
-            ushort uiReceivedPEC = (ushort)((packetSlice[6] << 8 |  packetSlice[7]) & 0x03FF);
+            ushort uiReceivedPEC = (ushort)((packetSlice[6] << 8 | packetSlice[7]) & 0x03FF);
 
             if (adi_pec10_calc(true, 6, packetSlice) != uiReceivedPEC)
             {
@@ -96,12 +97,33 @@ namespace CSnet
             }
         }
 
+        public byte[] GetCGDV()
+        {
+            return DoubleArrayToBytes(CGDV);
+        }
+
+        public byte[] GetCGV()
+        {
+            return DoubleArrayToBytes(CGV);
+        }
+
+        private byte[] DoubleArrayToBytes(double[] array)
+        {
+            List<byte> byteList = new List<byte>();
+            foreach (double d in array)
+            {
+                byteList.AddRange(Converter.DoubleToInt16Byte(d));
+            }
+
+            return byteList.ToArray();
+        }
+
         public void UpdateMetadata(byte[] packet, uint packetID)
         {
             if (packetID == 0)
             {
                 //Latency is little endian, so reverse byte order
-                Latency = BitConverter.ToUInt16(new byte[] { packet[25], packet[24] }, 0);           
+                Latency = BitConverter.ToInt16(new byte[] { packet[25], packet[24] }, 0); //this should technically be uint16
 
                 byte RSSI = packet[31];
                 if (RSSI > PeakRSSI)

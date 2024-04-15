@@ -48,23 +48,6 @@ namespace CSnet
             textBox16.Text = MyINI.GetIniKeyValueForStr("macAddress", "16", Application.StartupPath + "\\config.ini");
         }
 
-        public static List<string> GetStoredMacAddresses()
-        {
-            List<string> macAddresses = new List<string>();
-
-            for (int i = 0; i < 16; i++)
-            {
-                //read mac addresses from user input (Form 2)
-                string address = MyINI.GetIniKeyValueForStr("macAddress", $"{i + 1}", Application.StartupPath + "\\config.ini");
-                if (address != "000000") // TODO: do some more input validation
-                {
-                    macAddresses.Add(address);
-                }
-            }
-
-            return macAddresses;
-        }
-
         private void button1_Click(object sender, EventArgs e)
         {
             MyINI.WritePrivateProfileString("macAddress", "1", textBox1.Text, Application.StartupPath + "\\config.ini");

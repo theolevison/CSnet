@@ -23,15 +23,14 @@ namespace CSnet
                 case BETLower:
                     return device.SetupBETLower() ? new byte[] { } : ReturnFF();
                 case BMSPACKET:
-                    //send raw BMS packet to UDP client
-                    return device.modules[data[7]].Packet0; //TODO: change this to translate CGV to byte s -> packet
+                    return device.modules[data[7]].GetCGV();
                 case BMSTEMPPACKET:
                     {
                         //send temperature data to UDP client
                         byte[] tempPacket = new byte[8];
 
-                        byte[] raw1 = BitConverter.GetBytes(device.modules[data[7]].Thermistor1);
-                        byte[] raw2 = BitConverter.GetBytes(device.modules[data[7]].Thermistor2);
+                        byte[] raw1 = Converter.DoubleToInt16Byte(device.modules[data[7]].Thermistor1);
+                        byte[] raw2 = Converter.DoubleToInt16Byte(device.modules[data[7]].Thermistor2);
 
                         //将温度数组组装到返回数组里面
                         tempPacket[0] = device.modules[data[7]].Thermistor1Raw[0];
@@ -66,16 +65,13 @@ namespace CSnet
                         return device.GetPMS();
                     }
                 case EMSPACKET:                    
-                        return device.managers[0].GetEMS();
+                        return device.managers[0].GetEMS(); //TODO: make this int
                 case ModuleVersion:
                     return BitConverter.GetBytes(device.modules[data[7]].version);
                 case PackVersion:
                     return BitConverter.GetBytes(device.managers[0].Version);
                 case DiagnosticVoltage:
-                    {
-                        int[] data1 = uconst.DoubleArrayToIntArray(device.modules[data[2]].CGDV);
-                        return uconst.IntArrayToByteArray(data1);
-                    }
+                        return device.modules[data[7]].GetCGDV();
                 case Latency:
                     {
                         int data1 = device.modules[data[2]].Latency;
@@ -87,28 +83,36 @@ namespace CSnet
                         return BitConverter.GetBytes(data1);
                     }
                 case AverageUpdateRate:
-                    {
-                        int data1 = uconst.DoubleToInt(device.modules[data[2]].AverageUpdateRate * 1000 * 100);
-                        return BitConverter.GetBytes(data1);
-                    }
+                    
+                        return Converter.DoubleToInt16Byte(device.modules[data[7]].AverageUpdateRate);
+                        
+                    
                 case PeakUpdateRate:
-                    {
-                        int data1 = uconst.DoubleToInt(device.modules[data[2]].PeakUpdateRate * 1000 * 100);
-                        return BitConverter.GetBytes(data1);
-                    }
+                    
+                        return Converter.DoubleToInt16Byte(device.modules[data[7]].PeakUpdateRate);
+                    
                 case AverageRSSI:
                     {
-                        int data1 = device.modules[data[2]].AverageRSSI;
+                        int data1 = device.modules[data[7]].AverageRSSI;
                         return BitConverter.GetBytes(data1);
                     }
                 case PeakRSSI:
                     {
-                        int data1 = device.modules[data[2]].PeakRSSI;
+                        int data1 = device.modules[data[7]].PeakRSSI;
                         return BitConverter.GetBytes(data1);
                     }
                 case SetACL:
-                    device.SetACL();
+                    device.SetMESACL();
                     return new byte[0];
+                case Timings:
+                    return device.GetTimings();
+                case VoltAndCurrent:
+                    //protected const byte VoltAndCurrent = 19;
+                    //protected const byte HVDC = 20;
+                    return device.GetTimings();
+
+                case HVDC:
+                    return device.GetTimings();
                 default:
                     {
                         return ReturnFF();
