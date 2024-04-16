@@ -16,20 +16,26 @@ namespace CSnet
         public Int16 Version { get; set; }
         public byte[] PMSPacket0 { get; set; } = new byte[0];
         public byte[] EMSPacket0 { get; set; } = new byte[0];
+
+        private double ShuntResistance; //TODO: decide if we keep the format from the datasheet? Preserving mantisa & magnitude?
+        private double TemperatureReference;
+        private double TemperatureCoefficient1;
+        private double TemperatureCoefficient2;
+
         public double I1 { get; set; }
         public double I2 { get; set; }
         public double VBAT { get; set; }
-        private double AUX1 { get; set; } //BEV: FC+ Chassis, BETA: HVDC- Chassis, BETB: HVDC- Chassis
-        private double AUX2 { get; set; } //BEV: FC- Chassis, BETA: Isolation switch monitoring, BETB:DCFC+ Chassis
-        private double AUX3 { get; set; } //BEV: Shunt Thermistor, BETA: Shunt A temperature, BETB: DCFC differential
-        private double AUX4 { get; set; } //BEV: DCFC relay Thermistor, BETA: SA1 temperature, BETB: DCFC- Chassis
-        private double AUX5 { get; set; } //BEV: Main relay Thermistor, BETA: SA4 temperature, BETB: Isolation switch monitoring
-        private double AUX6 { get; set; } //BEV: Vref external, BETA: SA3 temperature, BETB:Shunt B temperature
-        private double AUX7 { get; set; } //BEV: 5V reference, BETA: input 12V sensing, BETB: SB1 temperature
-        private double AUX8 { get; set; } //BEV: VREF2, BETA: VREF2, BETB: VREF2
-        private double AUX9 { get; set; } //BEV: Dummy measurement, BETA: VREFA, BETB: VREFB
-        private double AUX10 { get; set; } //BEV: Dummy measurement, BETA: Balance measure, BETB: Fast Charge CH
-        private double AUX11 { get; set; } //BEV: Dummy measurement, BETA: Balance measure, BETB: Fast Charge FC
+        private double AUX1; //BEV: FC+ Chassis, BETA: HVDC- Chassis, BETB: HVDC- Chassis
+        private double AUX2; //BEV: FC- Chassis, BETA: Isolation switch monitoring, BETB:DCFC+ Chassis
+        private double AUX3; //BEV: Shunt Thermistor, BETA: Shunt A temperature, BETB: DCFC differential
+        private double AUX4; //BEV: DCFC relay Thermistor, BETA: SA1 temperature, BETB: DCFC- Chassis
+        private double AUX5; //BEV: Main relay Thermistor, BETA: SA4 temperature, BETB: Isolation switch monitoring
+        private double AUX6; //BEV: Vref external, BETA: SA3 temperature, BETB:Shunt B temperature
+        private double AUX7; //BEV: 5V reference, BETA: input 12V sensing, BETB: SB1 temperature
+        private double AUX8; //BEV: VREF2, BETA: VREF2, BETB: VREF2
+        private double AUX9; //BEV: Dummy measurement, BETA: VREFA, BETB: VREFB
+        private double AUX10; //BEV: Dummy measurement, BETA: Balance measure, BETB: Fast Charge CH
+        private double AUX11; //BEV: Dummy measurement, BETA: Balance measure, BETB: Fast Charge FC
 
 
         private double G1V { get; set; }
@@ -75,7 +81,10 @@ namespace CSnet
                 case 3:
                     AUX11 = BitConverter.ToUInt16(packet, 19) * 0.000375183;
                     break;
-               
+                case 4:
+                    //EEPROM data
+
+                    break;
             }
         }
 
@@ -111,8 +120,7 @@ namespace CSnet
         }
         public double GetBEVDCFCPlus()
         {
-            //Debug.WriteLine($"aux1 {AUX1}, aux2 {AUX2}, aux3 {AUX3}, aux4 {AUX4}, aux5 {AUX5}, aux6 {AUX6}, aux7 {AUX7}");
-            return AUX1 * 284.006; //TODO: confirm this is AUX 1, not AUX 0. Check VREF (AUX6) which should always be 3V
+            return AUX1 * 284.006;
         }
         public double GetBEVDCFCMinus()
         {
@@ -256,11 +264,11 @@ namespace CSnet
         }
         public double GetBETBShuntTemp()
         {
-            return ShuntNTCTransferFunction(AUX6); //TODO: transfer function
+            return ShuntNTCTransferFunction(AUX6);
         }
         public double GetBETBSB1Temp()
         {
-            return LittleFuseTransferFunction(AUX7); //TODO: transfer function
+            return LittleFuseTransferFunction(AUX7);
         }
 
         public byte[] GetBETBPMS()
@@ -350,6 +358,15 @@ namespace CSnet
                      .Concat(Converter.DoubleToInt16Byte(EMSGas1()))
                      .Concat(Converter.DoubleToInt16Byte(EMSGas2()))
                      .ToArray();
+        }
+
+        public byte[] GetEEPROM()
+        {
+            return Converter.DoubleToInt16Byte(ShuntResistance)
+                .Concat(Converter.DoubleToInt16Byte(TemperatureReference))
+                .Concat(Converter.DoubleToInt16Byte(TemperatureCoefficient1))
+                .Concat(Converter.DoubleToInt16Byte(TemperatureCoefficient2))
+                .ToArray();
         }
     }
 }

@@ -7,6 +7,28 @@ namespace CSnet
 {
     public class UDPGeneric : UDPListener
     {
+        
+        private const byte PMSPACKET = 2;
+        private const byte EMSPACKET = 3;
+        private const byte ModuleVersion = 4;
+        private const byte PackVersion = 5;
+        private const byte DiagnosticVoltage = 6;
+        private const byte Latency = 7;
+        private const byte TotalPECErrors = 8;
+        private const byte AverageUpdateRate = 9;
+        private const byte PeakUpdateRate = 10;
+        private const byte AverageRSSI = 11;
+        private const byte PeakRSSI = 12;
+        private const byte SetACL = 13;
+        private const byte BEV = 14;
+        private const byte BET = 15;
+        private const byte OP90 = 16;
+        private const byte BETLower = 17;
+        private const byte Timings = 18;
+        private const byte VoltAndCurrent = 19;
+        private const byte HVDC = 20;
+        private const byte EEPROM = 21;
+
         public UDPGeneric(ISocket server, Dictionary<string, DeviceModel> devices) : base(server, devices)
         { }
 
@@ -63,7 +85,7 @@ namespace CSnet
                 case PMSPACKET:
                     return device.GetPMS();
                 case EMSPACKET:                    
-                    return device.managers[0].GetEMS(); //TODO: make this int
+                    return device.managers[0].GetEMS();
                 case ModuleVersion:
                     return BitConverter.GetBytes(device.modules[data[7]].version);
                 case PackVersion:
@@ -100,11 +122,11 @@ namespace CSnet
                 case Timings:
                     return device.GetTimings();
                 case VoltAndCurrent:
-                    //protected const byte VoltAndCurrent = 19;
-                    //protected const byte HVDC = 20;
-                    return device.GetTimings();
+                    return device.GetTimings();//TODO: ask chaunlin, keep or remove
                 case HVDC:
-                    return device.GetTimings();
+                    return device.GetTimings();//TODO: ask chaunlin, keep or remove
+                case EEPROM:
+                    return device.GetEEPROM();
                 default:
                     return ReturnFF();
             }

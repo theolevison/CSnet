@@ -13,7 +13,7 @@ namespace CSnet.UDP
         private ISocket server;
         private Form1 form;
 
-        public UDPController(ISocket server, Form1 form)//TODO: MVC this, so that I don't have to pass in a UI element & then hunt through it
+        public UDPController(ISocket server, Form1 form)
         {
             this.server = server;
             this.form = form;

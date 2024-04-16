@@ -732,7 +732,7 @@ namespace CSnet
             {
                 //read mac addresses from user input (Form 2)
                 string address = MyINI.GetIniKeyValueForStr("macAddress", $"{i + 1}", Application.StartupPath + "\\config.ini");
-                if (address != "000000") // TODO: do some more input validation
+                if (address != "000000")
                 {
                     macAddresses.Add("64F9C00000"+address);
                 }
@@ -799,7 +799,7 @@ namespace CSnet
                 }
                 else if (uCallbackError == ADI_WIL_ERR_PARTIAL_SUCCESS)
                 {
-                    return true; //TODO: make it obvious that there was a partial success
+                    return true;
                 }
                 else if (uCallbackError == ADI_WIL_ERR_IN_PROGRESS)
                 {
@@ -975,18 +975,12 @@ namespace CSnet
                                         break;
                                     case SPI_STATS_PACKET_TYPE:
                                         //SPI Port Statistics
-
-                                        //TODO: decode payload
                                         break;
                                     case WIL_STATS_PACKET_TYPE:
                                         //WIL Statistics
-
-                                        //TODO: decode payload
                                         break;
                                     case EVENT_PACKET_TYPE:
                                         //Event Notification
-
-                                        //TODO: decode payload
                                         break;
                                     default:
                                         //Unknown
@@ -1121,8 +1115,6 @@ namespace CSnet
                 byte[] output = new byte[9];
                 Marshal.Copy(ReadGenericCommand(ADI_WIL_API_GET_NETWORK_STATUS), output, 0, output.Length);
 
-                //TODO: repeat this command until timeout (to one we pick) or until all nodes are checked against the bitmap returned from 
-
                 BitArray bitArray = new BitArray(output.Skip(1).ToArray());
 
                 int connectedCount = 0;
@@ -1147,19 +1139,9 @@ namespace CSnet
             return false;
         }
 
-        /*
-        iRetVal = WIL_RequestGetNetworkStatus(hObject, WIL_INSTANCE_0, &nwStatus);
-        CU_ASSERT_INT_EQUAL(iRetVal, ADI_WIL_RETURN_SUCCESS);
-
-        CU_ASSERT_INT_EQUAL(nwStatus.iCount, GLOBAL_TEST_CONFIG_NUMBER_NODES_UNDER_TEST); 
-        iNodesConnected = 0;
-        for (int i = 0; i < nwStatus.iCount; i++)
+        public byte[] GetEEPROM()
         {
-            if((nwStatus.iConnectState >> i) & 0x1)
-                iNodesConnected++;
-        } 
-        pStatus->iCount= bData[ADI_WIL_GET_NETWORK_STATUS_RETURN_NODE_COUNT_OFFSET];
-        pStatus->iConnectState = *(uint64_t*)(bData + ADI_WIL_GET_NETWORK_STATUS_RETURN_NODE_CONNECTED_BITMASK_OFFSET);
-         */
+            return managers[0].GetEEPROM().Concat(managers.Length > 1 ? managers[1].GetEEPROM() : new byte[0] {}).ToArray();            
+        }
     }
 }

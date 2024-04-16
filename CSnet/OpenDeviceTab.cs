@@ -157,6 +157,5 @@ namespace CSnet
         {
             deviceModel.SetupBETLower();
         }
-
     }
 }

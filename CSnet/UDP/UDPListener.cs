@@ -11,32 +11,13 @@ namespace CSnet
 {
     public abstract class UDPListener : IUDPListener
     {
-        public const byte BMSPACKET = 0;
-        public const byte BMSTEMPPACKET = 1;
-        public const byte PMSPACKET = 2;
-        public const byte EMSPACKET = 3;
-        public const byte ModuleVersion = 4;
-        public const byte PackVersion = 5;
-        public const byte DiagnosticVoltage = 6;
-        public const byte Latency = 7;
-        public const byte TotalPECErrors = 8;
-        public const byte AverageUpdateRate = 9;
-        public const byte PeakUpdateRate = 10;
-        public const byte AverageRSSI = 11;
-        public const byte PeakRSSI = 12;
-        public const byte SetACL = 13;
-        public const byte BEV = 14;
-        public const byte BET = 15;
-        public const byte OP90 = 16;
-        public const byte BETLower = 17;
-        protected const byte Timings = 18;
-        protected const byte VoltAndCurrent = 19;
-        protected const byte HVDC = 20;
+        protected const byte BMSPACKET = 0;
+        protected const byte BMSTEMPPACKET = 1;
 
         protected ISocket server;
         protected Dictionary<string, DeviceModel> devices;
 
-        public UDPListener(ISocket server, Dictionary<string, DeviceModel> devices)//TODO: MVC this, so that I don't have to pass in a UI element & then hunt through it
+        public UDPListener(ISocket server, Dictionary<string, DeviceModel> devices)
         {
             this.server = server;
             this.devices = devices;
