@@ -756,6 +756,8 @@ namespace CSnet
                 }
             }
 
+            IsSetup = false;
+
             SetMode(ADI_WIL_MODE_STANDBY);
 
             SendGenericCommand(ADI_WIL_API_SET_ACL, ACLList.ToArray());
@@ -1091,7 +1093,7 @@ namespace CSnet
         }
         public void PrettyPrintPMS(ListBox box)
         {
-            if (managers[0].AUX1 == managers[0].AUX2 && managers[0].AUX3 == managers[0].AUX7)
+            if (managers[0].SanityCheck())
             {
                 //Sanity check, to see if BDSB is return FFFFFFFFF
                 box.Items.Add("Turn on BDSB");
@@ -1100,13 +1102,13 @@ namespace CSnet
                 box.Items.Add($"BEV I1:{managers[0].I1:0.00}A I2:{managers[0].I2:0.00}A DCFC+:{managers[0].GetBEVDCFCPlus():0.00}V DCFC-:{managers[0].GetBEVDCFCMinus():0.00}V ShuntTemp:{managers[0].GetBEVShuntTemp():0.00}C ContactorTemp:{managers[0].GetBEVDCFCContactorTemp():0.00}C MainContactorTemp:{managers[0].GetBEVMainContactorTemp():0.00}C VRef:{managers[0].GetBEVVREF():0.00}V");
             } else if (BETLower)
             {
-                box.Items.Add($"BETB HVDC-:{managers[0].GetBETBHVDCMinus():0.00}V Diff:{managers[0].GetBETBDCFCDifferential():0.00}V DCFC-:{managers[0].GetBETBDCFCMinus():0.00}V DCFC+:{managers[0].GetBETBDCFCPlus():0.00}V SB1Temp:{managers[0].GetBETBSB1Temp():0.00}C ShuntTemp:{managers[0].GetBETBShuntTemp():0.00}C");
-                box.Items.Add($"BETA HVDC-:{managers[0].GetBETAHVDCMinus():0.00}V SA1Temp:{managers[0].GetBETASA1Temp():0.00}C SA4Temp:{managers[0].GetBETASA4Temp():0.00}C SA3Temp:{managers[0].GetBETASA3Temp():0.00}C ShuntTemp:{managers[0].GetBETAShuntTemperature():0.00}C");
+                box.Items.Add($"VBat:{managers[0].VBAT} BETB HVDC+:{managers[0].GetBETBHVDCPositive():0.00}V HVDC-:{managers[0].GetBETBHVDCMinus():0.00}V Diff:{managers[0].GetBETBDCFCDifferential():0.00}V DCFC-:{managers[0].GetBETBDCFCMinus():0.00}V DCFC+:{managers[0].GetBETBDCFCPlus():0.00}V SB1Temp:{managers[0].GetBETBSB1Temp():0.00}C ShuntTemp:{managers[0].GetBETBShuntTemp():0.00}C");
+                box.Items.Add($"VBat:{managers[0].VBAT} BETA HVDC+:{managers[0].GetBETAHVDCPositive():0.00}V HVDC-:{managers[0].GetBETAHVDCMinus():0.00}V SA1Temp:{managers[0].GetBETASA1Temp():0.00}C SA4Temp:{managers[0].GetBETASA4Temp():0.00}C SA3Temp:{managers[0].GetBETASA3Temp():0.00}C ShuntTemp:{managers[0].GetBETAShuntTemperature():0.00}C");
             }
             else if (BET)
             {
-                box.Items.Add($"VBat:{managers[1].VBAT} BETB HVDC-:{managers[1].GetBETBHVDCMinus():0.00}V Diff:{managers[1].GetBETBDCFCDifferential():0.00}V DCFC-:{managers[1].GetBETBDCFCMinus():0.00}V DCFC+:{managers[1].GetBETBDCFCPlus():0.00}V SB1Temp:{managers[1].GetBETBSB1Temp():0.00}C ShuntTemp:{managers[1].GetBETBShuntTemp():0.00}C");
-                box.Items.Add($"VBat:{managers[0].VBAT} BETA HVDC-:{managers[0].GetBETAHVDCMinus():0.00}V SA1Temp:{managers[0].GetBETASA1Temp():0.00}C SA4Temp:{managers[0].GetBETASA4Temp():0.00}C SA3Temp:{managers[0].GetBETASA3Temp():0.00}C ShuntTemp:{managers[0].GetBETAShuntTemperature():0.00}C");
+                box.Items.Add($"VBat:{managers[1].VBAT} BETB HVDC+:{managers[1].GetBETBHVDCPositive():0.00}V HVDC-:{managers[1].GetBETBHVDCMinus():0.00}V Diff:{managers[1].GetBETBDCFCDifferential():0.00}V DCFC-:{managers[1].GetBETBDCFCMinus():0.00}V DCFC+:{managers[1].GetBETBDCFCPlus():0.00}V SB1Temp:{managers[1].GetBETBSB1Temp():0.00}C ShuntTemp:{managers[1].GetBETBShuntTemp():0.00}C");
+                box.Items.Add($"VBat:{managers[0].VBAT} BETA HVDC+:{managers[0].GetBETAHVDCPositive():0.00}V HVDC-:{managers[0].GetBETAHVDCMinus():0.00}V SA1Temp:{managers[0].GetBETASA1Temp():0.00}C SA4Temp:{managers[0].GetBETASA4Temp():0.00}C SA3Temp:{managers[0].GetBETASA3Temp():0.00}C ShuntTemp:{managers[0].GetBETAShuntTemperature():0.00}C");
             }
         }
         public bool WaitForModulesToConnect()
@@ -1140,7 +1142,7 @@ namespace CSnet
                 }
                 timeoutCounter++;
                 Thread.Sleep(1000);
-            } while (timeoutCounter < 10);
+            } while (timeoutCounter < 20);
             MessageBox.Show("Connecting to modules took a long time, check ACL is correct");
             return false;
         }

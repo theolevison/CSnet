@@ -82,15 +82,10 @@ namespace CSnet
                         int data1 = device.modules[data[7]].TotalPECErrors;
                         return BitConverter.GetBytes(data1);
                     }
-                case AverageUpdateRate:
-                    
+                case AverageUpdateRate:                    
                         return Converter.DoubleToInt16Byte(device.modules[data[7]].AverageUpdateRate);
-                        
-                    
-                case PeakUpdateRate:
-                    
+                case PeakUpdateRate:                    
                         return Converter.DoubleToInt16Byte(device.modules[data[7]].PeakUpdateRate);
-                    
                 case AverageRSSI:
                     {
                         int data1 = device.modules[data[7]].AverageRSSI;

@@ -107,8 +107,6 @@ namespace CSnet
             return Converter.DoubleArrayToBytes(CGV);
         }
 
-        
-
         public void UpdateMetadata(byte[] packet, uint packetID)
         {
             if (packetID == 0)
