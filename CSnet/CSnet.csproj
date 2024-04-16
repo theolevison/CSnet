@@ -126,7 +126,9 @@
     <Compile Include="OpenDeviceTab.Designer.cs">
       <DependentUpon>OpenDeviceTab.cs</DependentUpon>
     </Compile>
+    <Compile Include="UDP\IUDPListener.cs" />
     <Compile Include="UDP\SocketWrapper.cs" />
+    <Compile Include="UDP\UDPController.cs" />
     <Compile Include="UDP\UDPOP140.cs" />
     <Compile Include="UDP\UDPGeneric.cs" />
     <Compile Include="UDP\UDPListener.cs" />

@@ -56,8 +56,8 @@ namespace CSnet
                 {
                     for (int i = 0; i < 12; i++)
                     {
-                        tempPacket = tempPacket.Concat(BitConverter.GetBytes((Int16)device.modules[i].Thermistor1 * 100))
-                        .Concat(BitConverter.GetBytes((Int16)device.modules[i].Thermistor2 * 100)).ToArray();
+                        tempPacket = tempPacket.Concat(Converter.DoubleToInt16Byte(device.modules[i].Thermistor1))
+                        .Concat(Converter.DoubleToInt16Byte(device.modules[i].Thermistor2)).ToArray();
                     }
 
                     return tempPacket;
@@ -66,8 +66,8 @@ namespace CSnet
                 {
                     for (int i = 0; i < 24; i++)
                     {
-                        tempPacket = tempPacket.Concat(BitConverter.GetBytes((Int16)device.modules[i].Thermistor1 * 100))
-                        .Concat(BitConverter.GetBytes((Int16)device.modules[i].Thermistor2 * 100)).ToArray();
+                        tempPacket = tempPacket.Concat(Converter.DoubleToInt16Byte(device.modules[i].Thermistor1))
+                        .Concat(Converter.DoubleToInt16Byte(device.modules[i].Thermistor2)).ToArray();
                     }
 
                     return tempPacket;

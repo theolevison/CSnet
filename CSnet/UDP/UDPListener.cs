@@ -5,10 +5,11 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Windows.Forms;
+using CSnet.UDP;
 
 namespace CSnet
 {
-    public abstract class UDPListener
+    public abstract class UDPListener : IUDPListener
     {
         public const byte BMSPACKET = 0;
         public const byte BMSTEMPPACKET = 1;

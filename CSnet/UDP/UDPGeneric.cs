@@ -61,11 +61,9 @@ namespace CSnet
                         return tempPacket;
                     }
                 case PMSPACKET:
-                    {
-                        return device.GetPMS();
-                    }
+                    return device.GetPMS();
                 case EMSPACKET:                    
-                        return device.managers[0].GetEMS(); //TODO: make this int
+                    return device.managers[0].GetEMS(); //TODO: make this int
                 case ModuleVersion:
                     return BitConverter.GetBytes(device.modules[data[7]].version);
                 case PackVersion:
@@ -105,13 +103,10 @@ namespace CSnet
                     //protected const byte VoltAndCurrent = 19;
                     //protected const byte HVDC = 20;
                     return device.GetTimings();
-
                 case HVDC:
                     return device.GetTimings();
                 default:
-                    {
-                        return ReturnFF();
-                    }
+                    return ReturnFF();
             }
         }
     }

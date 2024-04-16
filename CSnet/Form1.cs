@@ -11,6 +11,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
 using System.Windows.Forms;
+using CSnet.UDP;
 using LiuQF.Common;
 
 namespace CSnet
@@ -54,7 +55,7 @@ namespace CSnet
             }
         }
 
-        private void OpenDevices()
+        public void OpenDevices()
         {
             byte[] bNetwork = new byte[MAX_DEVICES];    //List of hardware IDs
             int iCount;		 //counter
@@ -103,6 +104,11 @@ namespace CSnet
 
         private void CmdCloseDevice_Click(object sender, EventArgs e)
         {
+            CloseDevices();
+        }
+
+        public void CloseDevices()
+        {
             if (Timer1.Enabled == true)
             {
                 Timer1.Enabled = false;
@@ -111,13 +117,13 @@ namespace CSnet
             //close tabs
             foreach (TabPage tabPage in TabControl1.TabPages)
             {
-                TabControl1.TabPages.Remove(tabPage);               
+                TabControl1.TabPages.Remove(tabPage);
             }
 
             //close devices
-            foreach(DeviceModel device in devices.Values)
+            foreach (DeviceModel device in devices.Values)
             {
-               device.CloseDevice();
+                device.CloseDevice();
             }
             devices.Clear();
         }
@@ -125,14 +131,14 @@ namespace CSnet
         private void Form1_Load(object sender, EventArgs e)
         {
             //开启线程
-            
-            
             StartUDPServer(new UDPGeneric(new SocketWrapper("127.0.0.1", 9011), devices));
-            /*
-            StartUDPServer(new UDPOP140(new SocketWrapper("192.168.3.100", 9020), devices));
-            StartUDPServer(new UDPOP140(new SocketWrapper("192.168.3.100", 9021), devices));
-            StartUDPServer(new UDPOP140(new SocketWrapper("192.168.3.100", 9022), devices));
-            */
+
+            StartUDPServer(new UDPController(new SocketWrapper("127.0.0.1", 5025), this));
+            
+            StartUDPServer(new UDPOP140(new SocketWrapper("127.0.0.1", 9020), devices));
+            StartUDPServer(new UDPOP140(new SocketWrapper("127.0.0.1", 9021), devices));
+            StartUDPServer(new UDPOP140(new SocketWrapper("127.0.0.1", 9022), devices));
+            
 
             //Add the version number to the title of the application.  
             try
@@ -145,7 +151,7 @@ namespace CSnet
             }
         }
 
-        private void StartUDPServer(UDPListener listener)
+        private void StartUDPServer(IUDPListener listener)
         {
             ThreadStart ts = new ThreadStart(listener.Start);
             Thread tc = new Thread(ts);
