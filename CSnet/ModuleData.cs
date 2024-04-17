@@ -19,7 +19,7 @@ namespace CSnet
         public byte[] Thermistor1Raw { get; set; } = new byte[2];
         public double Thermistor2 { get; set; }
         public byte[] Thermistor2Raw { get; set; } = new byte[2];
-        public double BMSMessageTimestamp { get; set; } = 0;
+        public double OldPktTimestamp { get; set; } = 0;
 
 
         //CMU Performance
@@ -31,16 +31,6 @@ namespace CSnet
         public Int16 PeakRSSI { get; set; }
         public Int16 UpdateRateCount { get; set; } = 0;
 
-        private void CalculatePECError(byte[] packetSlice) //TODO: implement for all data, not just READA
-        {
-            ushort uiReceivedPEC = (ushort)((packetSlice[6] << 8 | packetSlice[7]) & 0x03FF);
-
-            if (adi_pec10_calc(true, 6, packetSlice) != uiReceivedPEC)
-            {
-                TotalPECErrors++;
-            }
-        }
-
         public void UpdateData(byte[] packet, uint packetID, double time)
         {
             if (packetID == 0)
@@ -48,23 +38,24 @@ namespace CSnet
                 Packet0 = packet;
 
                 //ignore the initial value of 0
-                if (BMSMessageTimestamp == 0)
+                if (OldPktTimestamp == 0)
                 {
-                    BMSMessageTimestamp = time;
+                    OldPktTimestamp = time;
                 }
 
-                double difference = Math.Abs(time - BMSMessageTimestamp);
+                double difference = Math.Abs(time - OldPktTimestamp);
                 if (difference > PeakUpdateRate)
                 {
-                    PeakUpdateRate = difference;
-                }
-                //Debug.WriteLine($"Update {MacAddress} pu: {PeakUpdateRate} diff: {difference} pa: {AverageUpdateRate}");
+                    PeakUpdateRate = difference;//all times are measured in seconds
+                }               
 
-                BMSMessageTimestamp = time; //time measured in seconds since device turned on, save for next iteration
+                OldPktTimestamp = time; //time measured in seconds since device turned on, save for next iteration
 
                 //calculate cumulative average for time between packets
-                AverageUpdateRate = (difference + UpdateRateCount * AverageUpdateRate) / (UpdateRateCount + 1);
+                AverageUpdateRate = (difference + (UpdateRateCount * AverageUpdateRate)) / (UpdateRateCount + 1);
                 UpdateRateCount++;
+
+                Debug.WriteLine($"Update {MacAddress} time: {time} p: {PeakUpdateRate} diff: {difference} a: {AverageUpdateRate}");
 
                 //modules[uiDeviceSource].AverageUpdateRate;
                 //modules[uiDeviceSource].PeakUpdateRate;
@@ -88,7 +79,8 @@ namespace CSnet
                 CGDV[7] = BitConverter.ToInt16(packet, 64) * 0.0002;
 
                 //Want C# 8 for packet[6..12] :(
-                CalculatePECError(packet.Skip(6).Take(8).ToArray());
+                TotalPECErrors += Converter.CalculatePECError(packet.Skip(6).Take(8).ToArray()); 
+                //TODO: use C packet definitions/structs to structure packets as they come in, and then iterate through each read & apply PEC method
             }
             else if (packetID == 1)
             {
@@ -156,53 +148,6 @@ namespace CSnet
             return temp;
         }
 
-        public static ushort adi_pec10_calc(bool rx_cmd, int len, byte[] data)
-        {
-            ushort remainder = 16; /* PEC_SEED;   0000010000 */
-            ushort polynom = 0x48F; /* x10 + x7 + x3 + x2 + x + 1 <- the CRC10 polynomial         100 1000 1111   48F */
-
-            /* Perform modulo-2 division, a byte at a time. */
-            for (int pbyte = 0; pbyte < len; ++pbyte)
-            {
-                /* Bring the next byte into the remainder. */
-                remainder ^= (ushort)(data[pbyte] << 2);
-
-                /* Perform modulo-2 division, a bit at a time.*/
-                for (int bit_ = 8; bit_ > 0; --bit_)
-                {
-                    /* Try to divide the current data bit. */
-                    if ((remainder & 0x200) > 0) /* equivalent to remainder & 2^14 simply check for MSB */
-                    {
-                        remainder = (ushort)(remainder << 1);
-                        remainder = (ushort)(remainder ^ polynom);
-                    }
-                    else
-                    {
-                        remainder = (ushort)(remainder << 1);
-                    }
-                }
-            }
-
-            if (rx_cmd == true)
-            {
-                remainder ^= (ushort)((data[len] & 0xFC) << 2);
-
-                /* Perform modulo-2 division, a bit at a time */
-                for (int bit_ = 6; bit_ > 0; --bit_)
-                {
-                    /* Try to divide the current data bit */
-                    if ((remainder & 0x200) > 0) /* equivalent to remainder & 2^14 simply check for MSB */
-                    {
-                        remainder = (ushort)(remainder << 1);
-                        remainder = (ushort)(remainder ^ polynom);
-                    }
-                    else
-                    {
-                        remainder = (ushort)(remainder << 1);
-                    }
-                }
-            }
-            return (ushort)(remainder & 0x3FF);
-        }
+        
     }
 }

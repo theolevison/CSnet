@@ -118,7 +118,7 @@
             this.GPIOHigh.Name = "GPIOHigh";
             this.GPIOHigh.Size = new System.Drawing.Size(136, 64);
             this.GPIOHigh.TabIndex = 47;
-            this.GPIOHigh.Text = "Turn on BDSB";
+            this.GPIOHigh.Text = "Reset BDSB";
             this.GPIOHigh.Click += new System.EventHandler(this.GPIOHigh_Click);
             // 
             // label3
@@ -388,7 +388,7 @@
             // Timer1
             // 
             this.Timer1.Enabled = true;
-            this.Timer1.Interval = 500;
+            this.Timer1.Interval = 70;
             this.Timer1.Tick += new System.EventHandler(this.Timer1_Tick);
             // 
             // panel1

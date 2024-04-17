@@ -335,7 +335,7 @@ namespace CSnet
         private double EMSGasTransferFunction(double sensorVoltage, double referenceVoltage)
         {
             double temp = (sensorVoltage / referenceVoltage - 0.1) / 0.05; ;
-            return ((sensorVoltage / referenceVoltage - 0.1) / 0.05) * 10000; //convert to ppm
+            return ((sensorVoltage / referenceVoltage - 0.1) / 0.05) * 10000; //convert % to ppm
         }
         public double EMSReferenceVoltage1()
         {

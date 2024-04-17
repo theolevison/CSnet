@@ -276,6 +276,8 @@ namespace CSnet
             CMUWatch.Stop();
             secondsToAllCMUConnecting = CMUWatch.ElapsedMilliseconds * 0.001;
 
+            Thread.Sleep(4000); //TODO: clear message buffer here, so that there is no gap between messages read
+
             IsSetup = true;
             return true;
         }
@@ -328,7 +330,7 @@ namespace CSnet
             mysettings.Settings.spi_config.port_b.config.value = managerSetting;
 
             mysettings.Settings.wbms_wil_1.using_port_a = 1;
-            if (BET)
+            if (BET || (!BET && !BEV && !BETLower)) //BET or OP90
             {
                 mysettings.Settings.wbms_wil_1.using_port_b = 1;
             }

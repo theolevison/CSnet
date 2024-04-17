@@ -19,7 +19,7 @@ namespace UltimWBMSTests.UDPTests
             byte[] output = Converter.DoubleToInt16Byte(1.2345);
 
             //Assert
-            output.Should().Equal(0x7B, 0x00);
+            output.Should().Equal(0x7B, 0x00); //0123
         }
         [Fact]
         public void DoubleToInt16Byte_LongDouble_ReturnsShortenedInt16Bytes()
