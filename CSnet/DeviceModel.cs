@@ -276,7 +276,11 @@ namespace CSnet
             CMUWatch.Stop();
             secondsToAllCMUConnecting = CMUWatch.ElapsedMilliseconds * 0.001;
 
-            Thread.Sleep(4000); //TODO: clear message buffer here, so that there is no gap between messages read
+            int lNumberOfMessages = 0;
+            int lNumberOfErrors = 0;
+
+            //clear the message buffer, to correctly measure the time between messages
+            icsNeoDll.icsneoGetMessages(m_hObject, ref stMessages[0], ref lNumberOfMessages, ref lNumberOfErrors);
 
             IsSetup = true;
             return true;
