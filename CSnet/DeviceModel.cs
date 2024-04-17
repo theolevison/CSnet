@@ -695,7 +695,7 @@ namespace CSnet
             if (uCurrentFunction != function || iResult != 1) //1 is success
             {
                 //Handle Error Here
-                MessageBox.Show($"Read error {iResult}");
+                //MessageBox.Show($"Read error {iResult}");
             }
 
             return Marshal.UnsafeAddrOfPinnedArrayElement(pReturnedData, 0);

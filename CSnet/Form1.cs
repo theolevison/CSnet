@@ -57,47 +57,54 @@ namespace CSnet
 
         public void OpenDevices()
         {
-            byte[] bNetwork = new byte[MAX_DEVICES];    //List of hardware IDs
-            int iCount;		 //counter
-
-            //File NetworkID array
-            for (iCount = 0; iCount < MAX_DEVICES; iCount++)
+            if (InvokeRequired)
             {
-                bNetwork[iCount] = Convert.ToByte(iCount);
+                BeginInvoke(new MethodInvoker(OpenDevices));
             }
-
-            UInt32 StringSize = 6;
-            byte[] bSN = new byte[6];
-
-            OptionsOpenNeoEx OptionOpenNeoEX = new OptionsOpenNeoEx();
-
-            for (int i = 0; i < numberOfDevicesFound; i++)
+            else
             {
-                //Convert the Serial number to a String
-                icsNeoDll.icsneoSerialNumberToString(Convert.ToUInt32(ndNeoToOpenex[i].neoDevice.SerialNumber), ref bSN[0], ref StringSize);
-                string sConvertedSN = Encoding.ASCII.GetString(bSN);
+                byte[] bNetwork = new byte[MAX_DEVICES];    //List of hardware IDs
+                int iCount;      //counter
 
-                //keep track of devices that have already been opened
-                if (!devices.ContainsKey(sConvertedSN))
+                //File NetworkID array
+                for (iCount = 0; iCount < MAX_DEVICES; iCount++)
                 {
-                    IntPtr anonymousPointer = IntPtr.Zero;
-                    int iResult = icsNeoDll.icsneoOpenDevice(ref ndNeoToOpenex[i], ref anonymousPointer, ref bNetwork[0], 1, 0, ref OptionOpenNeoEX, 0);
-                    if (iResult != 1)
+                    bNetwork[iCount] = Convert.ToByte(iCount);
+                }
+
+                UInt32 StringSize = 6;
+                byte[] bSN = new byte[6];
+
+                OptionsOpenNeoEx OptionOpenNeoEX = new OptionsOpenNeoEx();
+
+                for (int i = 0; i < numberOfDevicesFound; i++)
+                {
+                    //Convert the Serial number to a String
+                    icsNeoDll.icsneoSerialNumberToString(Convert.ToUInt32(ndNeoToOpenex[i].neoDevice.SerialNumber), ref bSN[0], ref StringSize);
+                    string sConvertedSN = Encoding.ASCII.GetString(bSN);
+
+                    //keep track of devices that have already been opened
+                    if (!devices.ContainsKey(sConvertedSN))
                     {
-                        //MessageBox.Show("Problem Opening Port");
-                        Debug.WriteLine("Device not opened");
-                        return;
+                        IntPtr anonymousPointer = IntPtr.Zero;
+                        int iResult = icsNeoDll.icsneoOpenDevice(ref ndNeoToOpenex[i], ref anonymousPointer, ref bNetwork[0], 1, 0, ref OptionOpenNeoEX, 0);
+                        if (iResult != 1)
+                        {
+                            //MessageBox.Show("Problem Opening Port");
+                            Debug.WriteLine("Device not opened");
+                            return;
+                        }
+
+                        //create new tab per device
+                        TabPage tabPage = new TabPage($"Device {sConvertedSN}");
+
+                        DeviceModel model = new DeviceModel(ref anonymousPointer, sConvertedSN);
+                        devices.Add(sConvertedSN, model);
+
+
+                        tabPage.Controls.Add(new OpenDeviceTab(model) { Name = $"{sConvertedSN}" });
+                        TabControl1.TabPages.Add(tabPage);
                     }
-
-                    //create new tab per device
-                    TabPage tabPage = new TabPage($"Device {sConvertedSN}");
-
-                    DeviceModel model = new DeviceModel(ref anonymousPointer, sConvertedSN);
-                    devices.Add(sConvertedSN, model);
-                    
-                    
-                    tabPage.Controls.Add(new OpenDeviceTab(model) { Name = $"{sConvertedSN}" });
-                    TabControl1.TabPages.Add(tabPage);
                 }
             }
         }
@@ -109,23 +116,30 @@ namespace CSnet
 
         public void CloseDevices()
         {
-            if (Timer1.Enabled == true)
+            if (InvokeRequired)
             {
-                Timer1.Enabled = false;
+                BeginInvoke(new MethodInvoker(CloseDevices));
             }
+            else
+            {
+                if (Timer1.Enabled == true)
+                {
+                    Timer1.Enabled = false;
+                }
 
-            //close tabs
-            foreach (TabPage tabPage in TabControl1.TabPages)
-            {
-                TabControl1.TabPages.Remove(tabPage);
-            }
+                //close tabs
+                foreach (TabPage tabPage in TabControl1.TabPages)
+                {
+                    TabControl1.TabPages.Remove(tabPage);
+                }
 
-            //close devices
-            foreach (DeviceModel device in devices.Values)
-            {
-                device.CloseDevice();
+                //close devices
+                foreach (DeviceModel device in devices.Values)
+                {
+                    device.CloseDevice();
+                }
+                devices.Clear();
             }
-            devices.Clear();
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -133,7 +147,7 @@ namespace CSnet
             //开启线程
             StartUDPServer(new UDPGeneric(new SocketWrapper("127.0.0.1", 9011), devices));
 
-            StartUDPServer(new UDPController(new SocketWrapper("127.0.0.1", 5025), this));
+            StartUDPServer(new UDPController(new SocketWrapper("127.0.0.1", 5025), this)); 
             
             StartUDPServer(new UDPOP140(new SocketWrapper("127.0.0.1", 9020), devices));
             StartUDPServer(new UDPOP140(new SocketWrapper("127.0.0.1", 9021), devices));

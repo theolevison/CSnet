@@ -211,7 +211,7 @@ namespace CSnet
         }
         public byte[] GetBETAPMS()
         {
-            return Converter.DoubleToInt16Byte(GetBETAHVDCMinus()) //Div says, there is no HVDC plus
+            return Converter.DoubleToInt16Byte(Math.Abs(GetBETAHVDCMinus())) //Div says, there is no HVDC plus
                 .Concat(Converter.DoubleToInt16Byte(GetBETAIsolationSwitch()))
                 .Concat(Converter.DoubleToInt16Byte(GetBETAShuntTemperature()))
                 .Concat(Converter.DoubleToInt16Byte(GetBETASA1Temp()))
@@ -273,7 +273,7 @@ namespace CSnet
 
         public byte[] GetBETBPMS()
         {
-            return Converter.DoubleToInt16Byte(GetBETBHVDCMinus())
+            return Converter.DoubleToInt16Byte(Math.Abs(GetBETBHVDCMinus()))
                 .Concat(Converter.DoubleToInt16Byte(GetBETBDCFCPlus()))
                 .Concat(Converter.DoubleToInt16Byte(GetBETBDCFCMinus()))
                 .Concat(Converter.DoubleToInt16Byte(GetBETBDCFCDifferential()))
