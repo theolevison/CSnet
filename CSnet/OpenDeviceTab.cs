@@ -45,7 +45,8 @@ namespace CSnet
 
         private void OTAP_Click(object sender, EventArgs e)
         {
-            deviceModel.OTAP();
+            deviceModel.SelectEEPROMScript();
+            //deviceModel.OTAP();
         }
         private void GetMessages_Click(object sender, EventArgs e)
         {

@@ -346,6 +346,27 @@ namespace CSnet
             icsNeoDll.icsneoSetDeviceSettings(m_hObject, ref mysettings, Marshal.SizeOf(mysettings), 1, 0);  //write settings struct
         }
 
+        public void SelectEEPROMScript()
+        {
+            SelectScript(3);
+        }
+
+        private void SelectScript(byte scriptId)
+        {
+            byte[] parameters = new byte[10];
+            ulong deviceID = ADI_WIL_DEV_MANAGER_0;
+            BitConverter.GetBytes(deviceID).CopyTo(parameters, 0);
+
+            parameters[8] = 1;
+            parameters[9] = 3;
+            /*
+            BitConverter.GetBytes(1).CopyTo(parameters, 8); //ADI_WIL_SENSOR_ID_PMS 1
+            parameters[12] = scriptId;
+            */
+
+            SendGenericCommand(ADI_WIL_API_SELECT_SCRIPT, parameters);
+        }
+
         private void OTAP(Stream fileStream)
         {
             SetMode(ADI_WIL_MODE_STANDBY);

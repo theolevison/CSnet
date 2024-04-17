@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Deployment.Application;
 using System.Diagnostics;
@@ -81,9 +82,42 @@ namespace CSnet
                 case 3:
                     AUX11 = BitConverter.ToUInt16(packet, 19) * 0.000375183;
                     break;
-                case 4:
+                case 6:
+                    //redirect EEPROM pms data
+                    UpdatePMSData(packet, 0);
+                    break;
+                case 7:
+                    UpdatePMSData(packet, 1);
+                    break;
+                case 8:
+                    UpdatePMSData(packet, 2);
+                    break;
+                case 9:
+                    UpdatePMSData(packet, 3);
+                    break;
+                case 10:
                     //EEPROM data
+                    byte one = packet[6];
+                    byte two = packet[7];
+                    double mantissa = BitConverter.ToUInt16(new byte[] { one, (byte)(two & 0xFC) }, 0) * 0.000610352;
+                    int magnitude = two & 0x03; //turns ohms into micro etc using the below encoding
+                    /*
+                    Encoding: 
+                    0: -6 
+                    1: -5 
+                    2: -4 
+                    3: -3
+                     */
+                    int shuntCombo = BitConverter.ToUInt16(packet, 6);
+                    double mantissaTest = (shuntCombo >> 2) * 0.000610352; //ohms
+                    int shuntResInverse = BitConverter.ToUInt16(packet, 8);
 
+                    double coefficient1 = BitConverter.ToUInt16(packet, 12) * 0.25; //ppm
+                    double reference = packet[14] * 0.5; //celsius
+                    int inverse1 = BitConverter.ToUInt16(packet, 15);
+
+                    double coefficient2 = BitConverter.ToUInt16(packet, 18)  * 0.0001; //ppm
+                    int inverse2 = BitConverter.ToUInt16(packet, 20);
                     break;
             }
         }

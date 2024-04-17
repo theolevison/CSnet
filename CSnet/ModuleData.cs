@@ -55,7 +55,7 @@ namespace CSnet
                 AverageUpdateRate = (difference + (UpdateRateCount * AverageUpdateRate)) / (UpdateRateCount + 1);
                 UpdateRateCount++;
 
-                Debug.WriteLine($"Update {MacAddress} time: {time} p: {PeakUpdateRate} diff: {difference} a: {AverageUpdateRate}");
+                //Debug.WriteLine($"Update {MacAddress} time: {time} p: {PeakUpdateRate} diff: {difference} a: {AverageUpdateRate}");
 
                 //modules[uiDeviceSource].AverageUpdateRate;
                 //modules[uiDeviceSource].PeakUpdateRate;
